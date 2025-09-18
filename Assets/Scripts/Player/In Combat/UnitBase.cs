@@ -1,0 +1,102 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class UnitBase : MonoBehaviour
+{
+    [Header("Stats")]
+    [SerializeField] private string _name;
+    [SerializeField] private float _health;
+    [SerializeField] private float _maxHealth;
+    [SerializeField] private float _speed;
+    [SerializeField] private float _accumulatedSpeed;
+    [SerializeField] private float _speedNextTurn;
+    [SerializeField] private float _damage;
+    [SerializeField] private bool _isItsTurn;
+    [SerializeField] private EUnitTeam _team;
+    [SerializeField] private Animator _animator;
+    [SerializeField] private UnitBase _target;
+
+    public string Name => _name;
+    public float Health => _health;
+    public float MaxHealth => _maxHealth;
+    public float Speed => _speed;
+    public float AccumulatedSpeed => _accumulatedSpeed;
+    public float SpeedNextTurn => _speedNextTurn;
+    public float Damage => _damage;
+    public bool IsItsTurn => _isItsTurn;
+    public EUnitTeam Team => _team;
+
+    public static UnitBase Instance { get; private set; }
+
+    public event Action<float, float> OnUnitTookDamage;
+    public event Action OnEndAttack;
+
+    private void Awake()
+    {
+        _animator = GetComponent<Animator>();
+    }
+
+    public void StartAttackAnimation(UnitBase target)
+    {
+        _target = target;
+        _animator.SetTrigger("IsAttacking");
+    }
+    public void EndAttackAnimation()
+    {
+        Debug.Log("EndAttackAnimation invocato!");
+        OnEndAttack?.Invoke();
+    }
+
+    public void Attack()
+    {
+        float finalDamage = _damage;
+        Debug.Log($"{_name} has attacked {_target._name}. Damage inflicted: {finalDamage}.");
+        _target.TakeDamage(finalDamage);
+
+        _target = null;
+    }
+
+    protected virtual void TakeDamage(float damage)
+    {
+        _health -= damage;
+        OnUnitTookDamage?.Invoke(_health, _maxHealth);
+    }
+
+    protected virtual void Heal(float heal)
+    {
+        if (_health + heal > _maxHealth)
+            _health = _maxHealth;
+        else if (_health == _maxHealth)
+            Debug.Log("You're full health");
+        else
+            _health += heal;
+    }
+
+    public virtual void StartTurn()
+{
+        _isItsTurn = true;
+        _accumulatedSpeed += Speed;
+        Debug.Log($"{_name} has started the turn {_speed}.\n" +
+                  $"Current accumulated speed: {_accumulatedSpeed}.");
+    }
+
+    public virtual void EndTurn()
+    {
+        _isItsTurn = false;
+        Debug.Log($"{_name} has ended the turn");
+    }
+
+    public virtual void SetSpeed(int speed)
+    {
+        _speed = speed;
+    }
+
+    public virtual void ResetAccumulatedSpeed()
+    {
+        _accumulatedSpeed -= _speedNextTurn;
+        Debug.Log($"Reset speed, current accumulated speed: {_accumulatedSpeed}.");
+    }
+
+}

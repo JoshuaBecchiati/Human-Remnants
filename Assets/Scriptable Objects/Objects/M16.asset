@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4012c45b961f3f74a8719546b970e09f, type: 3}
+  m_Name: M16
+  m_EditorClassIdentifier: 
+  Name: M16
+  Prefab: {fileID: 782097213702016694, guid: 5a53f01905629bc4398cf40f000d2689, type: 3}
+  Damage: 10
+  WeaponType: 0
+  Type: 0
+  _projectile: {fileID: 8278458599917914750, guid: d8ee43e88eb17934ba6f35982761c9eb,
+    type: 3}
+  _forceProjectile: 16
+  _reloadTime: 3
+  _fireRate: 10
+  _magazineSize: 16
+  _magazine: 16
