@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -29,6 +30,7 @@ public class CharCtrl : MonoBehaviour
 
 
     private bool _isJumping;
+    private bool _isClimbing;
     private float _verticalVelocity = 0f;
 
     /*
@@ -114,22 +116,79 @@ public class CharCtrl : MonoBehaviour
         _currentSpeed = Vector3.MoveTowards(_currentSpeed, _wantedSpeed, _acceleration * Time.deltaTime);
 
         // Gestione della gravità
-        if (_characterController.isGrounded && !_isJumping)
+        if(!_isClimbing)
         {
-            _verticalVelocity = -1f;
+            if (_characterController.isGrounded && !_isJumping)
+            {
+                _verticalVelocity = -1f;
+            }
+            else
+            {
+                // Calcolo della velocità verticale per far tornare il giocatore a terra
+                _verticalVelocity += -_gravity * Time.deltaTime;
+            }
+            _currentSpeed.y = _verticalVelocity;
         }
-        else
-        {
-            // Calcolo della velocità verticale per far tornare il giocatore a terra
-            _verticalVelocity += -_gravity * Time.deltaTime;
-        }
+        HandleClimbing();
 
-        _currentSpeed.y = _verticalVelocity;
+
 
         // Movimento effettivo
         _characterController.Move(_cameraPivot.TransformDirection(_currentSpeed) * Time.deltaTime);
 
         UpdateAnimation(_currentSpeed.x, _currentSpeed.z);
+    }
+
+    private void HandleClimbing()
+    {
+        Vector3 direction = Quaternion.Euler(0.0f, transform.eulerAngles.y, 0.0f) * Vector3.forward;
+
+        float maxDistance = .5f;
+        if(!_isClimbing)
+        {
+            if (Physics.Raycast(transform.position + Vector3.down * .85f, direction, out RaycastHit hit, maxDistance))
+            {
+                if (hit.transform.CompareTag("Ladder"))
+                {
+                    GrabLadder();
+                }
+            }
+        }
+        else
+        {
+            if (Physics.Raycast(transform.position + Vector3.down * .85f, direction, out RaycastHit hit, maxDistance))
+            {
+                if (!hit.transform.CompareTag("Ladder"))
+                {
+                    DropLadder();
+                    _verticalVelocity = 4f;
+                }
+            }
+            else
+            {
+                DropLadder();
+                _verticalVelocity = 4f;
+            }
+        }
+
+        if(_isClimbing)
+        {
+            _currentSpeed.y = _vertical * _speedMagnitude;
+
+            _currentSpeed.z = 0;
+            _currentSpeed.x = 0;
+            _verticalVelocity = 0f;
+            _isJumping = false; 
+        }
+    }
+
+    private void GrabLadder()
+    {
+        _isClimbing = true;
+    }
+    private void DropLadder()
+    {
+        _isClimbing = false;
     }
 
     private void UpdateAnimation(float x, float y)
