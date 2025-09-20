@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,10 @@ public class InventoryManager : MonoBehaviour
 
     // --- Static ---
     public static InventoryManager Instance { get; private set; }
+
+    // --- Proprieties ---
+    public event Action OnAddItem;
+    public event Action OnRemoveItem;
 
     private void Awake()
     {
@@ -29,6 +34,7 @@ public class InventoryManager : MonoBehaviour
         {
             _itemsData.Add(new(item, qty));
         }
+        OnAddItem?.Invoke();
     }
 
     /// <summary>
@@ -42,6 +48,7 @@ public class InventoryManager : MonoBehaviour
         if (_itemsData[index].qty <= 0)
             _itemsData.RemoveAt(index);
         UIBattleManager.Instance.UpdateUI();
+        OnRemoveItem?.Invoke();
     }
 
     /// <summary>
@@ -55,6 +62,7 @@ public class InventoryManager : MonoBehaviour
         _itemsData[index].qty -= qty;
         if(_itemsData[index].qty <= 0)
             _itemsData.RemoveAt(index);
+        OnRemoveItem?.Invoke();
     }
 
 

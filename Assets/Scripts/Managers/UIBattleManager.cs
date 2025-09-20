@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIBattleManager : MonoBehaviour
 {
+    [Header("Menù")]
+    [SerializeField] private List<GameObject> m_menus = new();
+
     [Header("Health bar")]
     [SerializeField] private Transform m_playerUIParent;
     [SerializeField] private Transform m_enemyUIParent;
@@ -93,5 +97,11 @@ public class UIBattleManager : MonoBehaviour
         foreach (Transform Child in m_itemUIParent)
             Destroy(Child.gameObject);
         CreateInvUI();
+    }
+
+    public void NextMenu(int nextMenu)
+    {
+        m_menus.Find(m => m.gameObject.activeInHierarchy == true).SetActive(false);
+        m_menus[nextMenu].SetActive(true);
     }
 }
