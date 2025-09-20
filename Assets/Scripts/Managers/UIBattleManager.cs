@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +12,19 @@ public class UIBattleManager : MonoBehaviour
     [Header("Inventory")]
     [SerializeField] private Transform m_itemUIParent;
     [SerializeField] private GameObject m_itemPrefab;
+
+    // --- Static ---
+    public static UIBattleManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     private void OnEnable()
     {
@@ -76,5 +86,12 @@ public class UIBattleManager : MonoBehaviour
             itemGO.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
             itemQtyTMP.text = $"x{itemData.qty}";
         }
+    }
+
+    public void UpdateUI()
+    {
+        foreach (Transform Child in m_itemUIParent)
+            Destroy(Child.gameObject);
+        CreateInvUI();
     }
 }

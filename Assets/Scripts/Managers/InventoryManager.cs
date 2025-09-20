@@ -1,13 +1,9 @@
 using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-    [SerializeField] private List<Item> _items = new();
-
-    private List<ItemData> _itemsData = new();
+    [SerializeField] private List<ItemData> _itemsData = new();
 
     // --- Static ---
     public static InventoryManager Instance { get; private set; }
@@ -20,14 +16,47 @@ public class InventoryManager : MonoBehaviour
             return;
         }
         Instance = this;
-        AddItem();
     }
 
-    private void AddItem()
+    public void AddItem(Item item, int qty)
     {
-        foreach (Item item in _items)
-            _itemsData.Add(new(item));
+        if (_itemsData.Exists(i => i.item == item))
+        {
+            int index = _itemsData.FindIndex(i => i.item == item);
+            _itemsData[index].qty += qty;
+        }
+        else
+        {
+            _itemsData.Add(new(item, qty));
+        }
     }
+
+    /// <summary>
+    /// Remove item in combat
+    /// </summary>
+    /// <param name="item"></param>
+    public void RemoveItem(ItemData item)
+    {
+        int index = _itemsData.FindIndex(i => i == item);
+        _itemsData[index].qty -= 1;
+        if (_itemsData[index].qty <= 0)
+            _itemsData.RemoveAt(index);
+        UIBattleManager.Instance.UpdateUI();
+    }
+
+    /// <summary>
+    /// Remove item for crafting
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="qty"></param>
+    public void RemoveItem(ItemData item, int qty)
+    {
+        int index = _itemsData.FindIndex(i => i == item);
+        _itemsData[index].qty -= qty;
+        if(_itemsData[index].qty <= 0)
+            _itemsData.RemoveAt(index);
+    }
+
 
     public IReadOnlyList<ItemData> GetItems() => _itemsData;
 }

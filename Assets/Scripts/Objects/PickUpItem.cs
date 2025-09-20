@@ -4,17 +4,14 @@ using UnityEngine;
 public class PickUpItem : MonoBehaviour
 {
     [SerializeField] private Item item;
-    [SerializeField] private int qty;
+    [SerializeField] private int qty = 1;
 
 
     private void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("Player"))
         {
-            var player = col.GetComponent<Player>();
-            if (player == null) return;
-
-            //player.PickUpWeapon(_weapon);
+            InventoryManager.Instance.AddItem(item, qty);
             Destroy(gameObject);
         }
     }

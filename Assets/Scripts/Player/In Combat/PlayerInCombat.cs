@@ -32,6 +32,7 @@ public class PlayerInCombat : UnitBase, IPlayer
             Heal(healItem.HealAmount);
         else if (item.item is AttackItem attackItem)
             Attack(attackItem.DamageAmount);
+        InventoryManager.Instance.RemoveItem(item);
     }
 
     public void Attack(float damage)
