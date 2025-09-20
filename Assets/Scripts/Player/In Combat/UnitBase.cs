@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class UnitBase : MonoBehaviour
 {
     [Header("Stats")]
-    [SerializeField] private string _name;
+    [SerializeField] protected string _name;
     [SerializeField] private float _health;
     [SerializeField] private float _maxHealth;
     [SerializeField] private float _speed;
@@ -16,7 +16,7 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private bool _isItsTurn;
     [SerializeField] private EUnitTeam _team;
     [SerializeField] private Animator _animator;
-    [SerializeField] private UnitBase _target;
+    [SerializeField] protected UnitBase _target;
 
     public string Name => _name;
     public float Health => _health;
@@ -31,9 +31,10 @@ public abstract class UnitBase : MonoBehaviour
     public static UnitBase Instance { get; private set; }
 
     public event Action<float, float> OnUnitTookDamage;
+    public event Action<float, float> OnHeal;
     public event Action OnEndAttack;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _animator = GetComponent<Animator>();
     }
@@ -58,7 +59,7 @@ public abstract class UnitBase : MonoBehaviour
         _target = null;
     }
 
-    protected virtual void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         _health -= damage;
         OnUnitTookDamage?.Invoke(_health, _maxHealth);
@@ -72,6 +73,7 @@ public abstract class UnitBase : MonoBehaviour
             Debug.Log("You're full health");
         else
             _health += heal;
+        OnHeal?.Invoke(_health, _maxHealth);
     }
 
     public virtual void StartTurn()

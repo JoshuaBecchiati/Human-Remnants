@@ -1,35 +1,33 @@
+using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-    [SerializeField] private GameObject _ammoUI;
-    [SerializeField] private TextMeshProUGUI _tmpAmmo;
+    [SerializeField] private List<Item> _items = new();
+
+    private List<ItemData> _itemsData = new();
+
+    // --- Static ---
+    public static InventoryManager Instance { get; private set; }
 
     private void Awake()
     {
-        PlayerCombat.OnWeaponEquipped += HandleWeaponEquipped;
-        PlayerCombat.OnAmmoChanged += UpdateAmmoUI;
-    }
-    private void Start()
-    {
-        _ammoUI.SetActive(false);
-    }
-
-    private void OnDestroy()
-    {
-        PlayerCombat.OnWeaponEquipped -= HandleWeaponEquipped;
-        PlayerCombat.OnAmmoChanged -= UpdateAmmoUI;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        AddItem();
     }
 
-    private void HandleWeaponEquipped(Ranged weapon)
+    private void AddItem()
     {
-        _ammoUI.SetActive(true);
-        UpdateAmmoUI(weapon.Magazine, weapon.MagazineSize);
+        foreach (Item item in _items)
+            _itemsData.Add(new(item));
     }
 
-    private void UpdateAmmoUI(int currentAmmo, int maxAmmo)
-    {
-        _tmpAmmo.text = $"{currentAmmo}/{maxAmmo} - Ammo";
-    }
+    public IReadOnlyList<ItemData> GetItems() => _itemsData;
 }

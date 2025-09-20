@@ -167,6 +167,7 @@ public class CharCtrl : MonoBehaviour
         _isJumping = false;
     }
 
+    // Da spostare nello script della camera
     private void OrientCharToCamera()
     {
         Vector3 lookDirection = _cameraPivot.forward;

@@ -3276,7 +3276,7 @@ MonoBehaviour:
   _speed: 5
   _accumulatedSpeed: 0
   _speedNextTurn: 100
-  _damage: 1
+  _damage: 2.5
   _isItsTurn: 0
   _team: 1
   _animator: {fileID: 0}

@@ -33,6 +33,7 @@ public class BattleManager : MonoBehaviour
     // --- Events ---
     public event Action<UnitBase> OnCreateUnit;
     public event Action OnCloseBattle;
+    public event Action<UnitBase, ItemData> OnUseItem;
 
     #region Unity methods
     private void Awake()
@@ -226,6 +227,16 @@ public class BattleManager : MonoBehaviour
         {
             _isPlayerActing = false;
             OnCloseBattle?.Invoke();
+        }
+    }
+
+    public void BTNUseItem(ItemData item)
+    {
+        if (_isPlayerActing)
+        {
+            _isPlayerActing = false;
+            OnUseItem?.Invoke(_unitsInBattle[_selectedTarget], item);
+            NextTurn();
         }
     }
     #endregion

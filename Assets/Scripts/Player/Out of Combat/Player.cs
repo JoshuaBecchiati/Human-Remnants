@@ -21,16 +21,6 @@ public class Player : CharCtrl, IDamageable
     public event Action<float> OnChangeStamina;
     public event Action<float> OnRefillStamina;
 
-    protected override void Start()
-    {
-        base.Start();
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -64,15 +54,11 @@ public class Player : CharCtrl, IDamageable
     {
         _isInvincible = true;
 
-        Renderer baseColor = GetComponent<Renderer>();
-        Color savedColor = baseColor.material.color;
-        baseColor.material.color = Color.yellow;
+        // Disattiva il collider per alcuni secondi cosicché il giocatore può eventualmente scappare da una fight
 
         yield return new WaitForSeconds(_invicibleTime);
 
         _isInvincible = false;
-
-        baseColor.material.color = savedColor;
     }
 
     /*
@@ -83,7 +69,6 @@ public class Player : CharCtrl, IDamageable
 
     protected override void OnSprintStarted(InputAction.CallbackContext context)
     {
-        // Correre consuma stamina
         if (_stamina > 0)
         {
             _isRunning = true;
@@ -118,7 +103,6 @@ public class Player : CharCtrl, IDamageable
 
             if (_stamina <= 0)
             {
-                // stamina finita → ritorno a camminare
                 _stamina = 0;
                 _speedMagnitude = _walkSpeed;
             }

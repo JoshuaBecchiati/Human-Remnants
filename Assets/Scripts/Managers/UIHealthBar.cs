@@ -24,6 +24,7 @@ public class UIHealthBar : MonoBehaviour
 
         // Subscrive l’evento di UnitBase
         unit.OnUnitTookDamage += UpdateBar;
+        unit.OnHeal += UpdateBar;
 
         if (_nameText != null)
             _nameText.text = unit.Name;

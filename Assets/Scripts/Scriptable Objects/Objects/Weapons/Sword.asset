@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51a01aadeddb4048976c8b920192f71, type: 3}
+  m_Name: Sword
+  m_EditorClassIdentifier: 
+  Name: Long sword
+  Prefab: {fileID: 8847938827636051685, guid: 5d02c2b8d3fb3e949a3965348de9f8c0, type: 3}
+  Damage: 10
+  WeaponType: 1
+  Type: 0
+  _attackDuration: 5
+  _swordCol: {fileID: 8287031112329043776, guid: 5d02c2b8d3fb3e949a3965348de9f8c0,
+    type: 3}
