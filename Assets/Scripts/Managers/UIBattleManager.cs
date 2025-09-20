@@ -17,6 +17,10 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private Transform m_itemUIParent;
     [SerializeField] private GameObject m_itemPrefab;
 
+    [Header("Abilities")]
+    [SerializeField] private Transform m_abilityUIParent;
+    [SerializeField] private GameObject m_abilityPrefab;
+
     // --- Static ---
     public static UIBattleManager Instance { get; private set; }
 
@@ -104,4 +108,12 @@ public class UIBattleManager : MonoBehaviour
         m_menus.Find(m => m.gameObject.activeInHierarchy == true).SetActive(false);
         m_menus[nextMenu].SetActive(true);
     }
+
+    public void DisableMenu()
+    {
+        if (m_menus.Exists(m => m.gameObject.activeInHierarchy == true))
+            m_menus.Find(m => m.gameObject.activeInHierarchy == true).SetActive(false);
+    }
+
+    public void StartTurnMenu() => m_menus[0].SetActive(true);
 }

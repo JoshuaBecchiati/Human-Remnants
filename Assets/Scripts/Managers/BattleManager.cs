@@ -135,12 +135,16 @@ public class BattleManager : MonoBehaviour
             if (target != null)
                 _selectedTarget = _unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy);
         }
+        if (UIBattleManager.Instance != null)
+            UIBattleManager.Instance.StartTurnMenu();
     }
     /// <summary>
     /// Check if CurrentUnit is an enemy and manage its actions
     /// </summary>
     private void EnemyTurn()
     {
+        if(UIBattleManager.Instance != null)
+            UIBattleManager.Instance.DisableMenu();
         if (CurrentUnit.Team == EUnitTeam.enemy)
         {
             void HandleEndAttack()
@@ -239,6 +243,17 @@ public class BattleManager : MonoBehaviour
             OnUseItem?.Invoke(_unitsInBattle[_selectedTarget], item);
             NextTurn();
         }
+    }
+
+    public void BTNUseAbilites(AbilityData ability)
+    {
+        if (_isPlayerActing)
+        {
+            _isPlayerActing = false;
+
+            NextTurn();
+        }
+
     }
     #endregion
 
