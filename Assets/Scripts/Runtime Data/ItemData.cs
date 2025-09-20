@@ -1,6 +1,4 @@
-using UnityEngine;
-
-public class ItemData : MonoBehaviour
+public class ItemData
 {
     public Item item;
     public int qty;

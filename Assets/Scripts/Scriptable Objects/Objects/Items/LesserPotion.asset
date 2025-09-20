@@ -15,4 +15,4 @@ MonoBehaviour:
   name: Lesser heal potion
   description: Heal 10 hp
   type: 1
-  _healAmount: 10
+  _healAmount: 20

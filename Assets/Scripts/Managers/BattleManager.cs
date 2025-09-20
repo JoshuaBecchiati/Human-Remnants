@@ -65,7 +65,8 @@ public class BattleManager : MonoBehaviour
         if (_unitsInBattle != null)
         {
             foreach (var unit in _unitsInBattle)
-                Destroy(unit?.gameObject);
+                if (unit != null)
+                    Destroy(unit.gameObject);
 
             _unitsInBattle.Clear();
         }
