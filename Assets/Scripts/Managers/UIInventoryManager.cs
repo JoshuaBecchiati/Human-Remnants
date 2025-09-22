@@ -28,6 +28,7 @@ public class UIInventoryManager : MonoBehaviour
         if (m_inventoryManager != null)
         {
             m_inventoryManager.OnAddItem += CreateInvUI;
+            m_inventoryManager.OnRemoveItem += UpdateItemUI;
         }
 
         if (Instance != null && Instance != this)
@@ -49,6 +50,7 @@ public class UIInventoryManager : MonoBehaviour
         if (m_inventoryManager != null)
         {
             m_inventoryManager.OnAddItem -= CreateInvUI;
+            m_inventoryManager.OnRemoveItem -= UpdateItemUI;
         }
     }
 
@@ -85,12 +87,26 @@ public class UIInventoryManager : MonoBehaviour
 
             itemGO.name = itemData.Item.name;
 
-            itemGO.gameObject.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
+            itemGO.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
             Debug.Log($"Item name{itemData.Item.name}");
             itemNameTMP.text = itemData.Item.name;
 
-            itemGO.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
+            itemGO.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
             itemQtyTMP.text = $"x{itemData.Qty}";
+        }
+    }
+
+    public void UpdateItemUI(ItemData item)
+    {
+        Transform Child = m_itemUIParent.Find(item.Item.name);
+        if (item.Qty <= 0)
+        {
+            Destroy(Child.gameObject);
+        }
+        else
+        {
+            Child.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
+            itemQtyTMP.text = $"x{item.Qty}";
         }
     }
 }

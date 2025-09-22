@@ -41,7 +41,7 @@ public class UIBattleManager : MonoBehaviour
             m_battleManager.OnCreateUnit += CreateUnitUI;
 
         if (m_inventoryManager != null)
-            m_inventoryManager.OnRemoveItem += UpdateUI;
+            m_inventoryManager.OnRemoveItem += UpdateItemUI;
 
         RebuildUI();
         CreateInvUI();
@@ -53,7 +53,7 @@ public class UIBattleManager : MonoBehaviour
             m_battleManager.OnCreateUnit -= CreateUnitUI;
 
         if (m_inventoryManager != null)
-            m_inventoryManager.OnRemoveItem -= UpdateUI;
+            m_inventoryManager.OnRemoveItem -= UpdateItemUI;
 
         foreach (Transform child in m_playerUIParent)
             Destroy(child.gameObject);
@@ -74,10 +74,9 @@ public class UIBattleManager : MonoBehaviour
     {
         Transform parent = (unit.Team == EUnitTeam.player) ? m_playerUIParent : m_enemyUIParent;
         GameObject ui = Instantiate(m_healthBarPrefab, parent);
-        if (ui == null) Debug.LogError("HealthBar prefab is NULL!");
-        UIHealthBar healthBar = ui.GetComponent<UIHealthBar>();
-        if (healthBar == null) Debug.LogError("UIHealthManager mancante nel prefab!");
-        healthBar.Setup(unit);
+
+        if(ui.TryGetComponent(out UIHealthBar healthBar))
+            healthBar.Setup(unit);
     }
 
     private void CreateInvUI()
@@ -92,10 +91,10 @@ public class UIBattleManager : MonoBehaviour
 
             itemBTN.onClick.AddListener(() => BattleManager.Instance.BTNUseItem(itemData));
 
-            itemGO.gameObject.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
+            itemGO.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
             itemNameTMP.text = itemData.Item.name;
 
-            itemGO.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
+            itemGO.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
             itemQtyTMP.text = $"x{itemData.Qty}";
         }
     }
@@ -123,7 +122,7 @@ public class UIBattleManager : MonoBehaviour
     //    }
     //}
 
-    public void UpdateUI(ItemData item)
+    public void UpdateItemUI(ItemData item)
     {
         Transform Child = m_itemUIParent.Find(item.Item.name);
         if (item.Qty <= 0)
@@ -153,7 +152,7 @@ public class UIBattleManager : MonoBehaviour
 
     public void NextMenu(int nextMenu)
     {
-        m_menus.Find(m => m.gameObject.activeInHierarchy == true).SetActive(false);
+        m_menus.Find(m => m.activeInHierarchy == true).SetActive(false);
         m_menus[nextMenu].SetActive(true);
     }
 }
