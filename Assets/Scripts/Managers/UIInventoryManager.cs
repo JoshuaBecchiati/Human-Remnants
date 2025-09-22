@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class UIInventoryManager : MonoBehaviour
 {
@@ -61,6 +60,7 @@ public class UIInventoryManager : MonoBehaviour
             _isOpen = true;
             m_inventory.SetActive(_isOpen);
             Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             Debug.Log("Inventory opened");
         }
         else
@@ -69,6 +69,7 @@ public class UIInventoryManager : MonoBehaviour
             _isOpen = false;
             m_inventory.SetActive(_isOpen);
             Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
             Debug.Log("Inventory closed");
         }
     }
@@ -81,14 +82,14 @@ public class UIInventoryManager : MonoBehaviour
         {
             GameObject itemGO = Instantiate(m_itemPrefab, m_itemUIParent);
 
-            itemGO.name = itemData.item.name;
+            itemGO.name = itemData.Item.name;
 
             itemGO.gameObject.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
-            Debug.Log($"Item name{itemData.item.name}");
-            itemNameTMP.text = itemData.item.name;
+            Debug.Log($"Item name{itemData.Item.name}");
+            itemNameTMP.text = itemData.Item.name;
 
             itemGO.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
-            itemQtyTMP.text = $"x{itemData.qty}";
+            itemQtyTMP.text = $"x{itemData.Qty}";
         }
     }
 }

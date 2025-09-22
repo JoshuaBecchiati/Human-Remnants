@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 [DefaultExecutionOrder(-5)]
 public class BattleManager : MonoBehaviour
@@ -17,10 +18,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject[] _enemiesPF;
 
     // --- Runtime State ---
-    [SerializeField] private List<UnitBase> _unitsInBattle = new List<UnitBase>();
-    private List<GameObject> _playersDeathPF = new List<GameObject>();
+    [SerializeField] private List<UnitBase> _unitsInBattle = new ();
+    private List<GameObject> _playersDeathPF = new();
 
-    private Queue<UnitBase> turnQueue = new Queue<UnitBase>();
+    private Queue<UnitBase> turnQueue = new ();
     private UnitBase CurrentUnit;
     private int _selectedTarget = 0;
     private bool _isFighting = true;
@@ -34,6 +35,7 @@ public class BattleManager : MonoBehaviour
     public event Action<UnitBase> OnCreateUnit;
     public event Action OnCloseBattle;
     public event Action<UnitBase, ItemData> OnUseItem;
+    public event Action<List<UnitBase>, AbilityData> OnUseAbility;
 
     #region Unity methods
     private void Awake()
@@ -64,7 +66,7 @@ public class BattleManager : MonoBehaviour
 
         if (_unitsInBattle != null)
         {
-            foreach (var unit in _unitsInBattle)
+            foreach (UnitBase unit in _unitsInBattle)
                 if (unit != null)
                     Destroy(unit.gameObject);
 
@@ -94,11 +96,11 @@ public class BattleManager : MonoBehaviour
     /// <param name="context"></param>
     private void SelectTarget(InputAction.CallbackContext context)
     {
-        var dir = context.ReadValue<Vector2>();
+        Vector2 dir = context.ReadValue<Vector2>();
 
         if (!_isFighting || CurrentUnit == null) return;
 
-        int direction = 0;
+        int direction;
 
         if (dir.x > 0.5f) direction = 1;        // Destra
         else if (dir.x < -0.5f) direction = -1; // Sinistra
@@ -135,16 +137,12 @@ public class BattleManager : MonoBehaviour
             if (target != null)
                 _selectedTarget = _unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy);
         }
-        if (UIBattleManager.Instance != null)
-            UIBattleManager.Instance.StartTurnMenu();
     }
     /// <summary>
     /// Check if CurrentUnit is an enemy and manage its actions
     /// </summary>
     private void EnemyTurn()
     {
-        if(UIBattleManager.Instance != null)
-            UIBattleManager.Instance.DisableMenu();
         if (CurrentUnit.Team == EUnitTeam.enemy)
         {
             void HandleEndAttack()
@@ -168,7 +166,8 @@ public class BattleManager : MonoBehaviour
     {
         if (turnQueue.Count == 0) return;
 
-        CurrentUnit?.EndTurn();
+        if (CurrentUnit != null)
+            CurrentUnit.EndTurn();
 
         if(CurrentUnit == null || CurrentUnit.AccumulatedSpeed < CurrentUnit.SpeedNextTurn)
         {
@@ -240,17 +239,18 @@ public class BattleManager : MonoBehaviour
         if (_isPlayerActing)
         {
             _isPlayerActing = false;
-            OnUseItem?.Invoke(_unitsInBattle[_selectedTarget], item);
+            item.UseItem(_unitsInBattle[_selectedTarget]);
+            InventoryManager.Instance.RemoveItemInInventory(item);
             NextTurn();
         }
     }
 
-    public void BTNUseAbilites(AbilityData ability)
+    public void BTNUseAbility(AbilityData ability)
     {
         if (_isPlayerActing)
         {
             _isPlayerActing = false;
-
+            ability.UseAbility(new[] { _unitsInBattle[_selectedTarget] });
             NextTurn();
         }
 
@@ -267,13 +267,15 @@ public class BattleManager : MonoBehaviour
 
         for (int i = 0; i < _playersPF.Length; i++)
         {
-            var go = Instantiate(_playersPF[i], _spawnPointsPlayers[i].position, _spawnPointsPlayers[i].rotation);
-            var unit = go.GetComponent<PlayerInCombat>();
+            GameObject go = Instantiate(_playersPF[i], _spawnPointsPlayers[i].position, _spawnPointsPlayers[i].rotation);
+
+            if (!go.TryGetComponent(out PlayerInCombat unit))
+                return;
 
             if (unit != null)
             {
                 unit.OnPlayerDeath += HandlePlayerDeath;
-                unit.SetSpeed(UnityEngine.Random.Range(0, 10));
+                unit.SetSpeed(Random.Range(10, 20));
                 _unitsInBattle.Add(unit);
                 OnCreateUnit?.Invoke(unit);
             }
@@ -281,20 +283,22 @@ public class BattleManager : MonoBehaviour
 
         for (int i = 0; i < _enemiesPF.Length; i++)
         {
-            var go = Instantiate(_enemiesPF[i], _spawnPointsEnemies[i].position, _spawnPointsEnemies[i].rotation);
-            var unit = go.GetComponent<EnemyInCombat>();
+            GameObject go = Instantiate(_enemiesPF[i], _spawnPointsEnemies[i].position, _spawnPointsEnemies[i].rotation);
+
+            if (!go.TryGetComponent(out EnemyInCombat unit))
+                return;
 
             if (unit != null)
             {
                 unit.OnEnemyDeath += HandleEnemyDeath;
-                unit.SetSpeed(UnityEngine.Random.Range(0, 10));
+                unit.SetSpeed(Random.Range(10, 20));
                 _unitsInBattle.Add(unit);
                 OnCreateUnit?.Invoke(unit);
             }
         }
 
         // Ordina per velocità e costruisci la queue
-        var ordered = _unitsInBattle.OrderByDescending(u => u.Speed).ToList();
+        List<UnitBase> ordered = _unitsInBattle.OrderByDescending(u => u.Speed).ToList();
         turnQueue = new Queue<UnitBase>(ordered);
 
         // Primo turno

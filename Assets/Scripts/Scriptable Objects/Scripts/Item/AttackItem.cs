@@ -6,5 +6,8 @@ public class AttackItem : Item
 {
     [SerializeField] private float _damageAmount;
 
-    public float DamageAmount => _damageAmount;
+    public override void UseItem(UnitBase target)
+    {
+        target.TakeDamage(_damageAmount);
+    }
 }

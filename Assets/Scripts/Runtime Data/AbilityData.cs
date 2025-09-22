@@ -1,14 +1,20 @@
 [System.Serializable]
 public class AbilityData
 {
-    public Ability ability;
-    public int chargeCounter;
+    public Ability Ability;
+    public int ChargeCounter;
 
     public AbilityData(Ability ability)
     {
-        this.ability = ability;
-        chargeCounter += ability.maxCharge;
+        Ability = ability;
+        ChargeCounter = 0;
     }
 
-    public void CharchingAbility() => chargeCounter++;
+    public void UseAbility(UnitBase[] targets)
+    {
+        Ability.Use(targets);
+        ChargeCounter = 0;
+    }
+
+    public void CharchingAbility() => ChargeCounter++;
 }

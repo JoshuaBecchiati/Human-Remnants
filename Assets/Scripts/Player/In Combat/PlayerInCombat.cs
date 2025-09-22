@@ -3,18 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInCombat : UnitBase, IPlayer
+public class PlayerInCombat : UnitBase
 {
+    [SerializeField] private List<AbilityData> _AbilitiesData = new();
+
     public event Action OnPlayerDeath;
 
     protected override void Awake()
     {
         base.Awake();
-        BattleManager.Instance.OnUseItem += UseItem;
-    }
-    private void OnDestroy()
-    {
-        BattleManager.Instance.OnUseItem -= UseItem;
     }
 
     public override void TakeDamage(float damage)
@@ -24,22 +21,12 @@ public class PlayerInCombat : UnitBase, IPlayer
             OnPlayerDeath?.Invoke();
     }
 
-    private void UseItem(UnitBase target, ItemData item)
+    public override void StartTurn()
     {
-        _target = target;
-
-        if (item.item is HealItem healItem)
-            Heal(healItem.HealAmount);
-        else if (item.item is AttackItem attackItem)
-            Attack(attackItem.DamageAmount);
-        InventoryManager.Instance.RemoveItem(item);
+        base.StartTurn();
+        foreach (AbilityData ability in _AbilitiesData)
+            ability.CharchingAbility();
     }
 
-    public void Attack(float damage)
-    {
-        Debug.Log($"{_name} has attacked {_target.name}. Damage inflicted: {damage}.");
-        _target.TakeDamage(damage);
-
-        _target = null;
-    }
+    public IReadOnlyList<AbilityData> GetAbilities() => _AbilitiesData;
 }

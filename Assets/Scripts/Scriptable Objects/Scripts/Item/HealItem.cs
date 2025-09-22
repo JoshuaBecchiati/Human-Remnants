@@ -6,5 +6,8 @@ public class HealItem : Item
 {
     [SerializeField] private float _healAmount;
 
-    public float HealAmount => _healAmount;
+    public override void UseItem(UnitBase target)
+    {
+        target.Heal(_healAmount);
+    }
 }

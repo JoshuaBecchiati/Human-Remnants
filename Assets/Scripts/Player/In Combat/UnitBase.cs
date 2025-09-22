@@ -18,6 +18,8 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] protected UnitBase _target;
 
+    public int _id { get; private set; }
+
     public string Name => _name;
     public float Health => _health;
     public float MaxHealth => _maxHealth;
@@ -34,6 +36,7 @@ public abstract class UnitBase : MonoBehaviour
     public event Action<float, float> OnHeal;
     public event Action OnEndAttack;
 
+
     protected virtual void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -46,26 +49,18 @@ public abstract class UnitBase : MonoBehaviour
     }
     public void EndAttackAnimation()
     {
-        Debug.Log("EndAttackAnimation invocato!");
         OnEndAttack?.Invoke();
     }
 
-    public void Attack()
-    {
-        float finalDamage = _damage;
-        Debug.Log($"{_name} has attacked {_target._name}. Damage inflicted: {finalDamage}.");
-        _target.TakeDamage(finalDamage);
-
-        _target = null;
-    }
-
+    #region Handle health
     public virtual void TakeDamage(float damage)
     {
         _health -= damage;
         OnUnitTookDamage?.Invoke(_health, _maxHealth);
     }
 
-    protected virtual void Heal(float heal)
+
+    public virtual void Heal(float heal)
     {
         if (_health + heal > _maxHealth)
             _health = _maxHealth;
@@ -75,7 +70,9 @@ public abstract class UnitBase : MonoBehaviour
             _health += heal;
         OnHeal?.Invoke(_health, _maxHealth);
     }
+    #endregion
 
+    #region Handle start and end turn
     public virtual void StartTurn()
 {
         _isItsTurn = true;
@@ -89,7 +86,9 @@ public abstract class UnitBase : MonoBehaviour
         _isItsTurn = false;
         Debug.Log($"{_name} has ended the turn");
     }
+    #endregion
 
+    #region Handle speed
     public virtual void SetSpeed(int speed)
     {
         _speed = speed;
@@ -100,5 +99,35 @@ public abstract class UnitBase : MonoBehaviour
         _accumulatedSpeed -= _speedNextTurn;
         Debug.Log($"Reset speed, current accumulated speed: {_accumulatedSpeed}.");
     }
+    #endregion
 
+    // DA SPOSTARE
+    public void Attack()
+    {
+        float finalDamage = _damage;
+        Debug.Log($"{_name} has attacked {_target._name}. Damage inflicted: {finalDamage}.");
+        _target.TakeDamage(finalDamage);
+
+        _target = null;
+    }
+
+    public void Attack(float damage)
+    {
+        float finalDamage = damage;
+        Debug.Log($"{_name} has attacked {_target._name}. Damage inflicted: {finalDamage}.");
+        _target.TakeDamage(finalDamage);
+
+        _target = null;
+    }
+
+    public void Attack(AttackArguments args)
+    {
+        _target = args.MainTarget;
+        _target.TakeDamage(args.Damage);
+        _target = null;
+
+        if (args.OtherTargets != null && args.OtherTargets.Length > 0)
+            for (int i = 0; i < args.OtherTargets.Length; i++)
+                args.OtherTargets[i].TakeDamage(args.SplashDamage);
+    }
 }

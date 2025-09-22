@@ -17,10 +17,6 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private Transform m_itemUIParent;
     [SerializeField] private GameObject m_itemPrefab;
 
-    [Header("Abilities")]
-    [SerializeField] private Transform m_abilityUIParent;
-    [SerializeField] private GameObject m_abilityPrefab;
-
     // --- Static ---
     public static UIBattleManager Instance { get; private set; }
 
@@ -81,20 +77,42 @@ public class UIBattleManager : MonoBehaviour
         {
             GameObject itemGO = Instantiate(m_itemPrefab, m_itemUIParent);
 
-            itemGO.name = itemData.item.name;
+            itemGO.name = itemData.Item.name;
 
             itemGO.TryGetComponent(out Button itemBTN);
 
             itemBTN.onClick.AddListener(() => BattleManager.Instance.BTNUseItem(itemData));
 
             itemGO.gameObject.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
-            Debug.Log($"Item name{itemData.item.name}");
-            itemNameTMP.text = itemData.item.name;
+            itemNameTMP.text = itemData.Item.name;
 
             itemGO.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
-            itemQtyTMP.text = $"x{itemData.qty}";
+            itemQtyTMP.text = $"x{itemData.Qty}";
         }
     }
+
+    //public void CreateAbilityUI(List<AbilityData> abilitiesData)
+    //{
+    //    foreach (AbilityData abilityData in abilitiesData)
+    //    {
+    //        GameObject abilityGO = Instantiate(m_itemPrefab, m_itemUIParent);
+
+    //        abilityGO.name = abilityData.ability.name;
+
+    //        abilityGO.TryGetComponent(out Button abilityBTN);
+
+    //        abilityBTN.onClick.AddListener(() => BattleManager.Instance.BTNUseAbility(abilityData));
+
+    //        abilityGO.gameObject.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI abilityNameTMP);
+    //        abilityNameTMP.text = abilityData.ability.name;
+
+    //        abilityGO.gameObject.transform.Find("Item type").TryGetComponent(out TextMeshProUGUI abilityQtyTMP);
+    //        abilityQtyTMP.text = abilityData.ability.damageType.ToString();
+
+    //        abilityGO.gameObject.transform.Find("Item type").TryGetComponent(out TextMeshProUGUI abilityChargeTMP);
+    //        abilityChargeTMP.text = $"Charge{abilityData.chargeCounter}/{abilityData.ability.maxCharge}";
+    //    }
+    //}
 
     public void UpdateUI()
     {
@@ -108,12 +126,4 @@ public class UIBattleManager : MonoBehaviour
         m_menus.Find(m => m.gameObject.activeInHierarchy == true).SetActive(false);
         m_menus[nextMenu].SetActive(true);
     }
-
-    public void DisableMenu()
-    {
-        if (m_menus.Exists(m => m.gameObject.activeInHierarchy == true))
-            m_menus.Find(m => m.gameObject.activeInHierarchy == true).SetActive(false);
-    }
-
-    public void StartTurnMenu() => m_menus[0].SetActive(true);
 }

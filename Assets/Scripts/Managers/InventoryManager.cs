@@ -23,16 +23,17 @@ public class InventoryManager : MonoBehaviour
         Instance = this;
     }
 
-    public void AddItem(Item item, int qty)
+    public void AddItemInInventory(Item item, int qty)
     {
-        if (_itemsData.Exists(i => i.item == item))
+        if (_itemsData.Exists(i => i.Item == item))
         {
-            int index = _itemsData.FindIndex(i => i.item == item);
-            _itemsData[index].qty += qty;
+            int index = _itemsData.FindIndex(i => i.Item == item);
+            _itemsData[index].AddItem(qty);
         }
         else
         {
-            _itemsData.Add(new(item, qty));
+            ItemData newItem = new(item, qty);
+            _itemsData.Add(newItem);
         }
         OnAddItem?.Invoke();
     }
@@ -41,11 +42,11 @@ public class InventoryManager : MonoBehaviour
     /// Remove item in combat
     /// </summary>
     /// <param name="item"></param>
-    public void RemoveItem(ItemData item)
+    public void RemoveItemInInventory(ItemData item)
     {
         int index = _itemsData.FindIndex(i => i == item);
-        _itemsData[index].qty -= 1;
-        if (_itemsData[index].qty <= 0)
+        _itemsData[index].RemoveItem();
+        if (_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
         UIBattleManager.Instance.UpdateUI();
         OnRemoveItem?.Invoke();
@@ -56,11 +57,12 @@ public class InventoryManager : MonoBehaviour
     /// </summary>
     /// <param name="item"></param>
     /// <param name="qty"></param>
-    public void RemoveItem(ItemData item, int qty)
+    public void RemoveItemInInventory(ItemData item, int qty)
     {
         int index = _itemsData.FindIndex(i => i == item);
-        _itemsData[index].qty -= qty;
-        if(_itemsData[index].qty <= 0)
+        _itemsData[index].RemoveItem(qty);
+
+        if(_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
         OnRemoveItem?.Invoke();
     }
