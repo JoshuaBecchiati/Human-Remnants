@@ -9,10 +9,13 @@ public class UIInventoryManager : MonoBehaviour
     [SerializeField] private GameObject m_itemPrefab;
     [SerializeField] private Transform m_itemUIParent;
 
+    [Header("Dependency")]
+    [SerializeField] private InventoryManager m_inventoryManager;
+
     private bool _isOpen;
 
-    // --- Static ---
-    public static UIInventoryManager Instance { get; private set; }
+    // --- Instance ---
+    public UIInventoryManager Instance { get; private set; }
 
     // --- Proprieties ---
 
@@ -22,10 +25,9 @@ public class UIInventoryManager : MonoBehaviour
         {
             PlayerInputSingleton.Instance.Actions["Inventory"].performed += OpenInventory;
         }
-        if (InventoryManager.Instance != null)
+        if (m_inventoryManager != null)
         {
-            InventoryManager.Instance.OnAddItem += CreateInvUI;
-            InventoryManager.Instance.OnRemoveItem += CreateInvUI;
+            m_inventoryManager.OnAddItem += CreateInvUI;
         }
 
         if (Instance != null && Instance != this)
@@ -44,10 +46,9 @@ public class UIInventoryManager : MonoBehaviour
             PlayerInputSingleton.Instance.Actions["Inventory"].performed -= OpenInventory;
         }
 
-        if (InventoryManager.Instance != null)
+        if (m_inventoryManager != null)
         {
-            InventoryManager.Instance.OnAddItem -= CreateInvUI;
-            InventoryManager.Instance.OnRemoveItem -= CreateInvUI;
+            m_inventoryManager.OnAddItem -= CreateInvUI;
         }
     }
 
@@ -78,7 +79,7 @@ public class UIInventoryManager : MonoBehaviour
     {
         foreach (Transform Child in m_itemUIParent)
             Destroy(Child.gameObject);
-        foreach (ItemData itemData in InventoryManager.Instance.GetItems())
+        foreach (ItemData itemData in m_inventoryManager.GetItems())
         {
             GameObject itemGO = Instantiate(m_itemPrefab, m_itemUIParent);
 

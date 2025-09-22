@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -17,8 +18,12 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private Transform m_itemUIParent;
     [SerializeField] private GameObject m_itemPrefab;
 
-    // --- Static ---
-    public static UIBattleManager Instance { get; private set; }
+    [Header("Dependency")]
+    [SerializeField] private BattleManager m_battleManager;
+    [SerializeField] private InventoryManager m_inventoryManager;
+
+    // -- Instance ---
+    public UIBattleManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -32,20 +37,24 @@ public class UIBattleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        if (BattleManager.Instance != null)
-        {
-            BattleManager.Instance.OnCreateUnit += CreateUnitUI;
-            RebuildUI();
-            CreateInvUI();
-        }
+        if (m_battleManager != null)
+            m_battleManager.OnCreateUnit += CreateUnitUI;
+
+        if (m_inventoryManager != null)
+            m_inventoryManager.OnRemoveItem += UpdateUI;
+
+        RebuildUI();
+        CreateInvUI();
     }
 
     private void OnDisable()
     {
-        if (BattleManager.Instance != null)
-            BattleManager.Instance.OnCreateUnit -= CreateUnitUI;
+        if (m_battleManager != null)
+            m_battleManager.OnCreateUnit -= CreateUnitUI;
 
-        // se vuoi, pulisci la UI qui
+        if (m_inventoryManager != null)
+            m_inventoryManager.OnRemoveItem -= UpdateUI;
+
         foreach (Transform child in m_playerUIParent)
             Destroy(child.gameObject);
         foreach (Transform child in m_enemyUIParent)
@@ -56,7 +65,7 @@ public class UIBattleManager : MonoBehaviour
 
     private void RebuildUI()
     {
-        foreach (UnitBase unit in BattleManager.Instance.GetUnits())
+        foreach (UnitBase unit in m_battleManager.GetUnits())
             CreateUnitUI(unit);
     }
 
@@ -73,7 +82,7 @@ public class UIBattleManager : MonoBehaviour
 
     private void CreateInvUI()
     {
-        foreach (ItemData itemData in InventoryManager.Instance.GetItems())
+        foreach (ItemData itemData in m_inventoryManager.GetItems())
         {
             GameObject itemGO = Instantiate(m_itemPrefab, m_itemUIParent);
 
@@ -114,12 +123,33 @@ public class UIBattleManager : MonoBehaviour
     //    }
     //}
 
-    public void UpdateUI()
+    public void UpdateUI(ItemData item)
     {
-        foreach (Transform Child in m_itemUIParent)
+        Transform Child = m_itemUIParent.Find(item.Item.name);
+        if (item.Qty <= 0)
+        {
             Destroy(Child.gameObject);
-        CreateInvUI();
+        }
+        else
+        {
+            Child.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
+            itemQtyTMP.text = $"x{item.Qty}";
+        }
     }
+
+    //public void UpdateUI(Ability ability)
+    //{
+    //    Transform Child = m_itemUIParent.Find(item.Item.name);
+    //    if (item.Qty <= 0)
+    //    {
+    //        Destroy(Child.gameObject);
+    //    }
+    //    else
+    //    {
+    //        Child.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
+    //        itemQtyTMP.text = $"x{item.Qty}";
+    //    }
+    //}
 
     public void NextMenu(int nextMenu)
     {

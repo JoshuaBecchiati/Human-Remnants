@@ -34,8 +34,8 @@ public class BattleManager : MonoBehaviour
     // --- Events ---
     public event Action<UnitBase> OnCreateUnit;
     public event Action OnCloseBattle;
-    public event Action<UnitBase, ItemData> OnUseItem;
-    public event Action<List<UnitBase>, AbilityData> OnUseAbility;
+    public event Action<ItemData> OnUseItem;
+    public event Action<AbilityData> OnUseAbility;
 
     #region Unity methods
     private void Awake()
@@ -240,7 +240,7 @@ public class BattleManager : MonoBehaviour
         {
             _isPlayerActing = false;
             item.UseItem(_unitsInBattle[_selectedTarget]);
-            InventoryManager.Instance.RemoveItemInInventory(item);
+            OnUseItem?.Invoke(item);
             NextTurn();
         }
     }
@@ -251,6 +251,7 @@ public class BattleManager : MonoBehaviour
         {
             _isPlayerActing = false;
             ability.UseAbility(new[] { _unitsInBattle[_selectedTarget] });
+            OnUseAbility?.Invoke(ability);
             NextTurn();
         }
 

@@ -30,7 +30,7 @@ public abstract class UnitBase : MonoBehaviour
     public bool IsItsTurn => _isItsTurn;
     public EUnitTeam Team => _team;
 
-    public static UnitBase Instance { get; private set; }
+    public UnitBase Instance { get; private set; }
 
     public event Action<float, float> OnUnitTookDamage;
     public event Action<float, float> OnHeal;

@@ -6,12 +6,14 @@ public class InventoryManager : MonoBehaviour
 {
     [SerializeField] private List<ItemData> _itemsData = new();
 
+    [SerializeField] private BattleManager _battleManager;
+
     // --- Static ---
     public static InventoryManager Instance { get; private set; }
 
     // --- Proprieties ---
     public event Action OnAddItem;
-    public event Action OnRemoveItem;
+    public event Action<ItemData> OnRemoveItem;
 
     private void Awake()
     {
@@ -21,6 +23,17 @@ public class InventoryManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    private void Start()
+    {
+        if (_battleManager != null)
+            _battleManager.OnUseItem += RemoveItemInInventory;
+    }
+    private void OnDestroy()
+    {
+        if (_battleManager != null)
+            _battleManager.OnUseItem -= RemoveItemInInventory;
     }
 
     public void AddItemInInventory(Item item, int qty)
@@ -48,8 +61,7 @@ public class InventoryManager : MonoBehaviour
         _itemsData[index].RemoveItem();
         if (_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
-        UIBattleManager.Instance.UpdateUI();
-        OnRemoveItem?.Invoke();
+        OnRemoveItem?.Invoke(item);
     }
 
     /// <summary>
@@ -64,7 +76,7 @@ public class InventoryManager : MonoBehaviour
 
         if(_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
-        OnRemoveItem?.Invoke();
+        OnRemoveItem?.Invoke(item);
     }
 
 
