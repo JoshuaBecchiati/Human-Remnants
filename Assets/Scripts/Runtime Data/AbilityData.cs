@@ -1,4 +1,6 @@
-[System.Serializable]
+using System;
+
+[Serializable]
 public class AbilityData
 {
     public Ability Ability;
@@ -16,5 +18,10 @@ public class AbilityData
         ChargeCounter = 0;
     }
 
-    public void CharchingAbility() => ChargeCounter++;
+    public void CharchingAbility()
+    {
+        if (ChargeCounter != Ability.maxCharge)
+            ChargeCounter++;
+    }
+
 }

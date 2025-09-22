@@ -3162,6 +3162,9 @@ MonoBehaviour:
   _team: 0
   _animator: {fileID: 0}
   _target: {fileID: 0}
+  _AbilitiesData:
+  - Ability: {fileID: 11400000, guid: 81d7a69e8433fed4d9c4cba6520c09fa, type: 2}
+    ChargeCounter: 0
 --- !u!114 &3720821816567946711
 MonoBehaviour:
   m_ObjectHideFlags: 0

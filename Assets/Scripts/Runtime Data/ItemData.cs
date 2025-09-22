@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-[System.Serializable]
+[Serializable]
 public class ItemData
 {
     public Item Item { get; private set; }

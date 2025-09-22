@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[DefaultExecutionOrder(-5)]
 public class UIBattleManager : MonoBehaviour
 {
     [Header("Menù")]
@@ -18,12 +18,16 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private Transform m_itemUIParent;
     [SerializeField] private GameObject m_itemPrefab;
 
+    [Header("Abilities")]
+    [SerializeField] private Transform m_AbilityUIParent;
+    [SerializeField] private GameObject m_AbilityPrefab;
+
     [Header("Dependency")]
     [SerializeField] private BattleManager m_battleManager;
     [SerializeField] private InventoryManager m_inventoryManager;
 
     // -- Instance ---
-    public UIBattleManager Instance { get; private set; }
+    public static UIBattleManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -61,6 +65,8 @@ public class UIBattleManager : MonoBehaviour
             Destroy(child.gameObject);
         foreach (Transform Child in m_itemUIParent)
             Destroy(Child.gameObject);
+        foreach (Transform Child in m_AbilityUIParent)
+            Destroy(Child.gameObject);
     }
 
     private void RebuildUI()
@@ -89,7 +95,7 @@ public class UIBattleManager : MonoBehaviour
 
             itemGO.TryGetComponent(out Button itemBTN);
 
-            itemBTN.onClick.AddListener(() => BattleManager.Instance.BTNUseItem(itemData));
+            itemBTN.onClick.AddListener(() => m_battleManager.BTNUseItem(itemData));
 
             itemGO.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
             itemNameTMP.text = itemData.Item.name;
@@ -99,28 +105,31 @@ public class UIBattleManager : MonoBehaviour
         }
     }
 
-    //public void CreateAbilityUI(List<AbilityData> abilitiesData)
-    //{
-    //    foreach (AbilityData abilityData in abilitiesData)
-    //    {
-    //        GameObject abilityGO = Instantiate(m_itemPrefab, m_itemUIParent);
+    public void CreateAbilityUI(List<AbilityData> abilitiesData)
+    {
+        if (m_AbilityUIParent.childCount != 0)
+            foreach (Transform Child in m_AbilityUIParent)
+                Destroy(Child.gameObject);
+        foreach (AbilityData abilityData in abilitiesData)
+        {
+            GameObject abilityGO = Instantiate(m_AbilityPrefab, m_AbilityUIParent);
 
-    //        abilityGO.name = abilityData.ability.name;
+            abilityGO.name = abilityData.Ability.name;
 
-    //        abilityGO.TryGetComponent(out Button abilityBTN);
+            abilityGO.TryGetComponent(out Button abilityBTN);
 
-    //        abilityBTN.onClick.AddListener(() => BattleManager.Instance.BTNUseAbility(abilityData));
+            abilityBTN.onClick.AddListener(() => m_battleManager.BTNUseAbility(abilityData));
 
-    //        abilityGO.gameObject.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI abilityNameTMP);
-    //        abilityNameTMP.text = abilityData.ability.name;
+            abilityGO.transform.Find("Ability name").TryGetComponent(out TextMeshProUGUI abilityNameTMP);
+            abilityNameTMP.text = abilityData.Ability.name;
 
-    //        abilityGO.gameObject.transform.Find("Item type").TryGetComponent(out TextMeshProUGUI abilityQtyTMP);
-    //        abilityQtyTMP.text = abilityData.ability.damageType.ToString();
+            abilityGO.transform.Find("Ability type").TryGetComponent(out TextMeshProUGUI abilityQtyTMP);
+            abilityQtyTMP.text = abilityData.Ability.damageType.ToString();
 
-    //        abilityGO.gameObject.transform.Find("Item type").TryGetComponent(out TextMeshProUGUI abilityChargeTMP);
-    //        abilityChargeTMP.text = $"Charge{abilityData.chargeCounter}/{abilityData.ability.maxCharge}";
-    //    }
-    //}
+            abilityGO.transform.Find("Ability charge").TryGetComponent(out TextMeshProUGUI abilityChargeTMP);
+            abilityChargeTMP.text = $"Charge {abilityData.ChargeCounter}/{abilityData.Ability.maxCharge}";
+        }
+    }
 
     public void UpdateItemUI(ItemData item)
     {
@@ -136,23 +145,16 @@ public class UIBattleManager : MonoBehaviour
         }
     }
 
-    //public void UpdateUI(Ability ability)
-    //{
-    //    Transform Child = m_itemUIParent.Find(item.Item.name);
-    //    if (item.Qty <= 0)
-    //    {
-    //        Destroy(Child.gameObject);
-    //    }
-    //    else
-    //    {
-    //        Child.gameObject.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
-    //        itemQtyTMP.text = $"x{item.Qty}";
-    //    }
-    //}
+    public void UpdateAbilityUI(AbilityData ability)
+    {
+        Transform Child = m_itemUIParent.Find(ability.Ability.name);
+        Child.gameObject.transform.Find("Ability charge").TryGetComponent(out TextMeshProUGUI abilityChargeTMP);
+        abilityChargeTMP.text = $"Charge {ability.ChargeCounter}/{ability.Ability.maxCharge}";
+    }
 
-    public void NextMenu(int nextMenu)
+    public void NextMenu(int index)
     {
         m_menus.Find(m => m.activeInHierarchy == true).SetActive(false);
-        m_menus[nextMenu].SetActive(true);
+        m_menus[index].SetActive(true);
     }
 }

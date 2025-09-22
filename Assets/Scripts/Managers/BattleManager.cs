@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Random = UnityEngine.Random;
 
-[DefaultExecutionOrder(-5)]
 public class BattleManager : MonoBehaviour
 {
     // --- Inspector References ---
@@ -247,14 +245,15 @@ public class BattleManager : MonoBehaviour
 
     public void BTNUseAbility(AbilityData ability)
     {
-        if (_isPlayerActing)
+        if (_isPlayerActing && ability.ChargeCounter == ability.Ability.maxCharge)
         {
             _isPlayerActing = false;
-            ability.UseAbility(new[] { _unitsInBattle[_selectedTarget] });
+            List<UnitBase> enemies = new() { _unitsInBattle[_selectedTarget] };
+            enemies.AddRange(_unitsInBattle.FindAll(e => e.Team == EUnitTeam.enemy && e != _unitsInBattle[_selectedTarget]));
+            ability.UseAbility(enemies.ToArray());
             OnUseAbility?.Invoke(ability);
             NextTurn();
         }
-
     }
     #endregion
 
@@ -276,7 +275,7 @@ public class BattleManager : MonoBehaviour
             if (unit != null)
             {
                 unit.OnPlayerDeath += HandlePlayerDeath;
-                unit.SetSpeed(Random.Range(10, 20));
+                unit.SetSpeed(25);
                 _unitsInBattle.Add(unit);
                 OnCreateUnit?.Invoke(unit);
             }
@@ -292,7 +291,7 @@ public class BattleManager : MonoBehaviour
             if (unit != null)
             {
                 unit.OnEnemyDeath += HandleEnemyDeath;
-                unit.SetSpeed(Random.Range(10, 20));
+                unit.SetSpeed(UnityEngine.Random.Range(10, 20));
                 _unitsInBattle.Add(unit);
                 OnCreateUnit?.Invoke(unit);
             }
