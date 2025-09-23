@@ -96,12 +96,11 @@ public abstract class UnitBase : MonoBehaviour
 
     public virtual void ResetAccumulatedSpeed()
     {
-        _accumulatedSpeed -= _speedNextTurn;
+        _accumulatedSpeed = 0;
         Debug.Log($"Reset speed, current accumulated speed: {_accumulatedSpeed}.");
     }
     #endregion
 
-    // DA SPOSTARE
     public void Attack()
     {
         float finalDamage = _damage;
@@ -109,25 +108,5 @@ public abstract class UnitBase : MonoBehaviour
         _target.TakeDamage(finalDamage);
 
         _target = null;
-    }
-
-    public void Attack(float damage)
-    {
-        float finalDamage = damage;
-        Debug.Log($"{_name} has attacked {_target._name}. Damage inflicted: {finalDamage}.");
-        _target.TakeDamage(finalDamage);
-
-        _target = null;
-    }
-
-    public void Attack(AttackArguments args)
-    {
-        _target = args.MainTarget;
-        _target.TakeDamage(args.Damage);
-        _target = null;
-
-        if (args.OtherTargets != null && args.OtherTargets.Length > 0)
-            for (int i = 0; i < args.OtherTargets.Length; i++)
-                args.OtherTargets[i].TakeDamage(args.SplashDamage);
     }
 }

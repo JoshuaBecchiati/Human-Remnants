@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[DefaultExecutionOrder(-5)]
+//[DefaultExecutionOrder(-5)]
 public class UIBattleManager : MonoBehaviour
 {
-    [Header("Menù")]
+    [Header("Menu")]
     [SerializeField] private List<GameObject> m_menus = new();
 
     [Header("Health bar")]
@@ -46,6 +46,8 @@ public class UIBattleManager : MonoBehaviour
 
         if (m_inventoryManager != null)
             m_inventoryManager.OnRemoveItem += UpdateItemUI;
+
+        
 
         RebuildUI();
         CreateInvUI();
@@ -105,7 +107,7 @@ public class UIBattleManager : MonoBehaviour
         }
     }
 
-    public void CreateAbilityUI(List<AbilityData> abilitiesData)
+    public void CreateAbilityUI(IReadOnlyList<AbilityData> abilitiesData)
     {
         if (m_AbilityUIParent.childCount != 0)
             foreach (Transform Child in m_AbilityUIParent)

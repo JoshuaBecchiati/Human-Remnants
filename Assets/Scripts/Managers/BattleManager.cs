@@ -15,6 +15,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject[] _playersPF;
     [SerializeField] private GameObject[] _enemiesPF;
 
+    // --- Dependency ---
+    [Header("Dependency")]
+    [SerializeField] private UIBattleManager m_battleManager;
+
     // --- Runtime State ---
     [SerializeField] private List<UnitBase> _unitsInBattle = new ();
     private List<GameObject> _playersDeathPF = new();
@@ -34,6 +38,8 @@ public class BattleManager : MonoBehaviour
     public event Action OnCloseBattle;
     public event Action<ItemData> OnUseItem;
     public event Action<AbilityData> OnUseAbility;
+
+
 
     #region Unity methods
     private void Awake()
@@ -167,11 +173,11 @@ public class BattleManager : MonoBehaviour
         if (CurrentUnit != null)
             CurrentUnit.EndTurn();
 
-        if(CurrentUnit == null || CurrentUnit.AccumulatedSpeed < CurrentUnit.SpeedNextTurn)
+
+        if (CurrentUnit == null || CurrentUnit.AccumulatedSpeed < CurrentUnit.SpeedNextTurn)
         {
             do
             {
-                if (turnQueue.Count == 0) return;
                 CurrentUnit = turnQueue.Dequeue();
             } while (CurrentUnit == null || CurrentUnit.Health <= 0);
         }
@@ -179,6 +185,9 @@ public class BattleManager : MonoBehaviour
             CurrentUnit.ResetAccumulatedSpeed();
 
         CurrentUnit.StartTurn();
+
+        Debug.Log($"Velocità accumulatà: {CurrentUnit.AccumulatedSpeed}");
+        Debug.Log($"Velocità per il prossimo turno : {CurrentUnit.SpeedNextTurn}");
 
         if (CurrentUnit.Health > 0)
             turnQueue.Enqueue(CurrentUnit);
@@ -274,6 +283,7 @@ public class BattleManager : MonoBehaviour
 
             if (unit != null)
             {
+                unit.Init(m_battleManager);
                 unit.OnPlayerDeath += HandlePlayerDeath;
                 unit.SetSpeed(25);
                 _unitsInBattle.Add(unit);
