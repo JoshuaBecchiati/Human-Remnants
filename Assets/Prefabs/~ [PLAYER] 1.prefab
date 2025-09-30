@@ -261,11 +261,11 @@ MonoBehaviour:
   _collisionMask:
     serializedVersion: 2
     m_Bits: 65
-  _horizontalSpeed: 30
-  _verticalSpeed: 30
+  _horizontalSpeed: 10
+  _verticalSpeed: 10
   _maxElevation: 80
   _minElevation: -80
-  _desiredArmLenght: 3
+  _desiredArmLenght: 1.5
   _invertMouse: 0
 --- !u!1 &4981188390893463859
 GameObject:
@@ -359,7 +359,7 @@ CharacterController:
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!195 &1819300381612078251
 NavMeshAgent:

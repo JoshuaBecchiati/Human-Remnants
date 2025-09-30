@@ -113,7 +113,7 @@ public class CharCtrl : MonoBehaviour
         }
 
         // Calcolo per il movimento
-        _currentSpeed = Vector3.MoveTowards(_currentSpeed, _wantedSpeed, _acceleration * Time.deltaTime);
+        _currentSpeed = Vector3.Lerp(_currentSpeed, _wantedSpeed, _acceleration * Time.deltaTime);
 
         // Gestione della gravità
         if(!_isClimbing)
@@ -126,6 +126,7 @@ public class CharCtrl : MonoBehaviour
             {
                 // Calcolo della velocità verticale per far tornare il giocatore a terra
                 _verticalVelocity += -_gravity * Time.deltaTime;
+                _isJumping = false;
             }
             _currentSpeed.y = _verticalVelocity;
         }
@@ -214,16 +215,7 @@ public class CharCtrl : MonoBehaviour
             _animator.SetTrigger("Jump");
             _isJumping = true;
             _verticalVelocity = Mathf.Sqrt(2 * _jumpForce * _gravity);
-
-            // Optional: ritardo per impedire spam di salti
-            StartCoroutine(ResetJumpFlag());
         }
-    }
-
-    private IEnumerator ResetJumpFlag()
-    {
-        yield return new WaitForSeconds(0.1f); // Giusto per sicurezza
-        _isJumping = false;
     }
 
     // Da spostare nello script della camera

@@ -7,5 +7,5 @@ public abstract class Item : ScriptableObject
     // public Sprite icon;
     public ItemType type;
 
-    public abstract void UseItem(UnitBase target);
+    public abstract void Use(UnitBase target);
 }

@@ -47,6 +47,6 @@ public class ItemData
 
     public void UseItem(UnitBase target)
     {
-        Item.UseItem(target);
+        Item.Use(target);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
+
     [SerializeField] private List<ItemData> _itemsData = new();
 
     [SerializeField] private BattleManager _battleManager;

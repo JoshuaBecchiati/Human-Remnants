@@ -154,7 +154,7 @@ public class UIBattleManager : MonoBehaviour
         abilityChargeTMP.text = $"Charge {ability.ChargeCounter}/{ability.Ability.maxCharge}";
     }
 
-    public void NextMenu(int index)
+    public void ChangeMenu(int index)
     {
         m_menus.Find(m => m.activeInHierarchy == true).SetActive(false);
         m_menus[index].SetActive(true);
