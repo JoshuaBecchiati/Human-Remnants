@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class Player : CharCtrl, IDamageable
 {
+    // --- Inspector References ---
     [Header("Stats")]
     [SerializeField] private float _health = 100;
     [SerializeField] private float _stamina = 100;
@@ -13,9 +14,17 @@ public class Player : CharCtrl, IDamageable
     [SerializeField] private float _staminaDrainRun = 5f;
     [SerializeField] private float _invicibleTime = 5f;
 
+    [Header("Status")]
     [SerializeField] private bool _isInvincible;
     [SerializeField] private bool _isRunning;
 
+    [Header("Combat settings")]
+    [SerializeField] private GameObject _combatPF;
+
+    // --- Proprierties ---
+    public GameObject CombatPF => _combatPF;
+
+    // --- Events ---
     public event Action OnDeath;
     public event Action<float> OnChangeHealth;
     public event Action<float> OnChangeStamina;

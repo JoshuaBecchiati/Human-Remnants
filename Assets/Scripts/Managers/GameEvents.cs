@@ -6,15 +6,15 @@ public static class GameEvents
 {
     private static bool _isInFight = false;
 
-    public static event Action OnBattleStart;
+    public static event Action<BattleSettings> OnBattleStart;
     public static event Action OnBattleEnd;
 
-    public static void BattleStart()
+    public static void BattleStart(BattleSettings battleSettings)
     {
         if (!_isInFight)
         {
             _isInFight = true;
-            OnBattleStart?.Invoke();
+            OnBattleStart?.Invoke(battleSettings);
         }
     }
 

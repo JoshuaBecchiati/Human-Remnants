@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2bbae3613675e43a2340f8cf80e627, type: 3}
   m_Name: Battle_01
   m_EditorClassIdentifier: 
-  enemies: []
-  _scene: {fileID: 0}
+  enemies:
+  - {fileID: 4311111495703447436, guid: 790cbaa43a4b19c4a964617119f8d796, type: 3}
+  - {fileID: 4311111495703447436, guid: 790cbaa43a4b19c4a964617119f8d796, type: 3}
+  - {fileID: 4311111495703447436, guid: 790cbaa43a4b19c4a964617119f8d796, type: 3}

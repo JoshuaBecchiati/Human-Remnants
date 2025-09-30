@@ -2,15 +2,13 @@ using UnityEngine;
 
 public class BattleEnter : MonoBehaviour
 {
-    [SerializeField] private GameObject _battleScene;
-    [SerializeField] private GameObject _player;
+    [SerializeField] private BattleSettings _battleSettings;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            GameEvents.RaiseBattleEnter(_battleScene, _player);
-            Destroy(gameObject);
+            GameEvents.BattleStart(_battleSettings);
         }
     }
 }
