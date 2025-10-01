@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerInCombat : UnitBase
 {
     [SerializeField] private List<AbilityData> _AbilitiesData = new();
-    [SerializeField] private UIBattleManager m_battleManager;
+    [SerializeField] private UIBattleManager m_uiBattleManager;
 
     public event Action OnPlayerDeath;
 
@@ -16,7 +16,7 @@ public class PlayerInCombat : UnitBase
 
     public void Init(UIBattleManager uIBattleManager)
     {
-        m_battleManager = uIBattleManager;
+        m_uiBattleManager = uIBattleManager;
     }
 
     public override void TakeDamage(float damage)
@@ -29,10 +29,13 @@ public class PlayerInCombat : UnitBase
     public override void StartTurn()
     {
         base.StartTurn();
-        foreach (AbilityData ability in _AbilitiesData)
-            ability.CharchingAbility();
 
-        m_battleManager.CreateAbilityUI(_AbilitiesData);
+        if (_AbilitiesData != null)
+            foreach (AbilityData ability in _AbilitiesData)
+                ability.CharchingAbility();
+
+        if (m_uiBattleManager != null)
+            m_uiBattleManager.CreateAbilityUI(_AbilitiesData);
     }
 
     public IReadOnlyList<AbilityData> GetAbilities() => _AbilitiesData;

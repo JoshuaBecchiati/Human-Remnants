@@ -8,11 +8,12 @@ public class NewBattleManager : MonoBehaviour
 {
     // --- Inspector References ---
     [Header("Spawn Points")]
-    [SerializeField] private Transform[] _spawnPointsPlayers;
-    [SerializeField] private Transform[] _spawnPointsEnemies;
+    [SerializeField] private Transform[] m_spawnPointsPlayers;
+    [SerializeField] private Transform[] m_spawnPointsEnemies;
 
     [Header("Battle List")]
-    [SerializeField] private List<UnitBase> _unitsInBattle;
+    [SerializeField] private List<UnitBase> m_unitsInBattle;
+    [SerializeField] private List<UnitBase> m_turnOrder;
 
     // --- Instance ---
     public static NewBattleManager Instance { get; private set; }
@@ -24,14 +25,17 @@ public class NewBattleManager : MonoBehaviour
 
     private bool _isPlayerActing = false;
 
-    private UnitBase _currentUnit;
     private Camera _battleCamera;
+
+    // --- Proprierties ---
+    public UnitBase CurrentUnit => m_turnOrder[_indexCurrentUnit];
+    public UnitBase CurrentTarget => m_unitsInBattle[_indexTarget];
 
     // --- Events ---
     public event Action<ItemData> OnUseItem;
     public event Action<AbilityData> OnUseAbility;
 
-    #region Unity Methods
+    #region Unity methods
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -66,28 +70,32 @@ public class NewBattleManager : MonoBehaviour
         // Instantiate player and enemy prefabs
         for (int i = 0; i < playersPf.Count; i++)
         {
-            GameObject go = Instantiate(playersPf[i], _spawnPointsPlayers[i]);
+            GameObject go = Instantiate(playersPf[i], m_spawnPointsPlayers[i]);
             go.TryGetComponent(out PlayerInCombat p);
-            _unitsInBattle.Add(p);
+            p.OnPlayerDeath += HandleUnitDeath;
+            m_unitsInBattle.Add(p);
         }
 
         for (int i = 0; i < battleSettings.enemies.Length; i++)
         {
-            GameObject go = Instantiate(battleSettings.enemies[i], _spawnPointsEnemies[i]);
+            GameObject go = Instantiate(battleSettings.enemies[i], m_spawnPointsEnemies[i]);
             go.TryGetComponent(out EnemyInCombat e);
             e.SetSpeed(UnityEngine.Random.Range(10, 20));
-            _unitsInBattle.Add(e);
+            e.OnEnemyDeath += HandleUnitDeath;
+            m_unitsInBattle.Add(e);
         }
 
         // Ording the list by the speed
-        _unitsInBattle = _unitsInBattle.OrderBy(x => x.Speed).ToList();
+        m_turnOrder = m_unitsInBattle.OrderBy(x => x.Speed).ToList();
 
         // Start the first turn
-        _currentUnit = _unitsInBattle[0];
-        _currentUnit.StartTurn();
+        if (CurrentUnit.Team == EUnitTeam.player)
+            StartPlayerTurn();
+        CurrentUnit.StartTurn();
     }
     #endregion
 
+    #region Select target
     private void SelectAttackTarget(InputAction.CallbackContext context)
     {
         Vector2 dir = context.ReadValue<Vector2>();
@@ -97,36 +105,21 @@ public class NewBattleManager : MonoBehaviour
         else if (dir.x < -0.5f) direction = -1; // Left
         else return;
 
+        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+
         // Select the index of the wanted enemy, repeat until the target is an enemy
-        do
+        if (_indexTarget + direction > 0 && _indexTarget + direction < m_unitsInBattle.Count)
         {
-            _indexTarget += direction;
+            do _indexTarget += direction;
+            while (m_unitsInBattle[_indexTarget ].Health <= 0);
+        }
 
-            if (_indexTarget >= _unitsInBattle.Count) _indexTarget = 0;
-            else if (_indexTarget < 0) _indexTarget = _unitsInBattle.Count - 1;
-
-        } while (_unitsInBattle[_indexTarget].Team == EUnitTeam.player);
-
-        Debug.Log($"Target selected - {_indexTarget} {_unitsInBattle[_indexTarget].Team}");
+        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
+        Debug.Log($"Target selected - {_indexTarget} {CurrentTarget.Team}");
     }
+    #endregion
 
-    private void ChangeTurn()
-    {
-        _currentUnit.EndTurn();
-        if (_currentUnit.Team == EUnitTeam.player)
-            EndPlayerTurn();
-
-        do _indexCurrentUnit += 1;
-        while (_unitsInBattle[_indexCurrentUnit].Health <= 0);
-
-        _currentUnit = _unitsInBattle[_indexCurrentUnit];
-
-        if (_currentUnit.Team == EUnitTeam.player)
-            StartPlayerTurn();
-        _currentUnit.StartTurn();
-    }
-
-    #region Buttons Logic
+    #region Buttons logic
     /// <summary>
     /// Attack the selected enemy
     /// </summary>
@@ -137,12 +130,12 @@ public class NewBattleManager : MonoBehaviour
             _isPlayerActing = false;
             void HandleEndAttack()
             {
-                _currentUnit.OnEndAttack -= HandleEndAttack;
-                EndPlayerTurn();
+                CurrentUnit.OnEndAttack -= HandleEndAttack;
+                ChangeTurn();
             }
 
-            _currentUnit.OnEndAttack += HandleEndAttack;
-            _currentUnit.StartAttackAnimation(_unitsInBattle[_indexTarget]);
+            CurrentUnit.OnEndAttack += HandleEndAttack;
+            CurrentUnit.StartAttackAnimation(CurrentTarget);
         }
     }
 
@@ -154,7 +147,7 @@ public class NewBattleManager : MonoBehaviour
         if (_isPlayerActing)
         {
             _isPlayerActing = false;
-            EndPlayerTurn();
+            ChangeTurn();
         }
     }
 
@@ -175,9 +168,9 @@ public class NewBattleManager : MonoBehaviour
     {
         if (_isPlayerActing)
         {
-            item.UseItem(_unitsInBattle[_indexTarget]);
+            item.UseItem(CurrentTarget);
             OnUseItem?.Invoke(item);
-            EndPlayerTurn();
+            ChangeTurn();
         }
     }
 
@@ -191,8 +184,8 @@ public class NewBattleManager : MonoBehaviour
         if (_isPlayerActing && ability.ChargeCounter == ability.Ability.maxCharge)
         {
             _isPlayerActing = false;
-            List<UnitBase> enemies = new() { _unitsInBattle[_indexTarget] };
-            enemies.AddRange(_unitsInBattle.FindAll(e => e.Team == EUnitTeam.enemy && e != _unitsInBattle[_indexTarget]));
+            List<UnitBase> enemies = new() { CurrentTarget };
+            enemies.AddRange(m_unitsInBattle.FindAll(e => e.Team == EUnitTeam.enemy && e != CurrentTarget));
             ability.UseAbility(enemies.ToArray());
             OnUseAbility?.Invoke(ability);
             ChangeTurn();
@@ -201,23 +194,86 @@ public class NewBattleManager : MonoBehaviour
     #endregion
 
     #region Turn management
+    private void ChangeTurn()
+    {
+        CurrentUnit.EndTurn();
+        if (CurrentUnit.Team == EUnitTeam.player)
+            EndPlayerTurn();
+
+        do
+        {
+            _indexCurrentUnit += 1;
+
+            if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
+            else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
+
+        } while (CurrentUnit.gameObject.activeSelf == false);
+
+        if (CurrentUnit.Team == EUnitTeam.player)
+            StartPlayerTurn();
+        else
+            EnemyTurn();
+
+        CurrentUnit.StartTurn();
+    }
     private void StartPlayerTurn()
     {
         _isPlayerActing = true;
-        _indexTarget = _oldTarget;
+
+        if (m_unitsInBattle[_oldTarget].Team == EUnitTeam.enemy && m_unitsInBattle[_oldTarget].gameObject.activeSelf == true)
+        {
+            Debug.Log($"OLDTARGET {_oldTarget}");
+            _indexTarget = _oldTarget;
+        }
+        else
+            _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy && e.gameObject.activeSelf == true);
+
+        m_unitsInBattle[_indexTarget].transform.Find("Canvas").gameObject.SetActive(true);
+
     }
 
     private void EndPlayerTurn()
     {
         _isPlayerActing = false;
 
+        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+
         // Check if the current target is alive and is an enemy.
         // If yes, store the index for the next turn
         // else search the first alive enemy index
-        if (_unitsInBattle[_indexTarget].Health > 0 && _unitsInBattle[_indexTarget].Team == EUnitTeam.enemy)
+        if (CurrentTarget.Team == EUnitTeam.enemy && CurrentTarget.gameObject.activeSelf == true)
             _oldTarget = _indexTarget;
         else
-            _oldTarget = _unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy && e.Health > 0);
+            _oldTarget = m_unitsInBattle.FindIndex(e => e.gameObject.activeSelf == true);
+    }
+
+    private void EnemyTurn()
+    {
+        void HandleEndAttack()
+        {
+            CurrentUnit.OnEndAttack -= HandleEndAttack;
+            ChangeTurn();
+        }
+
+        CurrentUnit.OnEndAttack += HandleEndAttack;
+
+        UnitBase target = m_unitsInBattle.Find(p => p.Team == EUnitTeam.player);
+        if (target != null)
+            CurrentUnit.StartAttackAnimation(target);
+    }
+    #endregion
+
+    #region Victory and death
+
+
+    private void HandleUnitDeath()
+    {
+        if (m_unitsInBattle.Find(u => u.Health <= 0) is UnitBase unit)
+        {
+            if (CurrentUnit == unit)
+                ChangeTurn();
+            unit.gameObject.SetActive(false);
+        }
     }
     #endregion
 }
