@@ -18,7 +18,7 @@ public static class GameEvents
         }
     }
 
-    public static void BattleEnd()
+    public static void BattleEnd(EUnitTeam winnerTeam)
     {
         if (_isInFight)
         {

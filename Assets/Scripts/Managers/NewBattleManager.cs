@@ -111,7 +111,7 @@ public class NewBattleManager : MonoBehaviour
         if (_indexTarget + direction > 0 && _indexTarget + direction < m_unitsInBattle.Count)
         {
             do _indexTarget += direction;
-            while (m_unitsInBattle[_indexTarget ].Health <= 0);
+            while (CurrentTarget.IsDead);
         }
 
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
@@ -156,7 +156,7 @@ public class NewBattleManager : MonoBehaviour
         if (_isPlayerActing)
         {
             _isPlayerActing = false;
-            GameEvents.BattleEnd();
+            BattleEnd(EUnitTeam.Escape);
         }
     }
 
@@ -207,7 +207,7 @@ public class NewBattleManager : MonoBehaviour
             if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
             else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
 
-        } while (CurrentUnit.gameObject.activeSelf == false);
+        } while (CurrentUnit.IsDead == false);
 
         if (CurrentUnit.Team == EUnitTeam.player)
             StartPlayerTurn();
@@ -220,13 +220,13 @@ public class NewBattleManager : MonoBehaviour
     {
         _isPlayerActing = true;
 
-        if (m_unitsInBattle[_oldTarget].Team == EUnitTeam.enemy && m_unitsInBattle[_oldTarget].gameObject.activeSelf == true)
+        if (m_unitsInBattle[_oldTarget].Team == EUnitTeam.enemy && m_unitsInBattle[_oldTarget].IsDead == true)
         {
             Debug.Log($"OLDTARGET {_oldTarget}");
             _indexTarget = _oldTarget;
         }
         else
-            _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy && e.gameObject.activeSelf == true);
+            _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy && e.IsDead == true);
 
         m_unitsInBattle[_indexTarget].transform.Find("Canvas").gameObject.SetActive(true);
 
@@ -241,10 +241,10 @@ public class NewBattleManager : MonoBehaviour
         // Check if the current target is alive and is an enemy.
         // If yes, store the index for the next turn
         // else search the first alive enemy index
-        if (CurrentTarget.Team == EUnitTeam.enemy && CurrentTarget.gameObject.activeSelf == true)
+        if (CurrentTarget.Team == EUnitTeam.enemy && CurrentTarget.IsDead == true)
             _oldTarget = _indexTarget;
         else
-            _oldTarget = m_unitsInBattle.FindIndex(e => e.gameObject.activeSelf == true);
+            _oldTarget = m_unitsInBattle.FindIndex(e => e.IsDead == true);
     }
 
     private void EnemyTurn()
@@ -263,8 +263,28 @@ public class NewBattleManager : MonoBehaviour
     }
     #endregion
 
-    #region Victory and death
+    #region EndBattle and death
+    private EUnitTeam CheckBattleResult()
+    {
+        bool isPlayersAlive = m_unitsInBattle.Any(p => p.IsDead == false);
+        bool isEnemiesAlive = m_unitsInBattle.Any(e => e.IsDead == false);
 
+        if (isPlayersAlive) return EUnitTeam.player;
+        if (isEnemiesAlive) return EUnitTeam.enemy;
+
+        return EUnitTeam.None;
+
+    }
+    private void BattleEnd(EUnitTeam escape)
+    {
+        GameEvents.BattleEnd(escape);
+    }
+    private void BattleEnd()
+    {
+        EUnitTeam winnerTeam = CheckBattleResult();
+        if (winnerTeam != EUnitTeam.None)
+            GameEvents.BattleEnd(winnerTeam);
+    }
 
     private void HandleUnitDeath()
     {
@@ -272,8 +292,12 @@ public class NewBattleManager : MonoBehaviour
         {
             if (CurrentUnit == unit)
                 ChangeTurn();
-            unit.gameObject.SetActive(false);
+            unit.SetDead();
         }
+
+        // Check se la battaglia è finita
+        BattleEnd();
+
     }
     #endregion
 }

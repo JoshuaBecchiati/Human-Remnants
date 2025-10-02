@@ -14,6 +14,7 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private float _speedNextTurn;
     [SerializeField] private float _damage;
     [SerializeField] private bool _isItsTurn;
+    [SerializeField] private bool _isDead;
     [SerializeField] private EUnitTeam _team;
     [SerializeField] private Animator _animator;
     [SerializeField] protected UnitBase _target;
@@ -28,6 +29,7 @@ public abstract class UnitBase : MonoBehaviour
     public float SpeedNextTurn => _speedNextTurn;
     public float Damage => _damage;
     public bool IsItsTurn => _isItsTurn;
+    public bool IsDead => _isDead;
     public EUnitTeam Team => _team;
 
     public UnitBase Instance { get; private set; }
@@ -109,4 +111,7 @@ public abstract class UnitBase : MonoBehaviour
 
         _target = null;
     }
+
+    public void SetDead() => _isDead = true;
+    public void SetAlive() => _isDead = false;
 }
