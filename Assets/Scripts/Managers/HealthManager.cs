@@ -23,7 +23,7 @@ public class HealthManager : MonoBehaviour
 
     private void ChangeHealthHandler(float health)
     {
-            _healthBar.fillAmount = health / 100f;
+        _healthBar.fillAmount = health / 100f;
     }
 
     private void ChangeStaminaHandler(float stamina)

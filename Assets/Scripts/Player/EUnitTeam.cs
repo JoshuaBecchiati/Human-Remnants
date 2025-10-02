@@ -1,7 +1,7 @@
 public enum EUnitTeam
 {
     None,
-    player,
-    enemy,
+    Player,
+    Enemy,
     Escape,
 }

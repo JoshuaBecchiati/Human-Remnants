@@ -114,7 +114,7 @@ public class BattleManager : MonoBehaviour
         {
             _selectedTarget = (_selectedTarget + direction + _unitsInBattle.Count) % _unitsInBattle.Count;
 
-            if (_unitsInBattle[_selectedTarget].Team == EUnitTeam.enemy)
+            if (_unitsInBattle[_selectedTarget].Team == EUnitTeam.Enemy)
             {
                 Debug.Log($"Target selected - {_selectedTarget}\n" +
                           $"---[Statistics]---\n" +
@@ -135,11 +135,11 @@ public class BattleManager : MonoBehaviour
     private void PlayerTurn()
     {
         _isPlayerActing = true;
-        if (CurrentUnit.Team == EUnitTeam.player)
+        if (CurrentUnit.Team == EUnitTeam.Player)
         {
-            UnitBase target = _unitsInBattle.Find(p => p.Team == EUnitTeam.enemy);
+            UnitBase target = _unitsInBattle.Find(p => p.Team == EUnitTeam.Enemy);
             if (target != null)
-                _selectedTarget = _unitsInBattle.FindIndex(e => e.Team == EUnitTeam.enemy);
+                _selectedTarget = _unitsInBattle.FindIndex(e => e.Team == EUnitTeam.Enemy);
         }
     }
     /// <summary>
@@ -147,7 +147,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void EnemyTurn()
     {
-        if (CurrentUnit.Team == EUnitTeam.enemy)
+        if (CurrentUnit.Team == EUnitTeam.Enemy)
         {
             void HandleEndAttack()
             {
@@ -157,7 +157,7 @@ public class BattleManager : MonoBehaviour
 
             CurrentUnit.OnEndAttack += HandleEndAttack;
 
-            UnitBase target = _unitsInBattle.Find(p => p.Team == EUnitTeam.player);
+            UnitBase target = _unitsInBattle.Find(p => p.Team == EUnitTeam.Player);
             if (target != null)
                 CurrentUnit.StartAttackAnimation(target);
 
@@ -192,9 +192,9 @@ public class BattleManager : MonoBehaviour
         if (CurrentUnit.Health > 0)
             turnQueue.Enqueue(CurrentUnit);
 
-        if (CurrentUnit.Team == EUnitTeam.player)
+        if (CurrentUnit.Team == EUnitTeam.Player)
             PlayerTurn();
-        else if (CurrentUnit.Team == EUnitTeam.enemy)
+        else if (CurrentUnit.Team == EUnitTeam.Enemy)
             EnemyTurn();
     }
 
@@ -206,7 +206,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     public void BTNAttack()
     {
-        if (_selectedTarget >= 0 && _unitsInBattle[_selectedTarget].Team == EUnitTeam.enemy && _isPlayerActing)
+        if (_selectedTarget >= 0 && _unitsInBattle[_selectedTarget].Team == EUnitTeam.Enemy && _isPlayerActing)
         {
             _isPlayerActing = false;
             void HandleEndAttack()
@@ -258,7 +258,7 @@ public class BattleManager : MonoBehaviour
         {
             _isPlayerActing = false;
             List<UnitBase> enemies = new() { _unitsInBattle[_selectedTarget] };
-            enemies.AddRange(_unitsInBattle.FindAll(e => e.Team == EUnitTeam.enemy && e != _unitsInBattle[_selectedTarget]));
+            enemies.AddRange(_unitsInBattle.FindAll(e => e.Team == EUnitTeam.Enemy && e != _unitsInBattle[_selectedTarget]));
             ability.UseAbility(enemies.ToArray());
             OnUseAbility?.Invoke(ability);
             NextTurn();
@@ -314,7 +314,7 @@ public class BattleManager : MonoBehaviour
         // Primo turno
         NextTurn();
 
-        _selectedTarget = _unitsInBattle.FindIndex(u => u.Team == EUnitTeam.enemy);
+        _selectedTarget = _unitsInBattle.FindIndex(u => u.Team == EUnitTeam.Enemy);
     }
     #endregion
 
@@ -324,13 +324,13 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void Victory()
     {
-        if (!_unitsInBattle.Exists(p => p.Team == EUnitTeam.player))
+        if (!_unitsInBattle.Exists(p => p.Team == EUnitTeam.Player))
         {
             Debug.Log("Enemies won!");
             _isFighting = false;
             OnCloseBattle?.Invoke();
         }
-        else if (!_unitsInBattle.Exists(p => p.Team == EUnitTeam.enemy))
+        else if (!_unitsInBattle.Exists(p => p.Team == EUnitTeam.Enemy))
         {
             Debug.Log("Players won!");
             _isFighting = false;

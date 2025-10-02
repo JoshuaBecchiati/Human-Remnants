@@ -3413,7 +3413,8 @@ MonoBehaviour:
   _speedNextTurn: 100
   _damage: 2.5
   _isItsTurn: 0
-  _team: 1
+  _isDead: 0
+  _team: 2
   _animator: {fileID: 0}
   _target: {fileID: 0}
 --- !u!114 &-5729480921950717709

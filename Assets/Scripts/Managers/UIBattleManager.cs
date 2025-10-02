@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-//[DefaultExecutionOrder(-5)]
 public class UIBattleManager : MonoBehaviour
 {
     [Header("Menu")]
@@ -23,7 +22,7 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private GameObject m_AbilityPrefab;
 
     [Header("Dependency")]
-    [SerializeField] private BattleManager m_battleManager;
+    [SerializeField] private NewBattleManager m_battleManager;
     [SerializeField] private InventoryManager m_inventoryManager;
 
     // -- Instance ---
@@ -80,7 +79,7 @@ public class UIBattleManager : MonoBehaviour
 
     public void CreateUnitUI(UnitBase unit)
     {
-        Transform parent = (unit.Team == EUnitTeam.player) ? m_playerUIParent : m_enemyUIParent;
+        Transform parent = (unit.Team == EUnitTeam.Player) ? m_playerUIParent : m_enemyUIParent;
         GameObject ui = Instantiate(m_healthBarPrefab, parent);
 
         if(ui.TryGetComponent(out UIHealthBar healthBar))

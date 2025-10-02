@@ -19,8 +19,6 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] protected UnitBase _target;
 
-    public int _id { get; private set; }
-
     public string Name => _name;
     public float Health => _health;
     public float MaxHealth => _maxHealth;
@@ -42,6 +40,7 @@ public abstract class UnitBase : MonoBehaviour
     protected virtual void Awake()
     {
         _animator = GetComponent<Animator>();
+        _isDead = false;
     }
 
     public void StartAttackAnimation(UnitBase target)
@@ -52,6 +51,7 @@ public abstract class UnitBase : MonoBehaviour
     public void EndAttackAnimation()
     {
         OnEndAttack?.Invoke();
+
     }
 
     #region Handle health
