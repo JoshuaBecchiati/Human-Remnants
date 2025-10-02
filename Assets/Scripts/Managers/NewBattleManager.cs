@@ -25,6 +25,8 @@ public class NewBattleManager : MonoBehaviour
 
     private bool _isPlayerActing = false;
 
+    private BattleResult _battleResult;
+
     private Camera _battleCamera;
 
     // --- Proprierties ---
@@ -158,7 +160,7 @@ public class NewBattleManager : MonoBehaviour
         if (_isPlayerActing)
         {
             _isPlayerActing = false;
-            BattleEnd(EUnitTeam.Escape);
+            BattleEnd(BattleResult.Escape);
         }
     }
 
@@ -266,26 +268,26 @@ public class NewBattleManager : MonoBehaviour
     #endregion
 
     #region EndBattle and death
-    private EUnitTeam CheckBattleResult()
+    private BattleResult CheckBattleResult()
     {
         bool isPlayersAlive = m_unitsInBattle.Any(p => !p.IsDead);
         bool isEnemiesAlive = m_unitsInBattle.Any(e => !e.IsDead);
 
-        if (isPlayersAlive) return EUnitTeam.Player;
-        if (isEnemiesAlive) return EUnitTeam.Enemy;
+        if (isPlayersAlive) return BattleResult.Player;
+        if (isEnemiesAlive) return BattleResult.Enemy;
 
-        return EUnitTeam.None;
+        return BattleResult.None;
 
     }
-    private void BattleEnd(EUnitTeam escape)
+    private void BattleEnd(BattleResult escape)
     {
         GameEvents.BattleEnd(escape);
     }
     private void BattleEnd()
     {
-        EUnitTeam winnerTeam = CheckBattleResult();
-        if (winnerTeam != EUnitTeam.None)
-            GameEvents.BattleEnd(winnerTeam);
+        BattleResult winner = CheckBattleResult();
+        if (winner != BattleResult.None)
+            GameEvents.BattleEnd(winner);
     }
 
     private void HandleUnitDeath()
