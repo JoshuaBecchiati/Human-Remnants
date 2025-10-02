@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerInCombat : UnitBase
 {
     [SerializeField] private List<AbilityData> _AbilitiesData = new();
-    [SerializeField] private UIBattleManager m_uiBattleManager;
+    
+    private UIBattleManager m_uiBattleManager;
 
     public event Action OnPlayerDeath;
 

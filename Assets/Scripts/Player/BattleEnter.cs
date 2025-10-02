@@ -8,7 +8,7 @@ public class BattleEnter : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            GameEvents.BattleStart(_battleSettings);
+            GameEvents.BattleStart(_battleSettings, gameObject);
         }
     }
 }

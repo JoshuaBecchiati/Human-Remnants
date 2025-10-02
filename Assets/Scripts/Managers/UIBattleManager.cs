@@ -41,12 +41,15 @@ public class UIBattleManager : MonoBehaviour
     private void OnEnable()
     {
         if (m_battleManager != null)
+        {
             m_battleManager.OnCreateUnit += CreateUnitUI;
+            m_battleManager.OnCreateUnit += InitUnitUI;
+        }
 
         if (m_inventoryManager != null)
+        {
             m_inventoryManager.OnRemoveItem += UpdateItemUI;
-
-        
+        }
 
         RebuildUI();
         CreateInvUI();
@@ -55,10 +58,16 @@ public class UIBattleManager : MonoBehaviour
     private void OnDisable()
     {
         if (m_battleManager != null)
+        {
             m_battleManager.OnCreateUnit -= CreateUnitUI;
+        }
+
 
         if (m_inventoryManager != null)
+        {
             m_inventoryManager.OnRemoveItem -= UpdateItemUI;
+        }
+
 
         foreach (Transform child in m_playerUIParent)
             Destroy(child.gameObject);
@@ -68,6 +77,12 @@ public class UIBattleManager : MonoBehaviour
             Destroy(Child.gameObject);
         foreach (Transform Child in m_AbilityUIParent)
             Destroy(Child.gameObject);
+    }
+
+    private void InitUnitUI(UnitBase unit)
+    {
+        if(unit is PlayerInCombat player)
+            player.Init(Instance);
     }
 
     private void RebuildUI()

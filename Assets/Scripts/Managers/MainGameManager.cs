@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,13 +16,14 @@ public class MainGameManager : MonoBehaviour
     [SerializeField] private List<GameObject> m_players;
     [SerializeField] private GameObject m_currentPlayer;
 
+    // --- Private ---
+    private GameObject _enemy;
+
     public IReadOnlyList<GameObject> PlayersCombatPF =>
         m_players
             .Where(p => p.TryGetComponent<Player>(out _)) // filtra quelli che hanno lo script
             .Select(p => p.GetComponent<Player>().CombatPF) // prendi il prefab
             .ToList();
-
-    private GameObject _currentBattle;
 
 
     private void Awake()
@@ -36,22 +38,28 @@ public class MainGameManager : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnBattleStart += BattleStart;
+        GameEvents.OnBattleEnd += BattelClose;
     }
     private void OnDisable()
     {
         GameEvents.OnBattleStart -= BattleStart;
+        GameEvents.OnBattleEnd -= BattelClose;
     }
 
     private void OnDestroy()
     {
         if (BattleManager.Instance)
-            BattleManager.Instance.OnCloseBattle -= CloseBattle;
+            BattleManager.Instance.OnCloseBattle -= BattelClose;
 
         if (Instance == this) Instance = null;
     }
 
-    private void BattleStart(BattleSettings battleSettings)
+    private void BattleStart(BattleSettings battleSettings, GameObject enemy)
     {
+        _enemy = enemy;
+
+        _enemy.GetComponent<Collider>().isTrigger = false;
+        _enemy.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -62,32 +70,21 @@ public class MainGameManager : MonoBehaviour
 
     }
 
-    public void EnterBattle(GameObject battleScene, GameObject player)
+    public void BattelClose()
     {
-        _currentBattle = battleScene;
-        m_currentPlayer = player;
+        _battleScene.SetActive(false);
+        m_currentPlayer.SetActive(true);
 
-        _currentBattle.SetActive(true);
-
-        m_currentPlayer.SetActive(false);
-
-        BattleManager.Instance.OnCloseBattle += CloseBattle;
-
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
-
-    public void CloseBattle()
-    {
-        if (_currentBattle != null)
-            _currentBattle.SetActive(false);
-        if (m_currentPlayer != null)
-            m_currentPlayer.SetActive(true);
-
-        m_currentPlayer = null;
-        _currentBattle = null;
+        _enemy.SetActive(true);
+        StartCoroutine(DisableCollider());
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    private IEnumerator DisableCollider()
+    {
+        yield return new WaitForSeconds(2f);
+        _enemy.GetComponent<Collider>().isTrigger = true;
     }
 }

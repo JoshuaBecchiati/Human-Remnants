@@ -7,7 +7,7 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] private List<ItemData> _itemsData = new();
 
-    [SerializeField] private BattleManager _battleManager;
+    [SerializeField] private NewBattleManager m_battleManager;
 
     // --- Static ---
     public static InventoryManager Instance { get; private set; }
@@ -28,13 +28,13 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        if (_battleManager != null)
-            _battleManager.OnUseItem += RemoveItemInInventory;
+        if (m_battleManager != null)
+            m_battleManager.OnUseItem += RemoveItemInInventory;
     }
     private void OnDestroy()
     {
-        if (_battleManager != null)
-            _battleManager.OnUseItem -= RemoveItemInInventory;
+        if (m_battleManager != null)
+            m_battleManager.OnUseItem -= RemoveItemInInventory;
     }
 
     public void AddItemInInventory(Item item, int qty)

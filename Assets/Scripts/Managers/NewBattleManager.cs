@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,7 +26,6 @@ public class NewBattleManager : MonoBehaviour
 
     private bool _isPlayerActing = false;
 
-    private BattleResult _battleResult;
 
     private Camera _battleCamera;
 
@@ -35,7 +35,6 @@ public class NewBattleManager : MonoBehaviour
 
     // --- Events ---
     public event Action<ItemData> OnUseItem;
-    public event Action<AbilityData> OnUseAbility;
     public event Action<UnitBase> OnCreateUnit;
 
     #region Unity methods
@@ -112,12 +111,22 @@ public class NewBattleManager : MonoBehaviour
 
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
 
-        // Select the index of the wanted enemy, repeat until the target is an enemy
-        if (_indexTarget + direction > 0 && _indexTarget + direction < m_unitsInBattle.Count)
+        int nextIndex = _indexTarget;
+        int enemyStart = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.Enemy);
+
+        do
         {
-            do _indexTarget += direction;
-            while (CurrentTarget.IsDead);
-        }
+            nextIndex += direction;
+            if (nextIndex < enemyStart || nextIndex >= m_unitsInBattle.Count)
+            {
+                nextIndex -= direction;
+                break;
+            }
+        } while (m_unitsInBattle[nextIndex].IsDead);
+
+        Debug.Log($"Index {nextIndex}");
+
+        _indexTarget = nextIndex;
 
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
     }
@@ -191,7 +200,6 @@ public class NewBattleManager : MonoBehaviour
             List<UnitBase> enemies = new() { CurrentTarget };
             enemies.AddRange(m_unitsInBattle.FindAll(e => e.Team == EUnitTeam.Enemy && e != CurrentTarget));
             ability.UseAbility(enemies.ToArray());
-            OnUseAbility?.Invoke(ability);
             ChangeTurn();
         }
     }
@@ -270,24 +278,32 @@ public class NewBattleManager : MonoBehaviour
     #region EndBattle and death
     private BattleResult CheckBattleResult()
     {
-        bool isPlayersAlive = m_unitsInBattle.Any(p => !p.IsDead);
-        bool isEnemiesAlive = m_unitsInBattle.Any(e => !e.IsDead);
+        bool isPlayersAlive = m_unitsInBattle.Exists(p => !p.IsDead);
+        bool isEnemiesAlive = m_unitsInBattle.Exists(e => !e.IsDead);
 
-        if (isPlayersAlive) return BattleResult.Player;
-        if (isEnemiesAlive) return BattleResult.Enemy;
+        if (!isPlayersAlive) return BattleResult.Enemy;
+        if (!isEnemiesAlive) return BattleResult.Player;
 
         return BattleResult.None;
-
     }
     private void BattleEnd(BattleResult escape)
     {
+        foreach (UnitBase unit in m_unitsInBattle)
+            Destroy(unit.gameObject);
+        m_unitsInBattle.Clear();
         GameEvents.BattleEnd(escape);
     }
     private void BattleEnd()
     {
         BattleResult winner = CheckBattleResult();
         if (winner != BattleResult.None)
+        {
+            Debug.Log($"Winner {winner}");
+            foreach (UnitBase unit in m_unitsInBattle)
+                Destroy(unit.gameObject);
+            m_unitsInBattle.Clear();
             GameEvents.BattleEnd(winner);
+        }
     }
 
     private void HandleUnitDeath()
@@ -297,6 +313,7 @@ public class NewBattleManager : MonoBehaviour
             if (CurrentUnit == unit)
                 ChangeTurn();
             unit.SetDead();
+            unit.gameObject.SetActive(false);
         }
 
         // Check se la battaglia è finita
