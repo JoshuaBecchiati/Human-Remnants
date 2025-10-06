@@ -1,8 +1,9 @@
 public enum PlayerActionState
 {
     Idle,
-    ChoosingAlly,
-    ChoosingEnemy,
+    ChoosingItemAlly,
+    ChoosingItemEnemy,
+    ChoosingAttack,
     Acting,
 
 }

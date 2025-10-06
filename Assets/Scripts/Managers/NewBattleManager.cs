@@ -1,4 +1,3 @@
-using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,9 +16,9 @@ public class NewBattleManager : MonoBehaviour
     [SerializeField] private List<UnitBase> m_unitsInBattle;
     [SerializeField] private List<UnitBase> m_turnOrder;
 
-    [SerializeField] private CinemachineVirtualCamera m_enemyCamera;
-    [SerializeField] private CinemachineVirtualCamera m_playerCamera;
-    [SerializeField] private CinemachineVirtualCamera m_battleCamera;
+    [Header("Dependency")]
+    [SerializeField] private BattleCameraManager m_cameraController;
+    [SerializeField] private ActionSelector m_actionSelector;
 
     // --- Instance ---
     public static NewBattleManager Instance { get; private set; }
@@ -34,8 +33,7 @@ public class NewBattleManager : MonoBehaviour
 
     private BattleStatus _battleStatus;
     private BattleResult _pendingResult;
-    private PlayerActionState _playerActionState;
-    private EUnitTeam _selectingTeam;
+    private EUnitTeam _selectingTeam = EUnitTeam.Enemy;
 
     private ItemData _selectedItem;
 
@@ -72,30 +70,6 @@ public class NewBattleManager : MonoBehaviour
         _battleStatus = BattleStatus.None;
         if (PlayerInputSingleton.Instance != null)
             PlayerInputSingleton.Instance.Actions["Combat"].performed -= SelectAttackTarget;
-    }
-
-    private void Update()
-    {
-        if (_pendingBattleEnd)
-        {
-            _pendingBattleEnd = false;
-            BattleEnd(_pendingResult);
-        }
-
-        if (!_isPlayerActing || _battleStatus != BattleStatus.Ongoing)
-            return;
-
-        switch (_playerActionState)
-        {
-            case PlayerActionState.ChoosingAlly:
-                _selectingTeam = EUnitTeam.Player;
-                ConfirmAction();
-                break;
-            case PlayerActionState.ChoosingEnemy:
-                _selectingTeam = EUnitTeam.Enemy;
-                ConfirmAction();
-                break;
-        }
     }
     #endregion
 
@@ -145,9 +119,11 @@ public class NewBattleManager : MonoBehaviour
     #region Select target
     public void SelectAttackTarget(InputAction.CallbackContext context)
     {
+        // Return if the battle isn't ongoing
         if (_battleStatus != BattleStatus.Ongoing)
             return;
 
+        // Get directional value for select the target
         Vector2 dir = context.ReadValue<Vector2>();
         int direction = dir.x > 0.5f ? 1 : (dir.x < -0.5f ? -1 : 0);
         if (direction == 0)
@@ -158,6 +134,7 @@ public class NewBattleManager : MonoBehaviour
         if (indexesTeam.Count == 0)
             return;
 
+        // 
         int posInTeam = indexesTeam.IndexOf(_indexTarget);
         if (posInTeam == -1) posInTeam = 0;
 
@@ -181,6 +158,19 @@ public class NewBattleManager : MonoBehaviour
         _indexTarget = indexesTeam[nextPos];
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
     }
+    private void SelectTarget(UnitBase newTarget)
+    {
+        // Disattiva il vecchio target
+        if (CurrentTarget != null)
+            CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+
+        // Aggiorna l'indice
+        _oldTarget = _indexTarget;
+        _indexTarget = m_unitsInBattle.IndexOf(newTarget);
+
+        // Attiva il canvas del nuovo target
+        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
+    }
     #endregion
 
     #region Buttons logic
@@ -189,18 +179,15 @@ public class NewBattleManager : MonoBehaviour
     /// </summary>
     public void BTNAttack()
     {
-        if (_isPlayerActing && _battleStatus == BattleStatus.Ongoing)
-        {
-            _isPlayerActing = false;
-            void HandleEndAttack()
-            {
-                CurrentUnit.OnEndAttack -= HandleEndAttack;
-                ChangeTurn();
-            }
+        if (!_isPlayerActing || _battleStatus != BattleStatus.Ongoing)
+            return;
 
-            CurrentUnit.OnEndAttack += HandleEndAttack;
-            CurrentUnit.StartAttackAnimation(CurrentTarget);
-        }
+        m_cameraController.EnemyCamera();
+
+        m_actionSelector.StartConfirmAction(
+            onConfirm: () => StartCoroutine(ExecuteAttack()),
+            onCancel: CancelAttack
+        );
     }
 
     /// <summary>
@@ -238,16 +225,20 @@ public class NewBattleManager : MonoBehaviour
         _selectedItem = item;
         if (item.Item.type == ItemType.damage)
         {
-            m_battleCamera.Priority = 0;
-            m_enemyCamera.Priority = 10;
-            _playerActionState = PlayerActionState.ChoosingEnemy;
+            _selectingTeam = EUnitTeam.Enemy;
+            m_cameraController.EnemyCamera();
         }
-        else
+        else if (item.Item.type == ItemType.heal)
         {
-            m_battleCamera.Priority = 0;
-            m_playerCamera.Priority = 10;
-            _playerActionState = PlayerActionState.ChoosingAlly;
+            _selectingTeam = EUnitTeam.Player;
+            m_cameraController.PlayerCamera();
+            SelectTarget(CurrentUnit);
         }
+
+        m_actionSelector.StartConfirmAction(
+            onConfirm: () => StartCoroutine(ExecuteItemUse()),
+            onCancel: CancelItemAction
+        );
     }
 
     /// <summary>
@@ -268,18 +259,29 @@ public class NewBattleManager : MonoBehaviour
     }
     #endregion
 
-    private void ConfirmAction()
+    #region Action Execution
+    private IEnumerator ExecuteAttack()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
+        m_cameraController.BattleCamera();
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (_isPlayerActing && _battleStatus == BattleStatus.Ongoing)
         {
-            _playerActionState = PlayerActionState.Acting;
-            StartCoroutine(ExecuteItemUse());
+            _isPlayerActing = false;
+            void HandleEndAttack()
+            {
+                CurrentUnit.OnEndAttack -= HandleEndAttack;
+                ChangeTurn();
+            }
+
+            CurrentUnit.OnEndAttack += HandleEndAttack;
+            CurrentUnit.StartAttackAnimation(CurrentTarget);
         }
-        else if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            _playerActionState = PlayerActionState.Idle;
-            CancelItemAction();
-        }
+    }
+    private void CancelAttack()
+    {
+        m_cameraController.BattleCamera();
     }
     private IEnumerator ExecuteItemUse()
     {
@@ -290,66 +292,47 @@ public class NewBattleManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         // Ripristina camera e resetta stato
-        _playerActionState = PlayerActionState.Idle;
         _isPlayerActing = false;
+        m_cameraController.BattleCamera();
 
-        if (m_playerCamera.Priority > 0)
-        {
-            m_battleCamera.Priority = 10;
-            m_playerCamera.Priority = 0;
-        }
-        else if (m_enemyCamera.Priority > 0)
-        {
-            m_battleCamera.Priority = 10;
-            m_enemyCamera.Priority = 0;
-        }
-
-            yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.5f);
 
         ChangeTurn();
     }
     private void CancelItemAction()
     {
-        _playerActionState = PlayerActionState.Idle;
+        _selectingTeam = EUnitTeam.Enemy;
         _selectedItem = null;
-        if (m_playerCamera.Priority > 0)
-        {
-            m_battleCamera.Priority = 10;
-            m_playerCamera.Priority = 0;
-        }
-        else if (m_enemyCamera.Priority > 0)
-        {
-            m_battleCamera.Priority = 10;
-            m_enemyCamera.Priority = 0;
-        }
+        SelectTarget(m_unitsInBattle[_oldTarget]);
+        m_cameraController.BattleCamera();
         Debug.Log("Azione annullata");
     }
+    #endregion
 
     #region Turn management
     private void ChangeTurn()
     {
-        if (_battleStatus == BattleStatus.Ongoing)
+        if (_battleStatus != BattleStatus.Ongoing)
+            return;
+
+        CurrentUnit.EndTurn();
+        if (CurrentUnit.Team == EUnitTeam.Player)
+            EndPlayerTurn();
+
+        do
         {
-            CurrentUnit.EndTurn();
-            if (CurrentUnit.Team == EUnitTeam.Player)
-                EndPlayerTurn();
+            _indexCurrentUnit += 1;
 
-            do
-            {
-                _indexCurrentUnit += 1;
+            if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
+            else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
+        } while (CurrentUnit.IsDead);
 
-                if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
-                else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
+        if (CurrentUnit.Team == EUnitTeam.Player)
+            StartPlayerTurn();
+        else
+            EnemyTurn();
 
-            } while (CurrentUnit.IsDead);
-
-            if (CurrentUnit.Team == EUnitTeam.Player)
-                StartPlayerTurn();
-            else
-                EnemyTurn();
-
-            CurrentUnit.StartTurn();
-        }
+        CurrentUnit.StartTurn();
     }
     private void StartPlayerTurn()
     {
@@ -419,7 +402,6 @@ public class NewBattleManager : MonoBehaviour
         m_unitsInBattle.Clear();
         GameEvents.BattleEnd(winner);
     }
-
     private void HandleUnitDeath()
     {
         if (m_unitsInBattle.Find(u => u.Health <= 0 && !u.IsDead) is UnitBase unit)
