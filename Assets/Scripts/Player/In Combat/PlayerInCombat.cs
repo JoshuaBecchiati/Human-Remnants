@@ -8,7 +8,7 @@ public class PlayerInCombat : UnitBase
     
     private UIBattleManager m_uiBattleManager;
 
-    public event Action OnPlayerDeath;
+    public new event Action<UnitBase> OnDeath;
 
     protected override void Awake()
     {
@@ -18,13 +18,6 @@ public class PlayerInCombat : UnitBase
     public void Init(UIBattleManager uIBattleManager)
     {
         m_uiBattleManager = uIBattleManager;
-    }
-
-    public override void TakeDamage(float damage)
-    {
-        base.TakeDamage(damage);
-        if (Health <= 0)
-            OnPlayerDeath?.Invoke();
     }
 
     public override void StartTurn()

@@ -2,6 +2,11 @@ public enum BattleStatus
 {
     None,
     Starting,
-    Ongoing,
+    Executing,
+    ChangingTurn,
+    PlayerTurn,
+    EnemyTurn,
+    TurnTransition,
+    CheckingEnd,
     Ending,
 }

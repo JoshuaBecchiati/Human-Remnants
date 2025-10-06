@@ -46,14 +46,6 @@ public class MainGameManager : MonoBehaviour
         GameEvents.OnBattleEnd -= BattelClose;
     }
 
-    private void OnDestroy()
-    {
-        if (BattleManager.Instance)
-            BattleManager.Instance.OnCloseBattle -= BattelClose;
-
-        if (Instance == this) Instance = null;
-    }
-
     private void BattleStart(BattleSettings battleSettings, GameObject enemy)
     {
         _enemy = enemy;
@@ -67,7 +59,6 @@ public class MainGameManager : MonoBehaviour
         m_currentPlayer.SetActive(false);
 
         NewBattleManager.Instance.SetupBattle(battleSettings, PlayersCombatPF);
-
     }
 
     public void BattelClose()

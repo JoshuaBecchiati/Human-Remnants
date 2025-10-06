@@ -35,6 +35,7 @@ public abstract class UnitBase : MonoBehaviour
     public event Action<float, float> OnUnitTookDamage;
     public event Action<float, float> OnHeal;
     public event Action OnEndAttack;
+    public event Action<UnitBase> OnDeath;
 
 
     protected virtual void Awake()
@@ -59,8 +60,9 @@ public abstract class UnitBase : MonoBehaviour
     {
         _health -= damage;
         OnUnitTookDamage?.Invoke(_health, _maxHealth);
+        if (Health <= 0)
+            OnDeath?.Invoke(this);
     }
-
 
     public virtual void Heal(float heal)
     {
