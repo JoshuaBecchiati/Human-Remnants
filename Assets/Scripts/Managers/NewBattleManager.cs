@@ -1,7 +1,8 @@
+using Cinemachine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +17,10 @@ public class NewBattleManager : MonoBehaviour
     [SerializeField] private List<UnitBase> m_unitsInBattle;
     [SerializeField] private List<UnitBase> m_turnOrder;
 
+    [SerializeField] private CinemachineVirtualCamera m_enemyCamera;
+    [SerializeField] private CinemachineVirtualCamera m_playerCamera;
+    [SerializeField] private CinemachineVirtualCamera m_battleCamera;
+
     // --- Instance ---
     public static NewBattleManager Instance { get; private set; }
 
@@ -25,7 +30,14 @@ public class NewBattleManager : MonoBehaviour
     private int _oldTarget = 0;
 
     private bool _isPlayerActing = false;
+    private bool _pendingBattleEnd = false;
 
+    private BattleStatus _battleStatus;
+    private BattleResult _pendingResult;
+    private PlayerActionState _playerActionState;
+    private EUnitTeam _selectingTeam;
+
+    private ItemData _selectedItem;
 
     private Camera _battleCamera;
 
@@ -50,14 +62,40 @@ public class NewBattleManager : MonoBehaviour
 
     private void OnEnable()
     {
+        _battleStatus = BattleStatus.Starting;
         if (PlayerInputSingleton.Instance != null)
             PlayerInputSingleton.Instance.Actions["Combat"].performed += SelectAttackTarget;
     }
 
     private void OnDisable()
     {
+        _battleStatus = BattleStatus.None;
         if (PlayerInputSingleton.Instance != null)
             PlayerInputSingleton.Instance.Actions["Combat"].performed -= SelectAttackTarget;
+    }
+
+    private void Update()
+    {
+        if (_pendingBattleEnd)
+        {
+            _pendingBattleEnd = false;
+            BattleEnd(_pendingResult);
+        }
+
+        if (!_isPlayerActing || _battleStatus != BattleStatus.Ongoing)
+            return;
+
+        switch (_playerActionState)
+        {
+            case PlayerActionState.ChoosingAlly:
+                _selectingTeam = EUnitTeam.Player;
+                ConfirmAction();
+                break;
+            case PlayerActionState.ChoosingEnemy:
+                _selectingTeam = EUnitTeam.Enemy;
+                ConfirmAction();
+                break;
+        }
     }
     #endregion
 
@@ -67,67 +105,80 @@ public class NewBattleManager : MonoBehaviour
     /// </summary>
     public void SetupBattle(BattleSettings battleSettings, IReadOnlyList<GameObject> playersPf)
     {
-        _battleCamera = Camera.main;
-
-        // Instantiate player and enemy prefabs
-        for (int i = 0; i < playersPf.Count; i++)
+        if (_battleStatus == BattleStatus.Starting)
         {
-            GameObject go = Instantiate(playersPf[i], m_spawnPointsPlayers[i]);
-            go.TryGetComponent(out PlayerInCombat p);
-            p.OnPlayerDeath += HandleUnitDeath;
-            OnCreateUnit.Invoke(p);
-            m_unitsInBattle.Add(p);
+            _battleCamera = Camera.main;
+
+            // Instantiate player and enemy prefabs
+            for (int i = 0; i < playersPf.Count; i++)
+            {
+                GameObject go = Instantiate(playersPf[i], m_spawnPointsPlayers[i]);
+                go.TryGetComponent(out PlayerInCombat p);
+                p.OnPlayerDeath += HandleUnitDeath;
+                OnCreateUnit.Invoke(p);
+                m_unitsInBattle.Add(p);
+            }
+
+            for (int i = 0; i < battleSettings.enemies.Length; i++)
+            {
+                GameObject go = Instantiate(battleSettings.enemies[i], m_spawnPointsEnemies[i]);
+                go.TryGetComponent(out EnemyInCombat e);
+                e.SetSpeed(UnityEngine.Random.Range(10, 20));
+                e.OnEnemyDeath += HandleUnitDeath;
+                OnCreateUnit.Invoke(e);
+                m_unitsInBattle.Add(e);
+            }
+
+            // Ording the list by the speed
+            m_turnOrder = m_unitsInBattle.OrderBy(x => x.Speed).ToList();
+
+            // Start the first turn
+            if (CurrentUnit.Team == EUnitTeam.Player)
+                StartPlayerTurn();
+            CurrentUnit.StartTurn();
+
+            _battleStatus = BattleStatus.Ongoing;
         }
-
-        for (int i = 0; i < battleSettings.enemies.Length; i++)
-        {
-            GameObject go = Instantiate(battleSettings.enemies[i], m_spawnPointsEnemies[i]);
-            go.TryGetComponent(out EnemyInCombat e);
-            e.SetSpeed(UnityEngine.Random.Range(10, 20));
-            e.OnEnemyDeath += HandleUnitDeath;
-            OnCreateUnit.Invoke(e);
-            m_unitsInBattle.Add(e);
-        }
-
-        // Ording the list by the speed
-        m_turnOrder = m_unitsInBattle.OrderBy(x => x.Speed).ToList();
-
-        // Start the first turn
-        if (CurrentUnit.Team == EUnitTeam.Player)
-            StartPlayerTurn();
-        CurrentUnit.StartTurn();
     }
     #endregion
 
     #region Select target
-    private void SelectAttackTarget(InputAction.CallbackContext context)
+    public void SelectAttackTarget(InputAction.CallbackContext context)
     {
+        if (_battleStatus != BattleStatus.Ongoing)
+            return;
+
         Vector2 dir = context.ReadValue<Vector2>();
-        int direction;
+        int direction = dir.x > 0.5f ? 1 : (dir.x < -0.5f ? -1 : 0);
+        if (direction == 0)
+            return;
 
-        if (dir.x > 0.5f) direction = 1;        // Right
-        else if (dir.x < -0.5f) direction = -1; // Left
-        else return;
+        // Indexes's selected team
+        List<int> indexesTeam = m_unitsInBattle.FindAllIndexes(u => u.Team == _selectingTeam);
+        if (indexesTeam.Count == 0)
+            return;
 
-        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+        int posInTeam = indexesTeam.IndexOf(_indexTarget);
+        if (posInTeam == -1) posInTeam = 0;
 
-        int nextIndex = _indexTarget;
-        int enemyStart = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.Enemy);
+        int nextPos = posInTeam;
+
+        if(CurrentTarget.transform.Find("Canvas").gameObject.activeSelf)
+            CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
 
         do
         {
-            nextIndex += direction;
-            if (nextIndex < enemyStart || nextIndex >= m_unitsInBattle.Count)
+            nextPos += direction;
+
+            if (nextPos < 0 || nextPos >= indexesTeam.Count)
             {
-                nextIndex -= direction;
+                nextPos -= direction;
                 break;
             }
-        } while (m_unitsInBattle[nextIndex].IsDead);
+        }
+        while (m_unitsInBattle[indexesTeam[nextPos]].IsDead);
 
-        Debug.Log($"Index {nextIndex}");
-
-        _indexTarget = nextIndex;
-
+        _indexTarget = indexesTeam[nextPos];
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
     }
     #endregion
@@ -138,7 +189,7 @@ public class NewBattleManager : MonoBehaviour
     /// </summary>
     public void BTNAttack()
     {
-        if (_isPlayerActing)
+        if (_isPlayerActing && _battleStatus == BattleStatus.Ongoing)
         {
             _isPlayerActing = false;
             void HandleEndAttack()
@@ -157,7 +208,7 @@ public class NewBattleManager : MonoBehaviour
     /// </summary>
     public void BTNSkipTurn()
     {
-        if (_isPlayerActing)
+        if (_isPlayerActing && _battleStatus == BattleStatus.Ongoing)
         {
             _isPlayerActing = false;
             ChangeTurn();
@@ -166,9 +217,10 @@ public class NewBattleManager : MonoBehaviour
 
     public void BTNEscape()
     {
-        if (_isPlayerActing)
+        if (_isPlayerActing && _battleStatus == BattleStatus.Ongoing)
         {
             _isPlayerActing = false;
+            _battleStatus = BattleStatus.Ending;
             BattleEnd(BattleResult.Escape);
         }
     }
@@ -177,13 +229,24 @@ public class NewBattleManager : MonoBehaviour
     /// Use item logic
     /// </summary>
     /// <param name="item"></param>
+    /// 
     public void BTNUseItem(ItemData item)
     {
-        if (_isPlayerActing)
+        if (!_isPlayerActing || _battleStatus != BattleStatus.Ongoing)
+            return;
+
+        _selectedItem = item;
+        if (item.Item.type == ItemType.damage)
         {
-            item.UseItem(CurrentTarget);
-            OnUseItem?.Invoke(item);
-            ChangeTurn();
+            m_battleCamera.Priority = 0;
+            m_enemyCamera.Priority = 10;
+            _playerActionState = PlayerActionState.ChoosingEnemy;
+        }
+        else
+        {
+            m_battleCamera.Priority = 0;
+            m_playerCamera.Priority = 10;
+            _playerActionState = PlayerActionState.ChoosingAlly;
         }
     }
 
@@ -194,7 +257,7 @@ public class NewBattleManager : MonoBehaviour
     /// <param name="ability"></param>
     public void BTNUseAbility(AbilityData ability)
     {
-        if (_isPlayerActing && ability.ChargeCounter == ability.Ability.maxCharge)
+        if (_isPlayerActing && ability.ChargeCounter == ability.Ability.maxCharge && _battleStatus == BattleStatus.Ongoing)
         {
             _isPlayerActing = false;
             List<UnitBase> enemies = new() { CurrentTarget };
@@ -205,28 +268,88 @@ public class NewBattleManager : MonoBehaviour
     }
     #endregion
 
+    private void ConfirmAction()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            _playerActionState = PlayerActionState.Acting;
+            StartCoroutine(ExecuteItemUse());
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            _playerActionState = PlayerActionState.Idle;
+            CancelItemAction();
+        }
+    }
+    private IEnumerator ExecuteItemUse()
+    {
+        // Esegui effetto (puoi mettere animazioni, delay, ecc.)
+        _selectedItem.UseItem(CurrentTarget);
+        OnUseItem?.Invoke(_selectedItem);
+
+        yield return new WaitForSeconds(0.5f);
+
+        // Ripristina camera e resetta stato
+        _playerActionState = PlayerActionState.Idle;
+        _isPlayerActing = false;
+
+        if (m_playerCamera.Priority > 0)
+        {
+            m_battleCamera.Priority = 10;
+            m_playerCamera.Priority = 0;
+        }
+        else if (m_enemyCamera.Priority > 0)
+        {
+            m_battleCamera.Priority = 10;
+            m_enemyCamera.Priority = 0;
+        }
+
+            yield return new WaitForSeconds(0.5f);
+
+        ChangeTurn();
+    }
+    private void CancelItemAction()
+    {
+        _playerActionState = PlayerActionState.Idle;
+        _selectedItem = null;
+        if (m_playerCamera.Priority > 0)
+        {
+            m_battleCamera.Priority = 10;
+            m_playerCamera.Priority = 0;
+        }
+        else if (m_enemyCamera.Priority > 0)
+        {
+            m_battleCamera.Priority = 10;
+            m_enemyCamera.Priority = 0;
+        }
+        Debug.Log("Azione annullata");
+    }
+
     #region Turn management
     private void ChangeTurn()
     {
-        CurrentUnit.EndTurn();
-        if (CurrentUnit.Team == EUnitTeam.Player)
-            EndPlayerTurn();
-
-        do
+        if (_battleStatus == BattleStatus.Ongoing)
         {
-            _indexCurrentUnit += 1;
+            CurrentUnit.EndTurn();
+            if (CurrentUnit.Team == EUnitTeam.Player)
+                EndPlayerTurn();
 
-            if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
-            else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
+            do
+            {
+                _indexCurrentUnit += 1;
 
-        } while (CurrentUnit.IsDead);
+                if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
+                else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
 
-        if (CurrentUnit.Team == EUnitTeam.Player)
-            StartPlayerTurn();
-        else
-            EnemyTurn();
+            } while (CurrentUnit.IsDead);
 
-        CurrentUnit.StartTurn();
+            if (CurrentUnit.Team == EUnitTeam.Player)
+                StartPlayerTurn();
+            else
+                EnemyTurn();
+
+            CurrentUnit.StartTurn();
+        }
     }
     private void StartPlayerTurn()
     {
@@ -243,10 +366,10 @@ public class NewBattleManager : MonoBehaviour
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
 
     }
-
     private void EndPlayerTurn()
     {
         _isPlayerActing = false;
+        _selectingTeam = EUnitTeam.Enemy;
 
         CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
 
@@ -258,7 +381,6 @@ public class NewBattleManager : MonoBehaviour
         else
             _oldTarget = m_unitsInBattle.FindIndex(e => !e.IsDead);
     }
-
     private void EnemyTurn()
     {
         void HandleEndAttack()
@@ -286,38 +408,34 @@ public class NewBattleManager : MonoBehaviour
 
         return BattleResult.None;
     }
-    private void BattleEnd(BattleResult escape)
+    private void BattleEnd(BattleResult winner)
     {
+        if (winner != BattleResult.None && _battleStatus == BattleStatus.Ongoing) return;
+
+        _battleStatus = BattleStatus.Ending;
+        Debug.Log($"Winner {winner}");
         foreach (UnitBase unit in m_unitsInBattle)
             Destroy(unit.gameObject);
         m_unitsInBattle.Clear();
-        GameEvents.BattleEnd(escape);
-    }
-    private void BattleEnd()
-    {
-        BattleResult winner = CheckBattleResult();
-        if (winner != BattleResult.None)
-        {
-            Debug.Log($"Winner {winner}");
-            foreach (UnitBase unit in m_unitsInBattle)
-                Destroy(unit.gameObject);
-            m_unitsInBattle.Clear();
-            GameEvents.BattleEnd(winner);
-        }
+        GameEvents.BattleEnd(winner);
     }
 
     private void HandleUnitDeath()
     {
-        if (m_unitsInBattle.Find(u => u.Health <= 0) is UnitBase unit)
+        if (m_unitsInBattle.Find(u => u.Health <= 0 && !u.IsDead) is UnitBase unit)
         {
             if (CurrentUnit == unit)
                 ChangeTurn();
             unit.SetDead();
             unit.gameObject.SetActive(false);
-        }
 
-        // Check se la battaglia è finita
-        BattleEnd();
+            BattleResult winner = CheckBattleResult();
+            if (winner != BattleResult.None)
+            {
+                _pendingResult = winner;
+                _pendingBattleEnd = true;
+            }
+        }
     }
     #endregion
 
