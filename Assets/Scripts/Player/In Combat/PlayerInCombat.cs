@@ -8,8 +8,6 @@ public class PlayerInCombat : UnitBase
     
     private UIBattleManager m_uiBattleManager;
 
-    public new event Action<UnitBase> OnDeath;
-
     protected override void Awake()
     {
         base.Awake();
