@@ -9,8 +9,9 @@ public class NewBattleManager : MonoBehaviour
 {
     // --- Inspector References ---
     [Header("Spawn Points")]
-    [SerializeField] private Transform[] m_spawnPointsPlayers;
-    [SerializeField] private Transform[] m_spawnPointsEnemies;
+    [SerializeField] private Transform m_playerSide;
+    [SerializeField] private Transform m_enemySide;
+    [SerializeField] private float m_space = 5f;
 
     [Header("Battle List")]
     [SerializeField] private List<UnitBase> m_unitsInBattle;
@@ -97,30 +98,30 @@ public class NewBattleManager : MonoBehaviour
 
         _battleCamera = Camera.main;
 
-        // Instantiate player and enemy prefabs
-        for (int i = 0; i < playersPf.Count; i++)
-        {
-            GameObject go = Instantiate(playersPf[i], m_spawnPointsPlayers[i]);
-            go.TryGetComponent(out PlayerInCombat p);
-            p.OnDeath += HandleUnitDeath;
-            OnCreateUnit.Invoke(p);
-            m_unitsInBattle.Add(p);
-        }
-
-        for (int i = 0; i < battleSettings.enemies.Length; i++)
-        {
-            GameObject go = Instantiate(battleSettings.enemies[i], m_spawnPointsEnemies[i]);
-            go.TryGetComponent(out EnemyInCombat e);
-            e.SetSpeed(UnityEngine.Random.Range(10, 20));
-            e.OnDeath += HandleUnitDeath;
-            OnCreateUnit.Invoke(e);
-            m_unitsInBattle.Add(e);
-        }
+        InstantiatePrefab(playersPf.ToList(), m_playerSide);
+        InstantiatePrefab(battleSettings.enemies.ToList(), m_enemySide);
 
         // Ording the list by the speed
         m_turnOrder = m_unitsInBattle.OrderBy(x => x.Speed).ToList();
 
         _battleStatus = BattleStatus.ChangingTurn;
+    }
+
+    public void InstantiatePrefab(List<GameObject> prefabs, Transform transformSide)
+    {
+        float totalWidth = m_space * (prefabs.Count - 1) / 2f;
+
+        for (int i = 0; i < prefabs.Count; i++)
+        {
+            Vector3 spawnPos = transformSide.position + new Vector3((m_space * i) - totalWidth, 0f, 0f);
+
+            GameObject go = Instantiate(prefabs[i], transformSide);
+            go.transform.position = spawnPos;
+            go.TryGetComponent(out UnitBase u);
+            u.OnDeath += HandleUnitDeath;
+            OnCreateUnit.Invoke(u);
+            m_unitsInBattle.Add(u);
+        }
     }
     #endregion
 
