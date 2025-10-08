@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UnityEngine;
+using UnityEngine.Playables;
 
 [DefaultExecutionOrder(-10)]
 public class MainGameManager : MonoBehaviour
@@ -15,9 +17,11 @@ public class MainGameManager : MonoBehaviour
     [Header("Players")]
     [SerializeField] private List<GameObject> m_players;
     [SerializeField] private GameObject m_currentPlayer;
+    [SerializeField] private GameObject m_exploreCamera;
 
     // --- Private ---
     private GameObject _enemy;
+    private BattleSettings _battleSettings;
 
     public IReadOnlyList<GameObject> PlayersCombatPF =>
         m_players
@@ -39,12 +43,12 @@ public class MainGameManager : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnBattleStart += BattleStart;
-        GameEvents.OnBattleEnd += BattelClose;
+        GameEvents.OnBattleEnd += BattleClose;
     }
     private void OnDisable()
     {
         GameEvents.OnBattleStart -= BattleStart;
-        GameEvents.OnBattleEnd -= BattelClose;
+        GameEvents.OnBattleEnd -= BattleClose;
     }
 
     private void BattleStart(BattleSettings battleSettings, GameObject enemy)
@@ -52,19 +56,22 @@ public class MainGameManager : MonoBehaviour
         PlayerInputSingleton.Instance.CombatInput();
 
         _enemy = enemy;
+        _battleSettings = battleSettings;
 
         _enemy.GetComponent<Collider>().isTrigger = false;
         _enemy.SetActive(false);
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         _battleScene.SetActive(true);
         m_currentPlayer.SetActive(false);
 
-        NewBattleManager.Instance.SetupBattle(battleSettings, PlayersCombatPF);
+        NewBattleManager.Instance.SetupBattle(_battleSettings, PlayersCombatPF);
+
     }
 
-    public void BattelClose()
+    public void BattleClose()
     {
         _battleScene.SetActive(false);
         m_currentPlayer.SetActive(true);
