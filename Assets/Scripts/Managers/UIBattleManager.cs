@@ -10,7 +10,6 @@ public class UIBattleManager : MonoBehaviour
 
     [Header("Health bar")]
     [SerializeField] private Transform m_playerUIParent;
-    [SerializeField] private Transform m_enemyUIParent;
     [SerializeField] private GameObject m_healthBarPrefab;
 
     [Header("Inventory")]
@@ -42,7 +41,8 @@ public class UIBattleManager : MonoBehaviour
     {
         if (m_battleManager != null)
         {
-            m_battleManager.OnCreateUnit += CreateUnitUI;
+            m_battleManager.OnCreateUnit += CreatePlayerUI;
+            m_battleManager.OnCreateUnit += CreateEnemyUI;
             m_battleManager.OnCreateUnit += InitUnitUI;
         }
 
@@ -59,7 +59,8 @@ public class UIBattleManager : MonoBehaviour
     {
         if (m_battleManager != null)
         {
-            m_battleManager.OnCreateUnit -= CreateUnitUI;
+            m_battleManager.OnCreateUnit -= CreatePlayerUI;
+            m_battleManager.OnCreateUnit -= CreateEnemyUI;
         }
 
 
@@ -70,8 +71,6 @@ public class UIBattleManager : MonoBehaviour
 
 
         foreach (Transform child in m_playerUIParent)
-            Destroy(child.gameObject);
-        foreach (Transform child in m_enemyUIParent)
             Destroy(child.gameObject);
         foreach (Transform Child in m_itemUIParent)
             Destroy(Child.gameObject);
@@ -88,17 +87,39 @@ public class UIBattleManager : MonoBehaviour
     private void RebuildUI()
     {
         foreach (UnitBase unit in m_battleManager.GetUnits())
-            CreateUnitUI(unit);
+            CreatePlayerUI(unit);
     }
 
 
-    public void CreateUnitUI(UnitBase unit)
+    public void CreatePlayerUI(UnitBase player)
     {
-        Transform parent = (unit.Team == EUnitTeam.Player) ? m_playerUIParent : m_enemyUIParent;
-        GameObject ui = Instantiate(m_healthBarPrefab, parent);
+        if (player.Team != EUnitTeam.Player)
+            return;
 
-        if(ui.TryGetComponent(out UIHealthBar healthBar))
-            healthBar.Setup(unit);
+        GameObject ui = Instantiate(m_healthBarPrefab, m_playerUIParent);
+
+        if (ui.TryGetComponent(out UIHealthBar healthBar))
+            healthBar.Setup(player);
+    }
+    public void CreateEnemyUI(UnitBase enemy)
+    {
+        if (enemy.Team != EUnitTeam.Enemy)
+            return;
+
+        if (enemy.transform.Find("Canvas/Info").gameObject.TryGetComponent(out UIHealthBar healthBar))
+            healthBar.Setup(enemy);
+    }
+
+    public void SetOnInfoBar(UnitBase unit)
+    {
+        if (unit.transform.Find("Canvas").gameObject.TryGetComponent(out CanvasGroup canvasGroup))
+            canvasGroup.alpha = 1;
+    }
+
+    public void SetOffInfoBar(UnitBase unit)
+    {
+        if (unit.transform.Find("Canvas").gameObject.TryGetComponent(out CanvasGroup canvasGroup))
+            canvasGroup.alpha = 0;
     }
 
     private void CreateInvUI()

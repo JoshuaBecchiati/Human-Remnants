@@ -2,7 +2,7 @@
     "name": "Actions",
     "maps": [
         {
-            "name": "Player",
+            "name": "Explore",
             "id": "8b3d6364-65f9-44c6-904e-0da80c162a80",
             "actions": [
                 {
@@ -18,15 +18,6 @@
                     "name": "Look",
                     "type": "PassThrough",
                     "id": "b8b01892-8b79-4329-8667-d5c6bec84aeb",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Combat",
-                    "type": "PassThrough",
-                    "id": "90c093ce-5e53-44f5-b201-bcccf832b6b5",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -63,24 +54,6 @@
                     "name": "Inventory",
                     "type": "Button",
                     "id": "89eb4285-92bb-4fc1-87bc-b3fb3888e731",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Confirm",
-                    "type": "Button",
-                    "id": "8394d6bd-bb67-41b7-b913-92b9cdd9eeec",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Cancel",
-                    "type": "Button",
-                    "id": "bf18a595-e3c7-4749-9262-a05a573e8306",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -277,94 +250,6 @@
                 },
                 {
                     "name": "",
-                    "id": "d3e37fb2-2d53-417f-8129-c3d665efe62c",
-                    "path": "<Gamepad>/leftStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Gamepad",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Select Target",
-                    "id": "f2798dd0-eda8-4298-8a31-8a4d10dc7e58",
-                    "path": "Dpad",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Combat",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "left",
-                    "id": "01f8bd1b-86fc-4968-9638-995433c941d3",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "left",
-                    "id": "5f17b516-1315-4c10-93f1-5c58ae98428a",
-                    "path": "<Keyboard>/leftArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "dc219701-3df9-484f-af39-be97ecf7029b",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "2c570d15-9882-4128-8db1-556978f77d37",
-                    "path": "<Keyboard>/rightArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "42eee2be-28db-4a6e-b979-18790aa293ff",
-                    "path": "<XRController>/{Primary2DAxis}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XR",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4cfbe26c-807e-49a8-8917-d19aa7bd70b3",
-                    "path": "<Joystick>/stick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Joystick",
-                    "action": "Combat",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "c1f7a91b-d0fd-4a62-997e-7fb9b69bf235",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
@@ -483,10 +368,133 @@
                     "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Combat",
+            "id": "b8a8c40a-3c17-48b9-b0cc-10c68ace3709",
+            "actions": [
+                {
+                    "name": "Combat",
+                    "type": "PassThrough",
+                    "id": "7cd8db5e-0c90-4cd2-a5bf-5f6b60eba194",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Confirm",
+                    "type": "Button",
+                    "id": "e6460f26-e597-4256-9e28-86bdc6468c9b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "bd94ddb7-f810-4673-bc67-acff3bc0b40b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "3e4b01e1-8d47-4501-ad00-b56296478984",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Select Target",
+                    "id": "0bafea98-88d0-42a3-a3ce-f873b32be78b",
+                    "path": "Dpad",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Combat",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "left",
+                    "id": "d9d61d13-d175-461f-a39f-af9f3a4adfa1",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "9bfd1248-2f70-4167-a535-b23cd4938d54",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "64af6d42-eed0-48a5-92eb-e2d64109cfb9",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "7cb2ca6a-0105-4a07-932a-acc84df5d33c",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
-                    "id": "429215ed-d8dd-4916-83e6-2b9b4184f8a7",
+                    "id": "7a455762-5fbf-4ae4-96a1-2e73bcb8149b",
+                    "path": "<XRController>/{Primary2DAxis}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "XR",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a4cced5d-4985-4658-acca-7b0287610efe",
+                    "path": "<Joystick>/stick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Joystick",
+                    "action": "Combat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "42338d74-3de6-4a09-8836-c9afa148d669",
                     "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
@@ -497,7 +505,7 @@
                 },
                 {
                     "name": "",
-                    "id": "819adf2f-7443-4f08-af98-f4b7f592a360",
+                    "id": "03ce593a-9d20-4257-a9f8-d40bd4e2863e",
                     "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
@@ -507,12 +515,6 @@
                     "isPartOfComposite": false
                 }
             ]
-        },
-        {
-            "name": "PlayerInCombat",
-            "id": "b8a8c40a-3c17-48b9-b0cc-10c68ace3709",
-            "actions": [],
-            "bindings": []
         },
         {
             "name": "UI",

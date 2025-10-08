@@ -20,18 +20,23 @@ public class UIHealthBar : MonoBehaviour
         _unit = unit;
 
         // Inizializza subito la barra
-        UpdateBar(unit.Health, unit.MaxHealth);
+        UpdateBar(_unit.Health, _unit.MaxHealth);
 
         // Subscrive l’evento di UnitBase
-        unit.OnUnitTookDamage += UpdateBar;
-        unit.OnHeal += UpdateBar;
+        _unit.OnUnitTookDamage += UpdateBar;
+        _unit.OnHeal += UpdateBar;
+
+        if (_unit.Team == EUnitTeam.Enemy)
+            Debug.Log("Nemico inizializzato");
 
         if (_nameText != null)
-            _nameText.text = unit.Name;
+            _nameText.text = _unit.Name;
     }
 
     private void UpdateBar(float current, float max)
     {
+        if (_unit.Team == EUnitTeam.Enemy)
+            Debug.Log($"Nemico {_unit.name} Bar aggiornata");
         _image.fillAmount = current / max;
     }
 }

@@ -34,6 +34,7 @@ public class MainGameManager : MonoBehaviour
             return;
         }
         Instance = this;
+        _battleScene.SetActive(false);
     }
     private void OnEnable()
     {
@@ -48,6 +49,8 @@ public class MainGameManager : MonoBehaviour
 
     private void BattleStart(BattleSettings battleSettings, GameObject enemy)
     {
+        PlayerInputSingleton.Instance.CombatInput();
+
         _enemy = enemy;
 
         _enemy.GetComponent<Collider>().isTrigger = false;
@@ -71,6 +74,8 @@ public class MainGameManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        PlayerInputSingleton.Instance.ExploreInput();
     }
 
     private IEnumerator DisableCollider()

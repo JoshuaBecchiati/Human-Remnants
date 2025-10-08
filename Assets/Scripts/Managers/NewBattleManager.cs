@@ -20,22 +20,24 @@ public class NewBattleManager : MonoBehaviour
     [Header("Dependency")]
     [SerializeField] private BattleCameraManager m_cameraController;
     [SerializeField] private ActionSelector m_actionSelector;
+    [SerializeField] private UIBattleManager m_UIManager;
 
     // --- Instance ---
     public static NewBattleManager Instance { get; private set; }
 
     // --- Private ---
-    private int _indexTarget = 0;
-    private int _indexCurrentUnit = 0;
-    private int _oldTarget = 0;
+    private int _indexTarget;
+    private int _indexCurrentUnit;
+    private int _oldTarget;
 
-    private BattleStatus _battleStatus = BattleStatus.None;
-    private BattleResult _pendingResult = BattleResult.None;
-    private EUnitTeam _selectingTeam = EUnitTeam.Enemy;
+    private bool _isFirstTurn;
+
+    private BattleStatus _battleStatus;
+    private BattleResult _pendingResult;
+    private EUnitTeam _selectingTeam;
 
     private ItemData _selectedItem;
-
-    private Camera _battleCamera;
+    private AbilityData _selectedAbility;
 
     // --- Proprierties ---
     public UnitBase CurrentUnit => m_turnOrder[_indexCurrentUnit];
@@ -59,6 +61,13 @@ public class NewBattleManager : MonoBehaviour
     private void OnEnable()
     {
         _battleStatus = BattleStatus.Starting;
+        _pendingResult = BattleResult.None;
+        _selectingTeam = EUnitTeam.Enemy;
+        _isFirstTurn = true;
+        _indexTarget = 0;
+        _indexCurrentUnit = 0;
+        _oldTarget = 0;
+
         if (PlayerInputSingleton.Instance != null)
             PlayerInputSingleton.Instance.Actions["Combat"].performed += SelectAttackTarget;
     }
@@ -96,7 +105,7 @@ public class NewBattleManager : MonoBehaviour
         if (_battleStatus != BattleStatus.Starting)
             return;
 
-        _battleCamera = Camera.main;
+        m_cameraController.BattleCamera();
 
         InstantiatePrefab(playersPf.ToList(), m_playerSide);
         InstantiatePrefab(battleSettings.enemies.ToList(), m_enemySide);
@@ -149,8 +158,7 @@ public class NewBattleManager : MonoBehaviour
 
         int nextPos = posInTeam;
 
-        if(CurrentTarget.transform.Find("Canvas").gameObject.activeSelf)
-            CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+        m_UIManager.SetOffInfoBar(CurrentTarget);
 
         do
         {
@@ -165,7 +173,7 @@ public class NewBattleManager : MonoBehaviour
         while (m_unitsInBattle[indexesTeam[nextPos]].IsDead);
 
         _indexTarget = indexesTeam[nextPos];
-        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
+        m_UIManager.SetOnInfoBar(CurrentTarget);
     }
     private void SelectTarget(UnitBase newTarget)
     {
@@ -173,15 +181,14 @@ public class NewBattleManager : MonoBehaviour
             return;
 
         // Disattiva il vecchio target
-        if (CurrentTarget != null)
-            CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+        m_UIManager.SetOffInfoBar(CurrentTarget);
 
         // Aggiorna l'indice
         _oldTarget = _indexTarget;
         _indexTarget = m_unitsInBattle.IndexOf(newTarget);
 
         // Attiva il canvas del nuovo target
-        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
+        m_UIManager.SetOnInfoBar(CurrentTarget);
     }
     #endregion
 
@@ -242,9 +249,10 @@ public class NewBattleManager : MonoBehaviour
             SelectTarget(CurrentUnit);
         }
 
-        m_actionSelector.StartConfirmAction(
-            onConfirm: () => StartCoroutine(ExecuteItemUse()),
-            onCancel: CancelItemUse
+        m_actionSelector.StartConfirmAction
+        (
+            onConfirm: () => StartCoroutine(ExecuteItem()),
+            onCancel: CancelItem
         );
     }
 
@@ -258,10 +266,15 @@ public class NewBattleManager : MonoBehaviour
         if (ability.ChargeCounter != ability.Ability.maxCharge && _battleStatus != BattleStatus.PlayerTurn)
             return;
 
-        List<UnitBase> enemies = new() { CurrentTarget };
-        enemies.AddRange(m_unitsInBattle.FindAll(e => e.Team == EUnitTeam.Enemy && e != CurrentTarget));
-        ability.UseAbility(enemies.ToArray());
-        ChangeTurn();
+        m_cameraController.EnemyCamera();
+
+        _selectedAbility = ability;
+
+        m_actionSelector.StartConfirmAction
+        (
+            onConfirm: () => StartCoroutine(ExecuteAbility()),
+            onCancel: CancelAbility
+        );
     }
     #endregion
 
@@ -286,7 +299,7 @@ public class NewBattleManager : MonoBehaviour
     {
         m_cameraController.BattleCamera();
     }
-    private IEnumerator ExecuteItemUse()
+    private IEnumerator ExecuteItem()
     {
         _battleStatus = BattleStatus.Executing;
         _selectedItem.UseItem(CurrentTarget);
@@ -298,13 +311,39 @@ public class NewBattleManager : MonoBehaviour
 
         yield return new WaitForSeconds(1.5f);
 
+        _selectedAbility = null;
         _battleStatus = BattleStatus.ChangingTurn;
     }
-    private void CancelItemUse()
+    private void CancelItem()
     {
         _selectingTeam = EUnitTeam.Enemy;
         _selectedItem = null;
         SelectTarget(m_unitsInBattle[_oldTarget]);
+        m_cameraController.BattleCamera();
+        Debug.Log("Azione annullata");
+    }
+    private IEnumerator ExecuteAbility()
+    {
+        _battleStatus = BattleStatus.Executing;
+
+        List<UnitBase> enemies = new() { CurrentTarget };
+        enemies.AddRange(m_unitsInBattle.FindAll(e => e.Team == EUnitTeam.Enemy && e != CurrentTarget));
+
+        _selectedAbility.UseAbility(enemies.ToArray());
+
+        yield return new WaitForSeconds(1.5f);
+
+        m_cameraController.BattleCamera();
+
+        yield return new WaitForSeconds(1.5f);
+
+        _selectedAbility = null;
+        _battleStatus = BattleStatus.ChangingTurn;
+    }
+    private void CancelAbility()
+    {
+        _selectingTeam = EUnitTeam.Enemy;
+        _selectedAbility = null;
         m_cameraController.BattleCamera();
         Debug.Log("Azione annullata");
     }
@@ -316,20 +355,22 @@ public class NewBattleManager : MonoBehaviour
         if (_battleStatus != BattleStatus.ChangingTurn)
             return;
 
-        if (CurrentUnit != null)
+        if (!_isFirstTurn)
         {
             CurrentUnit.EndTurn();
             if (CurrentUnit.Team == EUnitTeam.Player)
                 EndPlayerTurn();
+
+            do
+            {
+                _indexCurrentUnit += 1;
+
+                if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
+                else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_turnOrder.Count - 1;
+            } while (CurrentUnit.IsDead);
         }
-
-        do
-        {
-            _indexCurrentUnit += 1;
-
-            if (_indexCurrentUnit >= m_unitsInBattle.Count) _indexCurrentUnit = 0;
-            else if (_indexCurrentUnit < 0) _indexCurrentUnit = m_unitsInBattle.Count - 1;
-        } while (CurrentUnit.IsDead);
+        else
+         _isFirstTurn = false;
 
         if (CurrentUnit.Team == EUnitTeam.Player)
             StartPlayerTurn();
@@ -347,7 +388,7 @@ public class NewBattleManager : MonoBehaviour
         else
             _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.Enemy && !e.IsDead);
 
-        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(true);
+        m_UIManager.SetOnInfoBar(CurrentTarget);
 
         _battleStatus = BattleStatus.PlayerTurn;
     }
@@ -355,7 +396,7 @@ public class NewBattleManager : MonoBehaviour
     {
         _selectingTeam = EUnitTeam.Enemy;
 
-        CurrentTarget.transform.Find("Canvas").gameObject.SetActive(false);
+        m_UIManager.SetOffInfoBar(CurrentTarget);
 
         // Check if the current target is alive and is an enemy.
         // If yes, store the index for the next turn

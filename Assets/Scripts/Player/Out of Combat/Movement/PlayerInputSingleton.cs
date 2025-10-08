@@ -19,10 +19,30 @@ public class PlayerInputSingleton : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            ExploreInput();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    private void SwitchActionMap(string actionMap)
+    {
+        _inputs.SwitchCurrentActionMap(actionMap);
+    }
+
+    public void ExploreInput()
+    {
+        _inputs.actions.Disable();
+        SwitchActionMap("Explore");
+        _inputs.actions.Enable();
+    }
+
+    public void CombatInput()
+    {
+        _inputs.actions.Disable();
+        SwitchActionMap("Combat");
+        _inputs.actions.Enable();
     }
 }
