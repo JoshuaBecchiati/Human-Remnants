@@ -12,21 +12,21 @@ public class CharCtrl : MonoBehaviour
     private const float MIN_MOVE_SPEED = 0.1f;
 
     [Header("Movement")]
-    [SerializeField] protected float _walkSpeed = 5f;
-    [SerializeField] private float _acceleration = 2f;
-    [SerializeField] protected float _runSpeed = 8f;
+    [SerializeField] protected float m_walkSpeed = 5f;
+    [SerializeField] protected float m_runSpeed = 8f;
+    [SerializeField] private float m_acceleration = 2f;
 
     [Header("Jump")]
-    [SerializeField] private float _jumpForce = 2.5f;
-    [SerializeField] private float _gravity = 9.81f;
+    [SerializeField] private float m_jumpForce = 2.5f;
+    [SerializeField] private float m_gravity = 9.81f;
 
     [Header("Camera")]
-    [SerializeField] private float _cameraSpeed = 5f;
-    [SerializeField] private Transform _cameraPivot;
+    [SerializeField] private float m_cameraSpeed = 5f;
+    [SerializeField] private Transform m_cameraPivot;
 
     [Header("Others")]
-    [SerializeField] CharacterController _characterController;
-    [SerializeField] Animator _animator;
+    [SerializeField] CharacterController m_characterController;
+    [SerializeField] Animator m_animator;
 
 
     private bool _isJumping;
@@ -54,7 +54,7 @@ public class CharCtrl : MonoBehaviour
 
     protected virtual void Start()
     {
-        _speedMagnitude = _walkSpeed;
+        _speedMagnitude = m_walkSpeed;
         if(PlayerInputSingleton.Instance != null)
         {
             PlayerInputSingleton.Instance.Actions["Move"].performed += OnMoveInput;
@@ -62,7 +62,6 @@ public class CharCtrl : MonoBehaviour
             PlayerInputSingleton.Instance.Actions["Sprint"].started += OnSprintStarted;
             PlayerInputSingleton.Instance.Actions["Sprint"].canceled += OnSprintCanceled;
         }
-
     }
 
     protected virtual void OnDestroy()
@@ -78,7 +77,7 @@ public class CharCtrl : MonoBehaviour
 
     private void OnEnable()
     {
-        _speedMagnitude = _walkSpeed;
+        _speedMagnitude = m_walkSpeed;
         if (PlayerInputSingleton.Instance != null)
         {
             PlayerInputSingleton.Instance.Actions["Move"].performed += OnMoveInput;
@@ -113,19 +112,19 @@ public class CharCtrl : MonoBehaviour
         }
 
         // Calcolo per il movimento
-        _currentSpeed = Vector3.Lerp(_currentSpeed, _wantedSpeed, _acceleration * Time.deltaTime);
+        _currentSpeed = Vector3.Lerp(_currentSpeed, _wantedSpeed, m_acceleration * Time.deltaTime);
 
         // Gestione della gravità
         if(!_isClimbing)
         {
-            if (_characterController.isGrounded && !_isJumping)
+            if (m_characterController.isGrounded && !_isJumping)
             {
                 _verticalVelocity = -1f;
             }
             else
             {
                 // Calcolo della velocità verticale per far tornare il giocatore a terra
-                _verticalVelocity += -_gravity * Time.deltaTime;
+                _verticalVelocity += -m_gravity * Time.deltaTime;
                 _isJumping = false;
             }
             _currentSpeed.y = _verticalVelocity;
@@ -135,7 +134,7 @@ public class CharCtrl : MonoBehaviour
 
 
         // Movimento effettivo
-        _characterController.Move(_cameraPivot.TransformDirection(_currentSpeed) * Time.deltaTime);
+        m_characterController.Move(m_cameraPivot.TransformDirection(_currentSpeed) * Time.deltaTime);
 
         UpdateAnimation(_currentSpeed.x, _currentSpeed.z);
     }
@@ -194,8 +193,8 @@ public class CharCtrl : MonoBehaviour
 
     private void UpdateAnimation(float x, float y)
     {
-        _animator.SetFloat("X", x);
-        _animator.SetFloat("Y", y);
+        m_animator.SetFloat("X", x);
+        m_animator.SetFloat("Y", y);
     }
 
     private void OnMoveInput(InputAction.CallbackContext context)
@@ -210,18 +209,18 @@ public class CharCtrl : MonoBehaviour
 
     private void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (_characterController.isGrounded)
+        if (m_characterController.isGrounded)
         {
-            _animator.SetTrigger("Jump");
+            m_animator.SetTrigger("Jump");
             _isJumping = true;
-            _verticalVelocity = Mathf.Sqrt(2 * _jumpForce * _gravity);
+            _verticalVelocity = Mathf.Sqrt(2 * m_jumpForce * m_gravity);
         }
     }
 
     // Da spostare nello script della camera
     private void OrientCharToCamera()
     {
-        Vector3 lookDirection = _cameraPivot.forward;
+        Vector3 lookDirection = m_cameraPivot.forward;
         lookDirection.y = 0f;
 
         if (lookDirection.sqrMagnitude < 0.001f)
@@ -231,17 +230,17 @@ public class CharCtrl : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(
             transform.rotation,
             targetRotation,
-            _cameraSpeed * Time.deltaTime
+            m_cameraSpeed * Time.deltaTime
         );
     }
 
     protected virtual void OnSprintStarted(InputAction.CallbackContext context)
     {
-        _speedMagnitude = _runSpeed;
+        _speedMagnitude = m_runSpeed;
     }
 
     protected virtual void OnSprintCanceled(InputAction.CallbackContext context)
     {
-        _speedMagnitude = _walkSpeed;
+        _speedMagnitude = m_walkSpeed;
     }
 }

@@ -372,23 +372,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a836e32a177144d8fc9db023144ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _walkSpeed: 4.5
-  _acceleration: 20
-  _runSpeed: 9
-  _jumpForce: 2
-  _gravity: 25
-  _cameraSpeed: 320
-  _cameraPivot: {fileID: 4309256205709023147}
-  _characterController: {fileID: 3143275856103230290}
-  _animator: {fileID: 4694789401805515377}
-  _health: 100
-  _stamina: 100
-  _maxStamina: 100
-  _staminaRegenRate: 20
-  _staminaDrainRun: 0
-  _invicibleTime: 2
-  _isInvincible: 0
-  _isRunning: 0
+  m_walkSpeed: 4.5
+  m_runSpeed: 9
+  m_acceleration: 20
+  m_jumpForce: 3
+  m_gravity: 35
+  m_cameraSpeed: 320
+  m_cameraPivot: {fileID: 4309256205709023147}
+  m_characterController: {fileID: 3143275856103230290}
+  m_animator: {fileID: 4694789401805515377}
+  m_health: 100
+  m_stamina: 100
+  m_maxStamina: 100
+  m_staminaRegenRate: 20
+  m_staminaDrainRun: 0
+  m_invicibleTime: 5
   _combatPF: {fileID: 4311111495703447436, guid: ec2325d712ba405419f3af7958978d0e,
     type: 3}
 --- !u!1 &7945880325837505886

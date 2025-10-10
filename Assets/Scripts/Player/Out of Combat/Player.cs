@@ -7,19 +7,19 @@ public class Player : CharCtrl, IDamageable
 {
     // --- Inspector References ---
     [Header("Stats")]
-    [SerializeField] private float _health = 100;
-    [SerializeField] private float _stamina = 100;
-    [SerializeField] private float _maxStamina = 100;
-    [SerializeField] private float _staminaRegenRate = 10f;
-    [SerializeField] private float _staminaDrainRun = 5f;
-    [SerializeField] private float _invicibleTime = 5f;
-
-    [Header("Status")]
-    [SerializeField] private bool _isInvincible;
-    [SerializeField] private bool _isRunning;
+    [SerializeField] private float m_health = 100;
+    [SerializeField] private float m_stamina = 100;
+    [SerializeField] private float m_maxStamina = 100;
+    [SerializeField] private float m_staminaRegenRate = 10f;
+    [SerializeField] private float m_staminaDrainRun = 5f;
+    [SerializeField] private float m_invicibleTime = 5f;
 
     [Header("Combat settings")]
     [SerializeField] private GameObject _combatPF;
+
+    // --- Private ---
+    private bool _isInvincible;
+    private bool _isRunning;
 
     // --- Proprierties ---
     public GameObject CombatPF => _combatPF;
@@ -47,11 +47,11 @@ public class Player : CharCtrl, IDamageable
     {
         if (!_isInvincible)
         {
-            _health -= amount;
+            m_health -= amount;
             StartCoroutine(Invincibility());
-            OnChangeHealth?.Invoke(_health);
+            OnChangeHealth?.Invoke(m_health);
         }
-        if (_health <= 0)
+        if (m_health <= 0)
         {
             // Avviso gli altri script in ascolto della morte del player
             OnDeath?.Invoke();
@@ -65,7 +65,7 @@ public class Player : CharCtrl, IDamageable
 
         // Disattiva il collider per alcuni secondi cosicché il giocatore può eventualmente scappare da una fight
 
-        yield return new WaitForSeconds(_invicibleTime);
+        yield return new WaitForSeconds(m_invicibleTime);
 
         _isInvincible = false;
     }
@@ -78,7 +78,7 @@ public class Player : CharCtrl, IDamageable
 
     protected override void OnSprintStarted(InputAction.CallbackContext context)
     {
-        if (_stamina > 0)
+        if (m_stamina > 0)
         {
             _isRunning = true;
             base.OnSprintStarted(context);
@@ -95,25 +95,25 @@ public class Player : CharCtrl, IDamageable
     private void HandleStamina()
     {
         // Rigenerazione se non sto correndo né sparando
-        if (_stamina < _maxStamina && !_isRunning)
+        if (m_stamina < m_maxStamina && !_isRunning)
         {
-            _stamina += _staminaRegenRate * Time.deltaTime;
-            _stamina = Mathf.Min(_stamina, _maxStamina);
-            OnRefillStamina?.Invoke(_stamina);
+            m_stamina += m_staminaRegenRate * Time.deltaTime;
+            m_stamina = Mathf.Min(m_stamina, m_maxStamina);
+            OnRefillStamina?.Invoke(m_stamina);
         }
     }
 
     private IEnumerator DrainStaminaWhileRunning()
     {
-        while (_speedMagnitude == _runSpeed && _stamina > 0)
+        while (_speedMagnitude == m_runSpeed && m_stamina > 0)
         {
-            _stamina -= _staminaDrainRun * Time.deltaTime;
-            OnChangeStamina?.Invoke(_stamina);
+            m_stamina -= m_staminaDrainRun * Time.deltaTime;
+            OnChangeStamina?.Invoke(m_stamina);
 
-            if (_stamina <= 0)
+            if (m_stamina <= 0)
             {
-                _stamina = 0;
-                _speedMagnitude = _walkSpeed;
+                m_stamina = 0;
+                _speedMagnitude = m_walkSpeed;
             }
             yield return null;
         }

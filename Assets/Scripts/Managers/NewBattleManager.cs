@@ -46,6 +46,7 @@ public class NewBattleManager : MonoBehaviour
     // --- Events ---
     public event Action<ItemData> OnUseItem;
     public event Action<UnitBase> OnCreateUnit;
+    public event Action OnStartBattle;
 
     #region Unity methods
     private void Awake()
@@ -100,15 +101,32 @@ public class NewBattleManager : MonoBehaviour
     /// <summary>
     /// Setup all the mandatory needs for the battle to start
     /// </summary>
-    public void SetupBattle(BattleSettings battleSettings, IReadOnlyList<GameObject> playersPf)
+    public void StartCinematicBattle(BattleSettings battleSettings, IReadOnlyList<GameObject> playersPf)
     {
         if (_battleStatus != BattleStatus.Starting)
             return;
 
-        m_cameraController.BattleCamera();
-
         InstantiatePrefab(playersPf.ToList(), m_playerSide);
         InstantiatePrefab(battleSettings.enemies.ToList(), m_enemySide);
+
+        OnStartBattle.Invoke();
+    }
+
+    public void SetupBattle()
+    {
+        if (_battleStatus != BattleStatus.Starting)
+            return;
+
+        foreach (UnitBase u in m_unitsInBattle)
+            if (u.Team == EUnitTeam.Player)
+            {
+                u.TryGetComponent(out AnimationTimeLine atl);
+                atl.CombatController();
+            }
+
+
+
+        m_cameraController.BattleCamera();
 
         // Ording the list by the speed
         m_turnOrder = m_unitsInBattle.OrderBy(x => x.Speed).ToList();
@@ -130,6 +148,14 @@ public class NewBattleManager : MonoBehaviour
             u.OnDeath += HandleUnitDeath;
             OnCreateUnit.Invoke(u);
             m_unitsInBattle.Add(u);
+
+            if (u.Team == EUnitTeam.Player)
+            {
+                go.transform.position += new Vector3(0f, 0f, -3f);
+                go.TryGetComponent(out AnimationTimeLine anim);
+                anim.CinematicController();
+                BindSignalUtility.BindMultiCallsToMultiAssets(anim.BattleEnterArgs(CinematicManager.Instance.m_signalBattleEnter));
+            }
         }
     }
     #endregion
@@ -148,7 +174,7 @@ public class NewBattleManager : MonoBehaviour
             return;
 
         // Indexes's selected team
-        List<int> indexesTeam = m_unitsInBattle.FindAllIndexes(u => u.Team == _selectingTeam);
+        List<int> indexesTeam = m_unitsInBattle.FindAllIndexes(u => u.Team == _selectingTeam && !u.IsDead);
         if (indexesTeam.Count == 0)
             return;
 
