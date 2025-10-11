@@ -46,7 +46,7 @@ public class CharController : MonoBehaviour
         if (PlayerInputSingleton.Instance != null)
         {
             PlayerInputSingleton.Instance.Actions["Move"].performed += OnMoveInput;
-            PlayerInputSingleton.Instance.Actions["Move"].canceled += OnMoveCanceled;
+            //PlayerInputSingleton.Instance.Actions["Move"].canceled += OnMoveCanceled;
             PlayerInputSingleton.Instance.Actions["Jump"].performed += OnJumpInput;
             PlayerInputSingleton.Instance.Actions["Sprint"].started += OnSprintStarted;
             PlayerInputSingleton.Instance.Actions["Sprint"].canceled += OnSprintCanceled;
@@ -58,7 +58,7 @@ public class CharController : MonoBehaviour
         if (PlayerInputSingleton.Instance != null)
         {
             PlayerInputSingleton.Instance.Actions["Move"].performed -= OnMoveInput;
-            PlayerInputSingleton.Instance.Actions["Move"].canceled -= OnMoveCanceled;
+            //PlayerInputSingleton.Instance.Actions["Move"].canceled -= OnMoveCanceled;
             PlayerInputSingleton.Instance.Actions["Jump"].performed -= OnJumpInput;
             PlayerInputSingleton.Instance.Actions["Sprint"].started -= OnSprintStarted;
             PlayerInputSingleton.Instance.Actions["Sprint"].canceled -= OnSprintCanceled;
