@@ -2,9 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 public abstract class UnitBase : MonoBehaviour
 {
+    // --- Inspector ---
     [Header("Stats")]
     [SerializeField] protected string _name;
     [SerializeField] private float _health;
@@ -13,12 +16,20 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private float _accumulatedSpeed;
     [SerializeField] private float _speedNextTurn;
     [SerializeField] private float _damage;
-    [SerializeField] private bool _isItsTurn;
-    [SerializeField] private bool _isDead;
     [SerializeField] private EUnitTeam _team;
-    [SerializeField] private Animator _animator;
-    [SerializeField] protected UnitBase _target;
 
+    [Header("Animations")]
+    [SerializeField] private Animator _animator;
+    [SerializeField] private PlayableDirector _attackCinematic;
+    [SerializeField] private TimelineAsset _baseAttack;
+    [SerializeField] private SignalReceiver _sr;
+
+    // --- Private ---
+    private UnitBase _target;
+    private bool _isItsTurn;
+    [SerializeField] private bool _isDead;
+
+    // --- Prorprierties ---
     public string Name => _name;
     public float Health => _health;
     public float MaxHealth => _maxHealth;
@@ -29,9 +40,12 @@ public abstract class UnitBase : MonoBehaviour
     public bool IsItsTurn => _isItsTurn;
     public bool IsDead => _isDead;
     public EUnitTeam Team => _team;
+    public PlayableDirector AttackCinematic => _attackCinematic;
+    public SignalReceiver SignalReceiver => _sr;
+    public TimelineAsset BaseAttack => _baseAttack;
 
-    public UnitBase Instance { get; private set; }
 
+    // --- Events ---
     public event Action<float, float> OnUnitTookDamage;
     public event Action<float, float> OnHeal;
     public event Action OnEndAttack;
@@ -40,7 +54,6 @@ public abstract class UnitBase : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _animator = GetComponent<Animator>();
         _isDead = false;
     }
 
@@ -49,19 +62,44 @@ public abstract class UnitBase : MonoBehaviour
         _target = target;
         _animator.SetTrigger("IsAttacking");
     }
+
+    public void StartAttackCinematic(UnitBase target)
+    {
+        _target = target;
+    }
+
     public void EndAttackAnimation()
     {
         OnEndAttack?.Invoke();
-
     }
 
     #region Handle health
     public virtual void TakeDamage(float damage)
     {
         _health -= damage;
+        _animator.SetTrigger("IsHitted");
+
+        if (_health <= 0)
+        {
+            StartCoroutine(DieSequence());
+        }
+
         OnUnitTookDamage?.Invoke(_health, _maxHealth);
-        if (Health <= 0)
-            OnDeath?.Invoke(this);
+    }
+
+    private IEnumerator DieSequence()
+    {
+        _animator.SetTrigger("IsDying");
+
+        // Attendi che l'animazione finisca o il segnale arrivi
+        yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
+
+        HandleDeath();
+    }
+
+    public virtual void HandleDeath()
+    {
+        OnDeath?.Invoke(this);
     }
 
     public virtual void Heal(float heal)
@@ -113,7 +151,7 @@ public abstract class UnitBase : MonoBehaviour
 
         _target = null;
     }
-
+    public void SetTarget(UnitBase target) => _target = target;
     public void SetDead() => _isDead = true;
     public void SetAlive() => _isDead = false;
 }

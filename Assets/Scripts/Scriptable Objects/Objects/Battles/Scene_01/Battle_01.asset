@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Battle_01
   m_EditorClassIdentifier: 
   enemies:
-  - {fileID: 4311111495703447436, guid: 790cbaa43a4b19c4a964617119f8d796, type: 3}
-  - {fileID: 4311111495703447436, guid: 790cbaa43a4b19c4a964617119f8d796, type: 3}
-  - {fileID: 4311111495703447436, guid: 790cbaa43a4b19c4a964617119f8d796, type: 3}
+  - {fileID: 5295967490099403151, guid: 984ef01a5fd581f46af9a6c609d62e4f, type: 3}
+  - {fileID: 5295967490099403151, guid: 984ef01a5fd581f46af9a6c609d62e4f, type: 3}
+  - {fileID: 5295967490099403151, guid: 984ef01a5fd581f46af9a6c609d62e4f, type: 3}

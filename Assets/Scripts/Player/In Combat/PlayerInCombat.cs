@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerInCombat : UnitBase
 {
+    [Header("Abilities")]
     [SerializeField] private List<AbilityData> _AbilitiesData = new();
     
     private UIBattleManager m_uiBattleManager;

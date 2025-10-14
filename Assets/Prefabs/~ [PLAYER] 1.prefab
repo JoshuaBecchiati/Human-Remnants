@@ -688,5 +688,5 @@ MonoBehaviour:
   m_animationTransition: 5
   m_health: 100
   m_invicibleTime: 5
-  _combatPF: {fileID: 4311111495703447436, guid: ec2325d712ba405419f3af7958978d0e,
+  _combatPF: {fileID: 6021961570360790873, guid: 140dcdb0fe9cab94d80e5256feef1813,
     type: 3}
