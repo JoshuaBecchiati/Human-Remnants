@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Timeline;
@@ -8,9 +7,9 @@ using UnityEngine.Timeline;
 public class AnimationTimeLine : MonoBehaviour
 {
     [SerializeField] private Animator m_animator;
-    [SerializeField] private AnimatorController m_CombatController;
-    [SerializeField] private AnimatorController m_CinematicController;
-    
+    [SerializeField] private RuntimeAnimatorController m_CombatController;
+    [SerializeField] private RuntimeAnimatorController m_CinematicController;
+
     private SignalReceiver m_srCombat;
 
     public void StartEntrance() => m_animator.CrossFade("StartEntrance", 0.3f);

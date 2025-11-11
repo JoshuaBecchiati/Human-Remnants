@@ -4,8 +4,8 @@ using System.Diagnostics;
 [Serializable]
 public class ItemData
 {
-    public Item Item { get; private set; }
-    public int Qty { get; private set; }
+    public Item Item;
+    public int Qty;
 
 
     public ItemData(Item item, int qty)

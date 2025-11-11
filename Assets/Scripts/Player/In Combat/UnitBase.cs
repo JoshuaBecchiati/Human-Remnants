@@ -25,7 +25,7 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private SignalReceiver _sr;
 
     // --- Private ---
-    private UnitBase _target;
+    [SerializeField] private UnitBase _target;
     private bool _isItsTurn;
     [SerializeField] private bool _isDead;
 
@@ -43,6 +43,7 @@ public abstract class UnitBase : MonoBehaviour
     public PlayableDirector AttackCinematic => _attackCinematic;
     public SignalReceiver SignalReceiver => _sr;
     public TimelineAsset BaseAttack => _baseAttack;
+    public UnitBase Target => _target;
 
 
     // --- Events ---
@@ -119,14 +120,11 @@ public abstract class UnitBase : MonoBehaviour
 {
         _isItsTurn = true;
         _accumulatedSpeed += Speed;
-        Debug.Log($"{_name} has started the turn {_speed}.\n" +
-                  $"Current accumulated speed: {_accumulatedSpeed}.");
     }
 
     public virtual void EndTurn()
     {
         _isItsTurn = false;
-        Debug.Log($"{_name} has ended the turn");
     }
     #endregion
 
@@ -139,17 +137,14 @@ public abstract class UnitBase : MonoBehaviour
     public virtual void ResetAccumulatedSpeed()
     {
         _accumulatedSpeed = 0;
-        Debug.Log($"Reset speed, current accumulated speed: {_accumulatedSpeed}.");
     }
     #endregion
 
     public void Attack()
     {
         float finalDamage = _damage;
-        Debug.Log($"{_name} has attacked {_target._name}. Damage inflicted: {finalDamage}.");
-        _target.TakeDamage(finalDamage);
 
-        _target = null;
+        _target.TakeDamage(finalDamage);
     }
     public void SetTarget(UnitBase target) => _target = target;
     public void SetDead() => _isDead = true;

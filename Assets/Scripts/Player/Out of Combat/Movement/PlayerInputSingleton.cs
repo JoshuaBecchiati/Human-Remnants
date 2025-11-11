@@ -45,4 +45,11 @@ public class PlayerInputSingleton : MonoBehaviour
         SwitchActionMap("Combat");
         _inputs.actions.Enable();
     }
+
+    public void UIInput()
+    {
+        _inputs.actions.Disable();
+        SwitchActionMap("UI");
+        _inputs.actions.Enable();
+    }
 }

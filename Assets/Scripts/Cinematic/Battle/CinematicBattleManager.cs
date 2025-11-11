@@ -43,10 +43,27 @@ public class CinematicBattleManager : MonoBehaviour
 
     private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit)
     {
+        // 1. Collega l’evento "StartAttack" della timeline all’attacco effettivo
         UnityAction call = unit.Attack;
         BindSignalUtility.BindSingleCallSingleAsset(call, "StartAttack", unit.SignalReceiver);
 
-        // Play the cinematic and wait
+        // 2. Salva la rotazione originale della unit (non del manager!)
+        Quaternion originalRotation = unit.transform.rotation;
+
+        // 3. Ruota la unit verso il target (solo sull’asse Y)
+        if (unit.Target != null)
+        {
+            Vector3 dir = unit.Target.transform.position - unit.transform.position;
+            dir.y = 0f;
+            if (dir != Vector3.zero)
+                unit.transform.rotation = Quaternion.LookRotation(dir);
+        }
+
+        // 4. Avvia la cinematica e attendi la fine
         yield return m_cinematicManager.PlayCinematicCoroutine(unit.BaseAttack, unit.AttackCinematic);
+
+        // 5. Ripristina la rotazione originale
+        unit.transform.rotation = originalRotation;
     }
+
 }

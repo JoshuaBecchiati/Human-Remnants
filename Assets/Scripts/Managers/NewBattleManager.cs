@@ -427,9 +427,16 @@ public class NewBattleManager : MonoBehaviour
         _battleStatus = BattleStatus.TurnTransition;
 
         if (m_unitsInBattle[_oldTarget].Team == EUnitTeam.Enemy && !m_unitsInBattle[_oldTarget].IsDead)
+        {
             _indexTarget = _oldTarget;
+            Debug.Log("[NewBattleManager] Assegnato vecchio target");
+        }
         else
+        {
             _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.Enemy && !e.IsDead);
+            Debug.Log("[NewBattleManager] Assegnato nuovo target");
+        }
+
 
         m_UIManager.SetOnInfoBar(CurrentTarget);
 
@@ -451,7 +458,6 @@ public class NewBattleManager : MonoBehaviour
     }
     private IEnumerator StartEnemyTurn()
     {
-        // Trova target
         UnitBase playerTarget = m_unitsInBattle.Find(u => u.Team == EUnitTeam.Player && !u.IsDead);
         if (playerTarget != null)
             CurrentUnit.SetTarget(playerTarget);
@@ -461,7 +467,7 @@ public class NewBattleManager : MonoBehaviour
 
         CurrentUnit.EndTurn();
 
-        _battleStatus = BattleStatus.CheckingEnd; // Torna allo stato principale per ChangeTurn
+        _battleStatus = BattleStatus.CheckingEnd;
     }
     #endregion
 

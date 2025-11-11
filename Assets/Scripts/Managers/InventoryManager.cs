@@ -50,6 +50,17 @@ public class InventoryManager : MonoBehaviour
             _itemsData.Add(newItem);
         }
         OnAddItem?.Invoke();
+        DebugList();
+    }
+
+    private void DebugList()
+    {
+        int i = 0;
+        foreach (var item in _itemsData)
+        {
+            Debug.Log($"[SLOT] {i} - [ITEM] {item.Item.name} - [QUANTIY] {item.Qty}");
+            i++;
+        }
     }
 
     /// <summary>
