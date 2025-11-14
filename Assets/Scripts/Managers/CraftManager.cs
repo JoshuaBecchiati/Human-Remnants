@@ -46,10 +46,10 @@ public class CraftManager : MonoBehaviour
     {
         foreach (ItemData ingridients in recipe.ingridients)
         {
-            foreach (ItemData item in m_inventory.GetItems())
+            foreach (ItemData item in new List<ItemData>(m_inventory.GetItems()))
             {
                 if (item.Item == ingridients.Item)
-                    item.RemoveItem(ingridients.Qty);
+                    m_inventory.RemoveItemInInventory(item, ingridients.Qty);
             }
         }
     }

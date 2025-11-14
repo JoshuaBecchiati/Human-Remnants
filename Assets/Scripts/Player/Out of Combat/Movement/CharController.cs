@@ -1,5 +1,7 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI;
 
 public class CharController : MonoBehaviour
 {
@@ -7,6 +9,7 @@ public class CharController : MonoBehaviour
     private const float MIN_MOVE_SPEED = 0.1f;
     private const float WALK_VALUE = 0.5f;
     private const float RUN_VALUE = 1.0f;
+    private const float STOP_VALUE = 0.0f;
 
     // --- Inspector ---
     [Header("Jump")]
@@ -40,6 +43,7 @@ public class CharController : MonoBehaviour
 
     #region Unity methods
     // Start is called before the first frame update
+
     void Start()
     {
         _speedMagnitude = WALK_VALUE;
@@ -180,8 +184,6 @@ public class CharController : MonoBehaviour
     }
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
-        Debug.Log("ONMOVECANCELED");
-
         _isMoving = false;
 
         _horizontal = 0f;
@@ -227,7 +229,10 @@ public class CharController : MonoBehaviour
     #region Animator
     private void UpdateAnimator()
     {
-        if (!_isMoving) return;
+        if (Mathf.Abs(m_animator.GetFloat("X")) < 0.005f && Mathf.Abs(m_animator.GetFloat("Y")) < 0.005f && !_isMoving)
+        {
+            _currentSpeed = Vector3.zero;
+        }
 
         m_animator.SetFloat("X", _currentSpeed.x);
         m_animator.SetFloat("Y", _currentSpeed.z);

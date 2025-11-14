@@ -50,17 +50,6 @@ public class InventoryManager : MonoBehaviour
             _itemsData.Add(newItem);
         }
         OnAddItem?.Invoke();
-        DebugList();
-    }
-
-    private void DebugList()
-    {
-        int i = 0;
-        foreach (var item in _itemsData)
-        {
-            Debug.Log($"[SLOT] {i} - [ITEM] {item.Item.name} - [QUANTIY] {item.Qty}");
-            i++;
-        }
     }
 
     /// <summary>
@@ -84,6 +73,7 @@ public class InventoryManager : MonoBehaviour
     public void RemoveItemInInventory(ItemData item, int qty)
     {
         int index = _itemsData.FindIndex(i => i == item);
+        Debug.Log("ITEM: " + _itemsData[index].Item);
         _itemsData[index].RemoveItem(qty);
 
         if(_itemsData[index].Qty <= 0)

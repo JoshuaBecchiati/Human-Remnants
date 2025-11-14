@@ -1,9 +1,11 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class UIInventoryManager : MonoBehaviour
 {
+    [Header("Inventory settings")]
     [SerializeField] private GameObject m_inventory;
 
     [SerializeField] private GameObject m_itemPrefab;
@@ -15,9 +17,19 @@ public class UIInventoryManager : MonoBehaviour
     private bool _isOpen;
 
     // --- Instance ---
-    public UIInventoryManager Instance { get; private set; }
+    public static UIInventoryManager Instance { get; private set; }
 
     // --- Proprieties ---
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -54,26 +66,27 @@ public class UIInventoryManager : MonoBehaviour
         }
     }
 
-
     private void OpenInventory(InputAction.CallbackContext context)
     {
         if (!_isOpen)
         {
             Time.timeScale = 0f;
+
             _isOpen = true;
             m_inventory.SetActive(_isOpen);
+
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            Debug.Log("Inventory opened");
         }
         else
         {
             Time.timeScale = 1f;
+
             _isOpen = false;
             m_inventory.SetActive(_isOpen);
+
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            Debug.Log("Inventory closed");
         }
     }
 
@@ -94,6 +107,21 @@ public class UIInventoryManager : MonoBehaviour
             itemGO.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
             itemQtyTMP.text = $"x{itemData.Qty}";
         }
+    }
+
+    private void OpenInvCraftingUI()
+    {
+        CreateInvUI();
+        foreach(GameObject Child in m_itemUIParent)
+        {
+            Button btn = Child.AddComponent<Button>();
+            btn.onClick.AddListener(() => Debug.Log("Bottone premuto"));
+        }
+    }
+
+    private void CloseInvCraftingUI()
+    {
+
     }
 
     public void UpdateItemUI(ItemData item)
