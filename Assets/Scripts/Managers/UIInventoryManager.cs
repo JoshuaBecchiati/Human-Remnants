@@ -1,140 +1,93 @@
+using System;
 using TMPro;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class UIInventoryManager : MonoBehaviour
 {
-    [Header("Inventory settings")]
     [SerializeField] private GameObject m_inventory;
+    [SerializeField] private Transform m_inventoryTransform;
 
-    [SerializeField] private GameObject m_itemPrefab;
-    [SerializeField] private Transform m_itemUIParent;
+    [SerializeField] private GameObject m_itemSlotPrefab;
 
-    [Header("Dependency")]
-    [SerializeField] private InventoryManager m_inventoryManager;
-
-    private bool _isOpen;
-
-    // --- Instance ---
-    public static UIInventoryManager Instance { get; private set; }
-
-    // --- Proprieties ---
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
+    private bool _isInventoryOpen; // True = open, False = closed
 
     private void Start()
     {
+        m_inventory.SetActive(false);
+
         if (PlayerInputSingleton.Instance != null)
+            PlayerInputSingleton.Instance.Actions["Inventory"].performed += ToggleInventory;
+
+        if (InventoryManager.Instance != null)
         {
-            PlayerInputSingleton.Instance.Actions["Inventory"].performed += OpenInventory;
-        }
-        if (m_inventoryManager != null)
-        {
-            m_inventoryManager.OnAddItem += CreateInvUI;
-            m_inventoryManager.OnRemoveItem += UpdateItemUI;
+            InventoryManager.Instance.OnAddItem += CreateItemSlots;
+            InventoryManager.Instance.OnRemoveItem += CreateItemSlots;
         }
 
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        m_inventory.SetActive(false);
+        CreateItemSlots();
     }
 
     private void OnDestroy()
     {
         if (PlayerInputSingleton.Instance != null)
-        {
-            PlayerInputSingleton.Instance.Actions["Inventory"].performed -= OpenInventory;
-        }
+            PlayerInputSingleton.Instance.Actions["Inventory"].performed -= ToggleInventory;
 
-        if (m_inventoryManager != null)
+        if (InventoryManager.Instance != null)
         {
-            m_inventoryManager.OnAddItem -= CreateInvUI;
-            m_inventoryManager.OnRemoveItem -= UpdateItemUI;
+            InventoryManager.Instance.OnAddItem -= CreateItemSlots;
+            InventoryManager.Instance.OnRemoveItem -= CreateItemSlots;
         }
     }
 
-    private void OpenInventory(InputAction.CallbackContext context)
+    private void ToggleInventory(InputAction.CallbackContext context)
     {
-        if (!_isOpen)
-        {
-            Time.timeScale = 0f;
-
-            _isOpen = true;
-            m_inventory.SetActive(_isOpen);
-
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        if (_isInventoryOpen)
+            CloseInventory();
         else
-        {
-            Time.timeScale = 1f;
-
-            _isOpen = false;
-            m_inventory.SetActive(_isOpen);
-
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
+            OpenInventory();
     }
 
-    private void CreateInvUI()
+    private void OpenInventory()
     {
-        foreach (Transform Child in m_itemUIParent)
-            Destroy(Child.gameObject);
-        foreach (ItemData itemData in m_inventoryManager.GetItems())
-        {
-            GameObject itemGO = Instantiate(m_itemPrefab, m_itemUIParent);
+        _isInventoryOpen = true;
 
-            itemGO.name = itemData.Item.name;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
-            itemGO.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
-            Debug.Log($"Item name{itemData.Item.name}");
-            itemNameTMP.text = itemData.Item.name;
+        Time.timeScale = 0f;
 
-            itemGO.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
-            itemQtyTMP.text = $"x{itemData.Qty}";
-        }
+        m_inventory.SetActive(true);
     }
 
-    private void OpenInvCraftingUI()
+    private void CloseInventory()
     {
-        CreateInvUI();
-        foreach(GameObject Child in m_itemUIParent)
-        {
-            Button btn = Child.AddComponent<Button>();
-            btn.onClick.AddListener(() => Debug.Log("Bottone premuto"));
-        }
+        _isInventoryOpen = false;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        Time.timeScale = 1f;
+
+        m_inventory.SetActive(false);
     }
 
-    private void CloseInvCraftingUI()
+    private void CreateItemSlots()
     {
+        foreach (Transform child in m_inventoryTransform)
+            Destroy(child.gameObject);
 
-    }
+        foreach (ItemData item in InventoryManager.Instance.GetItems())
+        {
+            GameObject itemSlot = Instantiate(m_itemSlotPrefab, m_inventoryTransform);
 
-    public void UpdateItemUI(ItemData item)
-    {
-        Transform Child = m_itemUIParent.Find(item.Item.name);
-        if (item.Qty <= 0)
-        {
-            Destroy(Child.gameObject);
-        }
-        else
-        {
-            Child.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
-            itemQtyTMP.text = $"x{item.Qty}";
+            // Object name
+            itemSlot.transform.Find("Item name").GetComponent<TextMeshProUGUI>().text = item.Item.name;
+
+            // Object quantity
+            itemSlot.transform.Find("Item qty").GetComponent<TextMeshProUGUI>().text = "x" + item.Qty;
         }
     }
 }

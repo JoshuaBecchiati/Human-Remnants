@@ -14,7 +14,7 @@ public class InventoryManager : MonoBehaviour
 
     // --- Proprieties ---
     public event Action OnAddItem;
-    public event Action<ItemData> OnRemoveItem;
+    public event Action OnRemoveItem;
 
     private void Awake()
     {
@@ -62,7 +62,7 @@ public class InventoryManager : MonoBehaviour
         _itemsData[index].RemoveItem();
         if (_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
-        OnRemoveItem?.Invoke(item);
+        OnRemoveItem?.Invoke();
     }
 
     /// <summary>
@@ -78,9 +78,8 @@ public class InventoryManager : MonoBehaviour
 
         if(_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
-        OnRemoveItem?.Invoke(item);
+        OnRemoveItem?.Invoke();
     }
-
 
     public IReadOnlyList<ItemData> GetItems() => _itemsData;
 }

@@ -48,7 +48,7 @@ public class UIBattleManager : MonoBehaviour
 
         if (m_inventoryManager != null)
         {
-            m_inventoryManager.OnRemoveItem += UpdateItemUI;
+            //m_inventoryManager.OnRemoveItem += UpdateItemUI;
         }
 
         RebuildUI();
@@ -66,7 +66,7 @@ public class UIBattleManager : MonoBehaviour
 
         if (m_inventoryManager != null)
         {
-            m_inventoryManager.OnRemoveItem -= UpdateItemUI;
+            //m_inventoryManager.OnRemoveItem -= UpdateItemUI;
         }
 
 
