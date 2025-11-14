@@ -16,3 +16,5 @@ MonoBehaviour:
   description: Heal 10 hp
   type: 1
   _healAmount: 20
+  _healVFXPrefab: {fileID: 1215112093427301738, guid: fd60b95a3543f894f9eafa375ee03b47,
+    type: 3}

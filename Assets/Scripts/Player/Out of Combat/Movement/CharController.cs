@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI;
 
 public class CharController : MonoBehaviour
 {
@@ -11,11 +9,13 @@ public class CharController : MonoBehaviour
     private const float MIN_MOVE_SPEED = 0.1f;
     private const float WALK_VALUE = 0.5f;
     private const float RUN_VALUE = 1.0f;
+    private const float STOP_VALUE = 0.0f;
 
     // --- Inspector ---
     [Header("Jump")]
     [SerializeField] private float m_jumpForce = 3f;
     [SerializeField] private float m_gravity = 15f;
+    [SerializeField] private LayerMask m_groundMask;
 
     [Header("Camera")]
     [SerializeField] private float m_cameraSpeed = 320f;
@@ -37,16 +37,20 @@ public class CharController : MonoBehaviour
 
     private bool _isJumping;
     private bool _isClimbing;
+    private bool _isRunning;
+    private bool _isGrounded;
+    private bool _isMoving;
 
     #region Unity methods
     // Start is called before the first frame update
+
     void Start()
     {
         _speedMagnitude = WALK_VALUE;
         if (PlayerInputSingleton.Instance != null)
         {
             PlayerInputSingleton.Instance.Actions["Move"].performed += OnMoveInput;
-            //PlayerInputSingleton.Instance.Actions["Move"].canceled += OnMoveCanceled;
+            PlayerInputSingleton.Instance.Actions["Move"].canceled += OnMoveCanceled;
             PlayerInputSingleton.Instance.Actions["Jump"].performed += OnJumpInput;
             PlayerInputSingleton.Instance.Actions["Sprint"].started += OnSprintStarted;
             PlayerInputSingleton.Instance.Actions["Sprint"].canceled += OnSprintCanceled;
@@ -58,7 +62,7 @@ public class CharController : MonoBehaviour
         if (PlayerInputSingleton.Instance != null)
         {
             PlayerInputSingleton.Instance.Actions["Move"].performed -= OnMoveInput;
-            //PlayerInputSingleton.Instance.Actions["Move"].canceled -= OnMoveCanceled;
+            PlayerInputSingleton.Instance.Actions["Move"].canceled -= OnMoveCanceled;
             PlayerInputSingleton.Instance.Actions["Jump"].performed -= OnJumpInput;
             PlayerInputSingleton.Instance.Actions["Sprint"].started -= OnSprintStarted;
             PlayerInputSingleton.Instance.Actions["Sprint"].canceled -= OnSprintCanceled;
@@ -82,13 +86,9 @@ public class CharController : MonoBehaviour
         _wantedSpeed.z = _vertical * _speedMagnitude;
         _wantedSpeed.x = _horizontal * _speedMagnitude;
 
-
-
         // Se mi sto muovendo la camera si deve spostare
         if (Mathf.Abs(_horizontal) > MIN_MOVE_SPEED || Mathf.Abs(_vertical) > MIN_MOVE_SPEED)
-        {
             OrientCharToCamera();
-        }
 
         // Gestione della gravità
         if (!_isClimbing)
@@ -112,6 +112,7 @@ public class CharController : MonoBehaviour
 
         // Movimento effettivo
         m_characterController.Move(m_cameraPivot.TransformDirection(_currentSpeed) * Time.deltaTime);
+        MovementSounds.UpdateMovementState(_isRunning, _currentSpeed);
     }
     #endregion
 
@@ -175,12 +176,16 @@ public class CharController : MonoBehaviour
         // Raccolto i valori (da -1 a 1) dell'input action
         Vector2 input = context.ReadValue<Vector2>();
 
+        _isMoving = true;
+
         // Assegno i valori raccolti
         _horizontal = input.x;
         _vertical = input.y;
     }
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
+        _isMoving = false;
+
         _horizontal = 0f;
         _vertical = 0f;
     }
@@ -189,30 +194,46 @@ public class CharController : MonoBehaviour
     #region Jump logic
     private void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (m_characterController.isGrounded)
+        if (IsGrounded())
         {
             m_animator.SetTrigger("Jump");
             _isJumping = true;
             _verticalVelocity = Mathf.Sqrt(2 * m_jumpForce * m_gravity);
         }
     }
+
+    private bool IsGrounded()
+    {
+        if (Physics.CheckSphere(transform.position, 0.3f, m_groundMask)) return true;
+
+        return false;
+    }
     #endregion
 
     #region Run logic
     protected virtual void OnSprintStarted(InputAction.CallbackContext context)
     {
+        if (!IsGrounded()) return;
         _speedMagnitude = RUN_VALUE;
+        _isRunning = true;
     }
 
     protected virtual void OnSprintCanceled(InputAction.CallbackContext context)
     {
+        if (!IsGrounded()) return;
         _speedMagnitude = WALK_VALUE;
+        _isRunning = false;
     }
     #endregion
 
     #region Animator
     private void UpdateAnimator()
     {
+        if (Mathf.Abs(m_animator.GetFloat("X")) < 0.005f && Mathf.Abs(m_animator.GetFloat("Y")) < 0.005f && !_isMoving)
+        {
+            _currentSpeed = Vector3.zero;
+        }
+
         m_animator.SetFloat("X", _currentSpeed.x);
         m_animator.SetFloat("Y", _currentSpeed.z);
     }

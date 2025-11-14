@@ -62,6 +62,7 @@ public class CameraCtrl : MonoBehaviour
 
     private void OnValidate()
     {
+        if (_target == null) return;
         transform.position = GetWantedPosition();
     }
     private void LateUpdate()
@@ -96,5 +97,10 @@ public class CameraCtrl : MonoBehaviour
     {
         _currentArmLenght = lenght;
         _cameraPoint.localPosition = new Vector3(0, 0, -lenght);
+    }
+
+    public void SetTarget(Transform target)
+    {
+        _target = target;
     }
 }

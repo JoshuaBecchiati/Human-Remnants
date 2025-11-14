@@ -1,51 +1,65 @@
+using Cinemachine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 public class CinematicManager : MonoBehaviour
 {
-    [SerializeField] private GameObject m_BattleCinematic;
-    [SerializeField] private PlayableDirector m_battleEnterTimeLine;
+    // --- Inspector ---
+    [Header("Cinematic")]
+    [SerializeField] private PlayableDirector m_director;
+    [SerializeField] private CinemachineBrain m_cameraBrain;
 
-    public SignalReceiver m_signalBattleEnter;
-
-    [Header("Dependencies")]
-    [SerializeField] private NewBattleManager m_BattleManager;
-
-    public static CinematicManager Instance { get; private set; }
-
-    private void Awake()
+    public void PlayCinematic(TimelineAsset timeline)
     {
-        if (Instance != null && Instance != this)
+        m_director.Stop();
+
+        m_director.playableAsset = timeline;
+        m_director.time = 0;
+
+        foreach (var track in timeline.GetOutputTracks())
+            if (track is CinemachineTrack cmTrack)
+                m_director.SetGenericBinding(cmTrack, m_cameraBrain);
+
+        m_director.Play();
+    }
+
+
+    public Coroutine PlayCinematicCoroutine(TimelineAsset timeline, PlayableDirector director)
+    {
+        return StartCoroutine(PlayAndWait(timeline, director));
+    }
+
+    private IEnumerator PlayAndWait(TimelineAsset timeline, PlayableDirector director)
+    {
+        bool finished = false;
+
+        void DirectorStopped(PlayableDirector dir)
         {
-            Destroy(gameObject);
-            return;
+            director.stopped -= DirectorStopped;
+            finished = true;
         }
-        Instance = this;
+
+        director.stopped += DirectorStopped;
+        director.playableAsset = timeline;
+        director.time = 0;
+
+        foreach (var track in timeline.GetOutputTracks())
+            if (track is CinemachineTrack cmTrack)
+                director.SetGenericBinding(cmTrack, m_cameraBrain);
+
+        director.Play();
+
+        yield return new WaitUntil(() => finished);
     }
 
-    private void Start()
+    public void Stop()
     {
-        m_BattleManager.OnStartBattle += BattleEnterCinematic;
-
-        m_BattleCinematic.SetActive(false);
-    }
-
-    public void BattleEnterCinematic()
-    {
-        m_BattleCinematic.SetActive(true);
-        if (m_battleEnterTimeLine.time != 0f)
-            m_battleEnterTimeLine.time = 0f;
-
-        m_battleEnterTimeLine.Play();
-        StartCoroutine(SetFalse((float)m_battleEnterTimeLine.duration));
-    }
-
-    private IEnumerator SetFalse(float time)
-    {
-        yield return new WaitForSeconds(time);
-        m_BattleCinematic.SetActive(false);
+        if (m_director.state == PlayState.Playing)
+            m_director.Stop();
     }
 }

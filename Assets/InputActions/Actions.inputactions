@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": "PassThrough",
+                    "type": "Value",
                     "id": "45a4c3ac-16ea-4127-a346-3c2a2434259a",
                     "expectedControlType": "Vector2",
                     "processors": "",
@@ -54,6 +54,24 @@
                     "name": "Inventory",
                     "type": "Button",
                     "id": "89eb4285-92bb-4fc1-87bc-b3fb3888e731",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchCharacter",
+                    "type": "Button",
+                    "id": "ee4a2ac3-d1a4-45a8-865d-4992bccb55ab",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Escape",
+                    "type": "Button",
+                    "id": "5ef66486-ce71-4343-895b-1d87ffec1967",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -368,6 +386,28 @@
                     "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7b200312-df6b-45a1-af28-8c37acdf314d",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchCharacter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8e866384-a1b5-4b99-94ba-1f1700b640de",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Escape",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -533,7 +573,7 @@
                     "name": "Submit",
                     "type": "Button",
                     "id": "e5a0f383-4990-46ba-bde1-ba0a367b7a01",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -542,7 +582,7 @@
                     "name": "Cancel",
                     "type": "Button",
                     "id": "47347118-3afb-4216-a908-426030af0196",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -606,6 +646,15 @@
                     "type": "PassThrough",
                     "id": "8e860749-46c8-4278-acf3-4e8c8b84aa4f",
                     "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "7c65e1f7-6971-4147-b5c9-a2c2b1c6fa81",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -1027,6 +1076,28 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c39116e2-22f6-4949-b711-0882ca622501",
+                    "path": "<NimbusGamepadHid>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5320738b-5655-4847-83a3-5c3ff39eda7b",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Back",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

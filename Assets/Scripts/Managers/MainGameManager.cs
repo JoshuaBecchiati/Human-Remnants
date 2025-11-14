@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,9 @@ public class MainGameManager : MonoBehaviour
     // --- Private ---
     private GameObject _enemy;
     private BattleSettings _battleSettings;
+
+    // --- Events ---
+    public event Action<BattleSettings, IReadOnlyList<GameObject>> OnSetupBattle;
 
 
     public IReadOnlyList<GameObject> PlayersCombatPF =>
@@ -76,7 +80,7 @@ public class MainGameManager : MonoBehaviour
         m_currentPlayer.SetActive(false);
         m_exploreCamera.SetActive(false);
 
-        NewBattleManager.Instance.StartCinematicBattle(_battleSettings, PlayersCombatPF);
+        OnSetupBattle?.Invoke(_battleSettings, PlayersCombatPF);
     }
 
     public void BattleClose()

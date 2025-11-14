@@ -3,16 +3,60 @@ using UnityEngine;
 
 public class CraftManager : MonoBehaviour
 {
-    [SerializeField] private List<ItemData> m_craftingList = new ();
-    [SerializeField] private GameObject[] m_itemSlot = new GameObject[2];
-    [SerializeField] private GameObject m_result;
+    [SerializeField] private List<CraftingRecipe> recipes;
 
     [Header("Dependencies")]
     [SerializeField] private InventoryManager m_inventory;
-    [SerializeField] private UIBattleManager m_uiBattle;
 
-    public void GetItemInInventory()
+    public void Craft(CraftingRecipe recipe)
     {
+        if (IsCraftable(recipe))
+        {
+            ConsumeIngridients(recipe);
+            CreateResult(recipe);
+        }
+        else
+        {
+            Debug.Log("Can't craft");
+        }
+    }
 
+    private bool IsCraftable(CraftingRecipe recipe)
+    {
+        foreach (ItemData ingridients in recipe.ingridients)
+        {
+            int itemCount = 0;
+            foreach (ItemData item in m_inventory.GetItems())
+            {
+                Debug.Log($"[ITEM] {item.Item.name} - [QUANTITY] {item.Qty}");
+                if (item.Item == ingridients.Item)
+                {
+                    itemCount = item.Qty;
+                }
+            }
+            if (itemCount < ingridients.Qty)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void ConsumeIngridients(CraftingRecipe recipe)
+    {
+        foreach (ItemData ingridients in recipe.ingridients)
+        {
+            foreach (ItemData item in new List<ItemData>(m_inventory.GetItems()))
+            {
+                if (item.Item == ingridients.Item)
+                    m_inventory.RemoveItemInInventory(item, ingridients.Qty);
+            }
+        }
+    }
+
+    private void CreateResult(CraftingRecipe recipe)
+    {
+        m_inventory.AddItemInInventory(recipe.result, recipe.resultAmount);
+        Debug.Log($"{recipe.result.name} added to inventory. Crafted amount: {recipe.resultAmount}");
     }
 }
