@@ -5,9 +5,73 @@ public class CraftManager : MonoBehaviour
 {
     [SerializeField] private List<CraftingRecipe> recipes;
 
-    [Header("Dependencies")]
-    [SerializeField] private InventoryManager m_inventory;
+    public static CraftManager Instance { get; private set; }
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    #region Craft by item
+    public bool Craft(ItemData[] items)
+    {
+        CraftingRecipe recipe = FindRecipeFromItems(items);
+
+        if (recipe != null)
+        {
+            Craft(recipe);
+            return true;
+        }
+
+        return false;
+    }
+
+    private CraftingRecipe FindRecipeFromItems(ItemData[] items)
+    {
+        foreach (var recipe in recipes)
+        {
+            if (RecipeMatchesItems(recipe, items))
+                return recipe;
+        }
+
+        return null;
+    }
+
+    private bool RecipeMatchesItems(CraftingRecipe recipe, ItemData[] items)
+    {
+        // Se il numero degli ingredienti non coincide, già non è la ricetta giusta
+        if (recipe.ingridients.Count != items.Length)
+            return false;
+
+        foreach (var ingredient in recipe.ingridients)
+        {
+            bool foundMatch = false;
+
+            foreach (var item in items)
+            {
+                if (item != null &&
+                    item.Item == ingredient.Item &&
+                    item.Qty >= ingredient.Qty)
+                {
+                    foundMatch = true;
+                    break;
+                }
+            }
+
+            if (!foundMatch)
+                return false;
+        }
+
+        return true;
+    }
+    #endregion
+
+    #region Craft by recipe
     public void Craft(CraftingRecipe recipe)
     {
         if (IsCraftable(recipe))
@@ -26,7 +90,7 @@ public class CraftManager : MonoBehaviour
         foreach (ItemData ingridients in recipe.ingridients)
         {
             int itemCount = 0;
-            foreach (ItemData item in m_inventory.GetItems())
+            foreach (ItemData item in InventoryManager.Instance.GetItems())
             {
                 Debug.Log($"[ITEM] {item.Item.name} - [QUANTITY] {item.Qty}");
                 if (item.Item == ingridients.Item)
@@ -41,22 +105,23 @@ public class CraftManager : MonoBehaviour
         }
         return true;
     }
+    #endregion
 
     private void ConsumeIngridients(CraftingRecipe recipe)
     {
         foreach (ItemData ingridients in recipe.ingridients)
         {
-            foreach (ItemData item in new List<ItemData>(m_inventory.GetItems()))
+            foreach (ItemData item in new List<ItemData>(InventoryManager.Instance.GetItems()))
             {
                 if (item.Item == ingridients.Item)
-                    m_inventory.RemoveItemInInventory(item, ingridients.Qty);
+                    InventoryManager.Instance.RemoveItemInInventory(item, ingridients.Qty);
             }
         }
     }
 
     private void CreateResult(CraftingRecipe recipe)
     {
-        m_inventory.AddItemInInventory(recipe.result, recipe.resultAmount);
+        InventoryManager.Instance.AddItemInInventory(recipe.result, recipe.resultAmount);
         Debug.Log($"{recipe.result.name} added to inventory. Crafted amount: {recipe.resultAmount}");
     }
 }

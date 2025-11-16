@@ -5,11 +5,11 @@ using UnityEngine;
 public class InventoryManager : MonoBehaviour
 {
 
-    [SerializeField] private List<ItemData> _itemsData = new();
+    [SerializeField] private static List<ItemData> _itemsData = new();
 
     [SerializeField] private NewBattleManager m_battleManager;
 
-    // --- Static ---
+    // --- Instance ---
     public static InventoryManager Instance { get; private set; }
 
     // --- Proprieties ---
@@ -81,5 +81,21 @@ public class InventoryManager : MonoBehaviour
         OnRemoveItem?.Invoke();
     }
 
-    public IReadOnlyList<ItemData> GetItems() => _itemsData;
+    public static ItemData FindItemByName(string name)
+    {
+        foreach (ItemData itemData in _itemsData)
+        {
+            if (name == itemData.Item.name)
+            {
+                return itemData;
+            }
+        }
+
+        return null;
+    }
+
+    public IReadOnlyList<ItemData> GetItems()
+    {
+        return _itemsData;
+    }
 }

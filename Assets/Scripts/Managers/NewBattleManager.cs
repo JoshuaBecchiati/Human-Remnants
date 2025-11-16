@@ -183,7 +183,6 @@ public class NewBattleManager : MonoBehaviour
         if (indexesTeam.Count == 0)
             return;
 
-        // 
         int posInTeam = indexesTeam.IndexOf(_indexTarget);
         if (posInTeam == -1) posInTeam = 0;
 
@@ -518,5 +517,8 @@ public class NewBattleManager : MonoBehaviour
     }
     #endregion
 
-    public IReadOnlyList<UnitBase> GetUnits() => m_unitsInBattle;
+    public IReadOnlyList<UnitBase> GetUnits()
+    {
+        return m_unitsInBattle;
+    }
 }

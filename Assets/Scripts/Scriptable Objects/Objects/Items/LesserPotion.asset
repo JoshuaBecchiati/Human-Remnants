@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Lesser heal potion
   description: Heal 10 hp
+  icon: {fileID: 21300000, guid: 91467c6c239d08248ae2073c1e73423e, type: 3}
   type: 1
   _healAmount: 20
   _healVFXPrefab: {fileID: 1215112093427301738, guid: fd60b95a3543f894f9eafa375ee03b47,

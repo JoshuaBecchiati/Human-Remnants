@@ -1,25 +1,40 @@
-using System;
 using TMPro;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class UIInventoryManager : MonoBehaviour
 {
+    // --- Inspector ---
     [SerializeField] private GameObject m_inventory;
     [SerializeField] private Transform m_inventoryTransform;
-
     [SerializeField] private GameObject m_itemSlotPrefab;
 
+    // --- Private ---
     private bool _isInventoryOpen; // True = open, False = closed
+
+    // --- Proprierties ---
+    public Transform InventoryTransform => m_inventoryTransform;
+
+    // --- Instance ---
+    public static UIInventoryManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
         m_inventory.SetActive(false);
 
         if (PlayerInputSingleton.Instance != null)
-            PlayerInputSingleton.Instance.Actions["Inventory"].performed += ToggleInventory;
+            PlayerInputSingleton.Instance.Actions["Inventory"].performed += OnToggleInventory;
 
         if (InventoryManager.Instance != null)
         {
@@ -27,23 +42,31 @@ public class UIInventoryManager : MonoBehaviour
             InventoryManager.Instance.OnRemoveItem += CreateItemSlots;
         }
 
+        GameEvents.OnOpenCrafting += OpenInventory;
+        GameEvents.OnCloseCrafting += CloseInventory;
+
         CreateItemSlots();
     }
 
     private void OnDestroy()
     {
         if (PlayerInputSingleton.Instance != null)
-            PlayerInputSingleton.Instance.Actions["Inventory"].performed -= ToggleInventory;
+            PlayerInputSingleton.Instance.Actions["Inventory"].performed -= OnToggleInventory;
 
         if (InventoryManager.Instance != null)
         {
             InventoryManager.Instance.OnAddItem -= CreateItemSlots;
             InventoryManager.Instance.OnRemoveItem -= CreateItemSlots;
         }
+
+        GameEvents.OnOpenCrafting -= OpenInventory;
+        GameEvents.OnCloseCrafting -= CloseInventory;
     }
 
-    private void ToggleInventory(InputAction.CallbackContext context)
+    private void OnToggleInventory(InputAction.CallbackContext context)
     {
+        if (GameEvents.IsInCrafting) return;
+
         if (_isInventoryOpen)
             CloseInventory();
         else
@@ -88,6 +111,9 @@ public class UIInventoryManager : MonoBehaviour
 
             // Object quantity
             itemSlot.transform.Find("Item qty").GetComponent<TextMeshProUGUI>().text = "x" + item.Qty;
+
+            // Object Sprite
+            itemSlot.transform.Find("Sprite").GetComponent<Image>().sprite = item.Item.icon;
         }
     }
 }
