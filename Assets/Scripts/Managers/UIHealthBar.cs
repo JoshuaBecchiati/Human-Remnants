@@ -26,9 +26,6 @@ public class UIHealthBar : MonoBehaviour
         _unit.OnUnitTookDamage += UpdateBar;
         _unit.OnHeal += UpdateBar;
 
-        if (_unit.Team == EUnitTeam.Enemy)
-            Debug.Log("Nemico inizializzato");
-
         if (_nameText != null)
             _nameText.text = _unit.Name;
     }
@@ -36,7 +33,6 @@ public class UIHealthBar : MonoBehaviour
     private void UpdateBar(float current, float max)
     {
         if (_unit.Team == EUnitTeam.Enemy)
-            Debug.Log($"Nemico {_unit.name} Bar aggiornata");
         _image.fillAmount = current / max;
     }
 }

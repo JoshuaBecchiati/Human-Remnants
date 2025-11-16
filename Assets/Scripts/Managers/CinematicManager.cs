@@ -1,9 +1,6 @@
 using Cinemachine;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
@@ -14,20 +11,19 @@ public class CinematicManager : MonoBehaviour
     [SerializeField] private PlayableDirector m_director;
     [SerializeField] private CinemachineBrain m_cameraBrain;
 
-    public void PlayCinematic(TimelineAsset timeline)
+    public static void PlayCinematic(TimelineAsset timeline, PlayableDirector director, CinemachineBrain cameraBrain)
     {
-        m_director.Stop();
+        director.Stop();
 
-        m_director.playableAsset = timeline;
-        m_director.time = 0;
+        director.playableAsset = timeline;
+        director.time = 0;
 
         foreach (var track in timeline.GetOutputTracks())
             if (track is CinemachineTrack cmTrack)
-                m_director.SetGenericBinding(cmTrack, m_cameraBrain);
+                director.SetGenericBinding(cmTrack, cameraBrain);
 
-        m_director.Play();
+        director.Play();
     }
-
 
     public Coroutine PlayCinematicCoroutine(TimelineAsset timeline, PlayableDirector director)
     {

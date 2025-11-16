@@ -12,7 +12,6 @@ public class MenuManager2 : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 1f;
-        Debug.Log("Start");
         pauseMenu.SetActive(false);
         if (PlayerInputSingleton.Instance != null)
         {

@@ -53,7 +53,6 @@ public class NewBattleManager : MonoBehaviour
     public event Action<ItemData> OnUseItem;
     public event Action<UnitBase> OnCreateUnit;
     public event Func<UnitBase, IEnumerator> OnStartAttack;
-    public event Action<List<UnitBase>, SignalReceiver> OnStartBattleCinematic;
 
     #region Unity methods
     private void Awake()
@@ -78,17 +77,20 @@ public class NewBattleManager : MonoBehaviour
 
         if (PlayerInputSingleton.Instance != null)
             PlayerInputSingleton.Instance.Actions["Combat"].performed += SelectAttackTarget;
-        if (MainGameManager.Instance != null)
-            MainGameManager.Instance.OnSetupBattle += StartCinematicBattle;
+
+        if (BattleFlowManager.Instance != null)
+            BattleFlowManager.Instance.OnSetupBattle += SetupBattleUnits;
     }
 
     private void OnDisable()
     {
         _battleStatus = BattleStatus.None;
+
         if (PlayerInputSingleton.Instance != null)
             PlayerInputSingleton.Instance.Actions["Combat"].performed -= SelectAttackTarget;
-        if (MainGameManager.Instance != null)
-            MainGameManager.Instance.OnSetupBattle -= StartCinematicBattle;
+
+        if (BattleFlowManager.Instance != null)
+            BattleFlowManager.Instance.OnSetupBattle -= SetupBattleUnits;
     }
 
     private void Update()
@@ -112,16 +114,34 @@ public class NewBattleManager : MonoBehaviour
     /// <summary>
     /// Setup all the mandatory needs for the battle to start
     /// </summary>
-    public void StartCinematicBattle(BattleSettings battleSettings, IReadOnlyList<GameObject> playersPf)
+    public void SetupBattleUnits(IReadOnlyList<GameObject> playersPf, IReadOnlyList<GameObject> EnemyPf)
     {
         if (_battleStatus != BattleStatus.Starting)
             return;
 
+        InitializeUnitsOnSide(playersPf, m_playerSide);
+        InitializeUnitsOnSide(EnemyPf, m_enemySide);
+    }
 
-        InstantiatePrefab(playersPf.ToList(), m_playerSide);
-        OnStartBattleCinematic.Invoke(m_unitsInBattle, _signalReceiver);
+    public void InitializeUnitsOnSide(IReadOnlyList<GameObject> prefabs, Transform transformSide)
+    {
+        float totalWidth = m_space * (prefabs.Count - 1) / 2f;
 
-        InstantiatePrefab(battleSettings.enemies.ToList(), m_enemySide);
+        for (int i = 0; i < prefabs.Count; i++)
+        {
+            prefabs[i].transform.SetParent(transformSide, false);
+
+            Vector3 spawnPos = transformSide.position + new Vector3((m_space * i) - totalWidth, 0f, 0f);
+
+            prefabs[i].transform.position = spawnPos;
+            prefabs[i].TryGetComponent(out UnitBase u);
+            u.OnDeath += HandleUnitDeath;
+            OnCreateUnit.Invoke(u);
+            m_unitsInBattle.Add(u);
+
+            if (u.Team == EUnitTeam.Player)
+                prefabs[i].transform.Find("Model").position += new Vector3(0f, 0f, -3f);
+        }
     }
 
     public void SetupBattle()
@@ -130,11 +150,12 @@ public class NewBattleManager : MonoBehaviour
             return;
 
         foreach (UnitBase u in m_unitsInBattle)
-            if (u.Team == EUnitTeam.Player)
-            {
-                u.TryGetComponent(out AnimationTimeLine atl);
-                atl.CombatController();
-            }
+        {
+            if (u.Team != EUnitTeam.Player) continue;
+
+            u.TryGetComponent(out AnimationPlayer atl);
+            atl.CombatController();
+        }
 
         m_cameraController.BattleCamera();
 
@@ -142,26 +163,6 @@ public class NewBattleManager : MonoBehaviour
         m_turnOrder = m_unitsInBattle.OrderBy(x => x.Speed).ToList();
 
         _battleStatus = BattleStatus.ChangingTurn;
-    }
-
-    public void InstantiatePrefab(List<GameObject> prefabs, Transform transformSide)
-    {
-        float totalWidth = m_space * (prefabs.Count - 1) / 2f;
-
-        for (int i = 0; i < prefabs.Count; i++)
-        {
-            Vector3 spawnPos = transformSide.position + new Vector3((m_space * i) - totalWidth, 0f, 0f);
-
-            GameObject go = Instantiate(prefabs[i], transformSide);
-            go.transform.position = spawnPos;
-            go.TryGetComponent(out UnitBase u);
-            u.OnDeath += HandleUnitDeath;
-            OnCreateUnit.Invoke(u);
-            m_unitsInBattle.Add(u);
-
-            if (u.Team == EUnitTeam.Player)
-                go.transform.Find("Model").position += new Vector3(0f, 0f, -3f);
-        }
     }
     #endregion
 
@@ -428,12 +429,10 @@ public class NewBattleManager : MonoBehaviour
         if (m_unitsInBattle[_oldTarget].Team == EUnitTeam.Enemy && !m_unitsInBattle[_oldTarget].IsDead)
         {
             _indexTarget = _oldTarget;
-            Debug.Log("[NewBattleManager] Assegnato vecchio target");
         }
         else
         {
             _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == EUnitTeam.Enemy && !e.IsDead);
-            Debug.Log("[NewBattleManager] Assegnato nuovo target");
         }
 
 
@@ -494,8 +493,6 @@ public class NewBattleManager : MonoBehaviour
     {
         if (_battleStatus != BattleStatus.Ending)
             return;
-
-        Debug.Log($"Winner {_pendingResult}");
 
         foreach (Transform child in m_playerSide.Cast<Transform>().ToArray())
             Destroy(child.gameObject);

@@ -916,6 +916,7 @@ GameObject:
   - component: {fileID: 3176777684762490511}
   - component: {fileID: 5977710994050529584}
   - component: {fileID: 966903604218362776}
+  - component: {fileID: 8941925366205074761}
   m_Layer: 0
   m_Name: Model
   m_TagString: Player
@@ -956,7 +957,12 @@ Animator:
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'c_thumb1.r'\n\tTransform 'c_middle1.r'\n\tTransform
+    'c_ring3.l'\n\tTransform 'root'\n\tTransform 'arm_stretch.l'\n\tTransform 'spine_02.x'\n\tTransform
+    'spine_01.x'\n\tTransform 'toes_01.r'\n\tTransform 'c_ring3.r'\n\tTransform 'thigh_stretch.r'\n\tand
+    more ..."
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -982,6 +988,96 @@ MonoBehaviour:
   - layerName: Tile
     surface: {fileID: 11400000, guid: 2b7539fe3236f4d428af533aa96e1af6, type: 2}
   m_minTimeBetweenSteps: 0.1
+--- !u!114 &8941925366205074761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2997381393261168210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: 8992aeb8f4cb13d4ebb21bc1eb884e36, type: 2}
+    - {fileID: 11400000, guid: 74e522084d3c2824189a8eb8227f8bfb, type: 2}
+    - {fileID: 11400000, guid: 1ea3d4420524b234089b803b14287f04, type: 2}
+    - {fileID: 11400000, guid: 22eba49bb5ea5c14b90f217f06090984, type: 2}
+    - {fileID: 11400000, guid: 49cc0423da78eaf42bafa71aa0c622d3, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3361631204552669985}
+          m_TargetAssemblyTypeName: AnimationTimeLine, Assembly-CSharp
+          m_MethodName: StartEntrance
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3361631204552669985}
+          m_TargetAssemblyTypeName: AnimationTimeLine, Assembly-CSharp
+          m_MethodName: ReadyPose
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3361631204552669985}
+          m_TargetAssemblyTypeName: AnimationTimeLine, Assembly-CSharp
+          m_MethodName: CombatPose
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8448220523841056727}
+          m_TargetAssemblyTypeName: UnitBase, Assembly-CSharp
+          m_MethodName: Attack
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8448220523841056727}
+          m_TargetAssemblyTypeName: UnitBase, Assembly-CSharp
+          m_MethodName: EndAttackAnimation
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &3196240650547693125
 GameObject:
   m_ObjectHideFlags: 0
@@ -1325,6 +1421,8 @@ PlayableDirector:
     value: {fileID: 5758986852851539292}
   - key: {fileID: 4735643496654193495, guid: d536307411373ca49ad0c4b8ddb61eef, type: 2}
     value: {fileID: 7955542323178003729}
+  - key: {fileID: -634014071902493481, guid: d536307411373ca49ad0c4b8ddb61eef, type: 2}
+    value: {fileID: 8941925366205074761}
   m_ExposedReferences:
     m_References: []
 --- !u!114 &5442348928734931707
@@ -1762,7 +1860,6 @@ GameObject:
   - component: {fileID: 8448220523841056727}
   - component: {fileID: 3361631204552669985}
   - component: {fileID: 7593341238193194359}
-  - component: {fileID: -4402531609951331411}
   m_Layer: 0
   m_Name: Marx_PF
   m_TagString: Player
@@ -1854,66 +1951,6 @@ MonoBehaviour:
         - m_Target: {fileID: 8448220523841056727}
           m_TargetAssemblyTypeName: UnitBase, Assembly-CSharp
           m_MethodName: HandleDeath
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
---- !u!114 &-4402531609951331411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6021961570360790873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Events:
-    m_Signals:
-    - {fileID: 11400000, guid: 8992aeb8f4cb13d4ebb21bc1eb884e36, type: 2}
-    - {fileID: 11400000, guid: 74e522084d3c2824189a8eb8227f8bfb, type: 2}
-    - {fileID: 11400000, guid: 1ea3d4420524b234089b803b14287f04, type: 2}
-    m_Events:
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 3361631204552669985}
-          m_TargetAssemblyTypeName: AnimationTimeLine, Assembly-CSharp
-          m_MethodName: StartEntrance
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 3361631204552669985}
-          m_TargetAssemblyTypeName: AnimationTimeLine, Assembly-CSharp
-          m_MethodName: ReadyPose
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 3361631204552669985}
-          m_TargetAssemblyTypeName: AnimationTimeLine, Assembly-CSharp
-          m_MethodName: CombatPose
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

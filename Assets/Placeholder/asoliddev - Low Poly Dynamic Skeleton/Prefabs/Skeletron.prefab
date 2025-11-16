@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2361176360955713106}
   - component: {fileID: 6031248495254112359}
-  - component: {fileID: 3157286664470040144}
   m_Layer: 0
   m_Name: Seq_01_Timeline
   m_TagString: Untagged
@@ -52,41 +51,10 @@ PlayableDirector:
     value: {fileID: 0}
   - key: {fileID: 3589956108303382223, guid: 8186f66f094404c4993a49630ba614af, type: 2}
     value: {fileID: 3792665942685763900}
+  - key: {fileID: -1619358991219462679, guid: 8186f66f094404c4993a49630ba614af, type: 2}
+    value: {fileID: 3144999669219150840}
   m_ExposedReferences:
     m_References: []
---- !u!114 &3157286664470040144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6394851769780902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Events:
-    m_Signals:
-    - {fileID: 11400000, guid: 49cc0423da78eaf42bafa71aa0c622d3, type: 2}
-    - {fileID: 11400000, guid: 22eba49bb5ea5c14b90f217f06090984, type: 2}
-    m_Events:
-    - m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7313931901185539192}
-          m_TargetAssemblyTypeName: UnitBase, Assembly-CSharp
-          m_MethodName: EndAttackAnimation
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    - m_PersistentCalls:
-        m_Calls: []
 --- !u!1 &58112228079021197
 GameObject:
   m_ObjectHideFlags: 0
@@ -2451,6 +2419,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7100293468835398515}
   - component: {fileID: 3792665942685763900}
+  - component: {fileID: 3144999669219150840}
   m_Layer: 0
   m_Name: Model
   m_TagString: Enemy
@@ -2496,6 +2465,51 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3144999669219150840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3277631713211838636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: 49cc0423da78eaf42bafa71aa0c622d3, type: 2}
+    - {fileID: 11400000, guid: 22eba49bb5ea5c14b90f217f06090984, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7313931901185539192}
+          m_TargetAssemblyTypeName: UnitBase, Assembly-CSharp
+          m_MethodName: EndAttackAnimation
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7313931901185539192}
+          m_TargetAssemblyTypeName: UnitBase, Assembly-CSharp
+          m_MethodName: Attack
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &3278530590464022259
 GameObject:
   m_ObjectHideFlags: 0
@@ -4423,7 +4437,9 @@ MonoBehaviour:
   _animator: {fileID: 3792665942685763900}
   _attackCinematic: {fileID: 6031248495254112359}
   _baseAttack: {fileID: 11400000, guid: 8186f66f094404c4993a49630ba614af, type: 2}
-  _sr: {fileID: 3157286664470040144}
+  _sr: {fileID: 0}
+  _target: {fileID: 0}
+  _isDead: 0
 --- !u!114 &-2052338877084209827
 MonoBehaviour:
   m_ObjectHideFlags: 0

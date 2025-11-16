@@ -1,13 +1,15 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 public class CinematicBattleManager : MonoBehaviour
 {
-    [SerializeField] private TimelineAsset m_battleEnterTimeline;
+    [SerializeField] private TimelineDatabase m_TimelineDB;
+    [SerializeField] private CinemachineBrain m_cameraBrain;
+    [SerializeField] private PlayableDirector m_director;
 
     [Header("Dependencies")]
     [SerializeField] private NewBattleManager m_newBattleManager;
@@ -15,37 +17,58 @@ public class CinematicBattleManager : MonoBehaviour
 
     private void OnEnable()
     {
-        m_newBattleManager.OnStartBattleCinematic += SetupBattleIntro;
         m_newBattleManager.OnStartAttack += PlayAttackCinematicCoroutine;
+
+        BattleFlowManager.Instance.OnSetupBattle += SetupCinematicBattle;
     }
 
     private void OnDisable()
     {
-        m_newBattleManager.OnStartBattleCinematic -= SetupBattleIntro;
         m_newBattleManager.OnStartAttack -= PlayAttackCinematicCoroutine;
+
+        BattleFlowManager.Instance.OnSetupBattle -= SetupCinematicBattle;
     }
 
-    public void SetupBattleIntro(List<UnitBase> units, SignalReceiver receiver)
+    public void SetupCinematicBattle(IReadOnlyList<GameObject> players, IReadOnlyList<GameObject> enemies)
     {
-        foreach (UnitBase unit in units)
+        TimelineAsset battleEnter = m_TimelineDB.GetTimeline("Battle enter");
+        m_director.playableAsset = battleEnter;
+
+        foreach (GameObject player in players)
         {
-            if (!unit.TryGetComponent(out AnimationTimeLine anim))
-                continue;
+            player.GetComponent<AnimationPlayer>().CinematicController();
 
-            anim.CinematicController();
-
-            BindSignalArgs args = anim.BattleEnterArgs(receiver);
-            BindSignalUtility.BindMultiCallsToMultiAssets(args);
+            BindSignal(player);
         }
 
-        m_cinematicManager.PlayCinematic(m_battleEnterTimeline);
+        CinematicManager.PlayCinematic(battleEnter, m_director, m_cameraBrain);
+    }
+
+    private void BindSignal(GameObject unit)
+    {
+        SignalReceiver receiver = unit.GetComponentInChildren<SignalReceiver>();
+
+        foreach (var output in m_director.playableAsset.outputs)
+        {
+            var track = output.sourceObject as TrackAsset;
+            Object Binding = m_director.GetGenericBinding(track);
+
+            if (track == null || Binding != null) continue;
+
+            // Controllo più sicuro: è un SignalTrack?
+            if (track.GetType().Name == "SignalTrack" || track is SignalTrack)
+            {
+                m_director.SetGenericBinding(track, receiver);
+                break;
+            }
+        }
     }
 
     private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit)
     {
-        // 1. Collega l’evento "StartAttack" della timeline all’attacco effettivo
-        UnityAction call = unit.Attack;
-        BindSignalUtility.BindSingleCallSingleAsset(call, "StartAttack", unit.SignalReceiver);
+        m_director = unit.AttackCinematic;
+
+        BindSignal(unit.gameObject);
 
         // 2. Salva la rotazione originale della unit (non del manager!)
         Quaternion originalRotation = unit.transform.rotation;
@@ -60,7 +83,7 @@ public class CinematicBattleManager : MonoBehaviour
         }
 
         // 4. Avvia la cinematica e attendi la fine
-        yield return m_cinematicManager.PlayCinematicCoroutine(unit.BaseAttack, unit.AttackCinematic);
+        yield return m_cinematicManager.PlayCinematicCoroutine(unit.BaseAttack, m_director);
 
         // 5. Ripristina la rotazione originale
         unit.transform.rotation = originalRotation;
