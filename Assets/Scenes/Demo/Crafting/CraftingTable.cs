@@ -191,7 +191,7 @@ public class CraftingTable : MonoBehaviour
     {
         string itemName = item.Find("Item name").GetComponent<TextMeshProUGUI>().text;
 
-        ItemData itemData = InventoryManager.FindItemByName(itemName);
+        ItemData itemData = InventoryManager.Instance.FindItemByName(itemName);
 
         _items[_slotIndex] = itemData;
 

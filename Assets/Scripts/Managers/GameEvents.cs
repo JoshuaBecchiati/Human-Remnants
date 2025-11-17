@@ -16,7 +16,7 @@ public static class GameEvents
 
     // --- Battle events ---
     public static event Action<BattleSettings, GameObject> OnBattleStart;
-    public static event Action OnBattleEnd;
+    public static event Action<BattleResult> OnBattleEnd;
 
     #region Handle crafting
     public static void SetCraftingState(bool state)
@@ -55,7 +55,7 @@ public static class GameEvents
         if (!IsInFight) return;
 
         IsInFight = false;
-        OnBattleEnd?.Invoke();
+        OnBattleEnd?.Invoke(winner);
     }
     #endregion
 }

@@ -5,5 +5,6 @@ using UnityEngine;
 public class BattleSettings : ScriptableObject
 {
     public GameObject[] enemies;
+    public ItemData[] drops;
     // public GameObject _scene;
 }

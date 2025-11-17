@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemies:
   - {fileID: 5295967490099403151, guid: 984ef01a5fd581f46af9a6c609d62e4f, type: 3}
-  - {fileID: 5295967490099403151, guid: 984ef01a5fd581f46af9a6c609d62e4f, type: 3}
-  - {fileID: 5295967490099403151, guid: 984ef01a5fd581f46af9a6c609d62e4f, type: 3}
+  drops:
+  - Item: {fileID: 11400000, guid: 31561755bf8dff54ab71ce6ad9e83cbf, type: 2}
+    Qty: 3

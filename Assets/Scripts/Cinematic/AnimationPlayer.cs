@@ -6,6 +6,11 @@ public class AnimationPlayer : MonoBehaviour
     [SerializeField] private RuntimeAnimatorController m_CombatController;
     [SerializeField] private RuntimeAnimatorController m_CinematicController;
 
+    private void OnValidate()
+    {
+        if (!m_animator) m_animator = GetComponent<Animator>();
+    }
+
     public void StartEntrance()
     {
         m_animator.CrossFade("StartEntrance", 0.3f);

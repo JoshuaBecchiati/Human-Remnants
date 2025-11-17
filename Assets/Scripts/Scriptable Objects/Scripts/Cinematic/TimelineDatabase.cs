@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Timeline;
 
-[CreateAssetMenu(fileName = "TimelineDatabase", menuName = "Game/TimelineDatabase")]
+[CreateAssetMenu(fileName = "TimelineDatabase", menuName = "Cinematic/TimelineDatabase")]
 public class TimelineDatabase : ScriptableObject
 {
     public List<TimelineEntry> timelines;

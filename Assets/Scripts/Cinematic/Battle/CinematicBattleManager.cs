@@ -12,19 +12,19 @@ public class CinematicBattleManager : MonoBehaviour
     [SerializeField] private PlayableDirector m_director;
 
     [Header("Dependencies")]
-    [SerializeField] private NewBattleManager m_newBattleManager;
+    [SerializeField] private BattleManager m_battleManager;
     [SerializeField] private CinematicManager m_cinematicManager;
 
     private void OnEnable()
     {
-        m_newBattleManager.OnStartAttack += PlayAttackCinematicCoroutine;
+        m_battleManager.OnStartAttack += PlayAttackCinematicCoroutine;
 
         BattleFlowManager.Instance.OnSetupBattle += SetupCinematicBattle;
     }
 
     private void OnDisable()
     {
-        m_newBattleManager.OnStartAttack -= PlayAttackCinematicCoroutine;
+        m_battleManager.OnStartAttack -= PlayAttackCinematicCoroutine;
 
         BattleFlowManager.Instance.OnSetupBattle -= SetupCinematicBattle;
     }
@@ -36,29 +36,46 @@ public class CinematicBattleManager : MonoBehaviour
 
         foreach (GameObject player in players)
         {
-            player.GetComponent<AnimationPlayer>().CinematicController();
+            player.GetComponentInChildren<AnimationPlayer>().CinematicController();
+            SignalReceiver receiver = player.GetComponentInChildren<SignalReceiver>();
 
-            BindSignal(player);
+            BindSignal(receiver, m_director);
         }
 
         CinematicManager.PlayCinematic(battleEnter, m_director, m_cameraBrain);
     }
 
-    private void BindSignal(GameObject unit)
+    private void BindSignal(SignalReceiver receiver, PlayableDirector director)
     {
-        SignalReceiver receiver = unit.GetComponentInChildren<SignalReceiver>();
-
-        foreach (var output in m_director.playableAsset.outputs)
+        foreach (var output in director.playableAsset.outputs)
         {
             var track = output.sourceObject as TrackAsset;
-            Object Binding = m_director.GetGenericBinding(track);
+            Object Binding = director.GetGenericBinding(track);
 
             if (track == null || Binding != null) continue;
 
             // Controllo più sicuro: è un SignalTrack?
             if (track.GetType().Name == "SignalTrack" || track is SignalTrack)
             {
-                m_director.SetGenericBinding(track, receiver);
+                director.SetGenericBinding(track, receiver);
+                break;
+            }
+        }
+    }
+
+    private void BindAnimation(Animator animator, PlayableDirector director)
+    {
+        foreach (var output in director.playableAsset.outputs)
+        {
+            var track = output.sourceObject as TrackAsset;
+            Object Binding = director.GetGenericBinding(track);
+
+            if (track == null) continue;
+
+            // Controllo più sicuro: è un SignalTrack?
+            if (track.GetType().Name == "AnimationTrack" || track is AnimationTrack)
+            {
+                director.SetGenericBinding(track, animator);
                 break;
             }
         }
@@ -66,27 +83,33 @@ public class CinematicBattleManager : MonoBehaviour
 
     private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit)
     {
-        m_director = unit.AttackCinematic;
+        GameObject attackPrefab = unit.AttackDatas.Find(n => n.attackName == "Base attack").attackPrefab;
+        GameObject attack = Instantiate(attackPrefab, unit.transform.parent);
 
-        BindSignal(unit.gameObject);
+        PlayableDirector director = attack.GetComponent<PlayableDirector>();
+        TimelineAsset attckTimeLine = director.playableAsset as TimelineAsset;
+
+        BindAnimation(unit.Animator, director);
+        BindSignal(unit.gameObject.GetComponent<SignalReceiver>(), director);
 
         // 2. Salva la rotazione originale della unit (non del manager!)
-        Quaternion originalRotation = unit.transform.rotation;
+        Quaternion originalRotation = unit.gameObject.transform.parent.rotation;
 
         // 3. Ruota la unit verso il target (solo sull’asse Y)
         if (unit.Target != null)
         {
-            Vector3 dir = unit.Target.transform.position - unit.transform.position;
+            Vector3 dir = unit.Target.gameObject.transform.parent.position - unit.gameObject.transform.position;
             dir.y = 0f;
             if (dir != Vector3.zero)
-                unit.transform.rotation = Quaternion.LookRotation(dir);
+                unit.gameObject.transform.parent.rotation = Quaternion.LookRotation(dir);
         }
 
         // 4. Avvia la cinematica e attendi la fine
-        yield return m_cinematicManager.PlayCinematicCoroutine(unit.BaseAttack, m_director);
+        yield return m_cinematicManager.PlayCinematicCoroutine(attckTimeLine, director);
 
         // 5. Ripristina la rotazione originale
-        unit.transform.rotation = originalRotation;
-    }
+        unit.gameObject.transform.parent.rotation = originalRotation;
 
+        Destroy(attack);
+    }
 }

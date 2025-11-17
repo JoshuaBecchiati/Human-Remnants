@@ -1,11 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : CharController
 {
     // --- Inspector References ---
-    [Header("Stats")]
-    [SerializeField] private float m_health = 100f;
+    //[Header("Stats")]
+    //[SerializeField] private float m_health = 100f;
 
     [Header("Combat settings")]
     [SerializeField] private GameObject _combatPF;
