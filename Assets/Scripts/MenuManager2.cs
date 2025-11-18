@@ -64,6 +64,7 @@ public class MenuManager2 : MonoBehaviour
 
     public void MenuButton()
     {
-        SceneManager.LoadScene(0);
+        Time.timeScale = 1;
+        LoadingScreenManager.Instance.LoadScene(0);
     }
 }
