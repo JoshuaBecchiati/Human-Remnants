@@ -4,30 +4,58 @@ using UnityEngine;
 // Global Event Bus
 public static class GameEvents
 {
-    private static bool _isInFight = false;
+    // --- Proprierties ---
+    public static bool IsInCrafting { get; private set; }
+    public static bool IsInInventory { get; private set; }
+    public static bool IsInFight { get; private set; }
 
+    // --- Crafting events ---
+    public static event Action OnOpenCrafting;
+    public static event Action OnCloseCrafting;
+    public static event Action<bool> OnCraftingStateChanged;
+
+    // --- Battle events ---
     public static event Action<BattleSettings, GameObject> OnBattleStart;
-    public static event Action OnBattleEnd;
+    public static event Action<BattleResult> OnBattleEnd;
 
+    #region Handle crafting
+    public static void SetCraftingState(bool state)
+    {
+        if (IsInCrafting == state) return;
+
+        IsInCrafting = state;
+
+        OnCraftingStateChanged?.Invoke(state);
+    }
+
+    public static void SetCraftingOpened(bool state)
+    {
+        if (IsInInventory == state) return;
+
+        IsInInventory = state;
+
+        if (IsInInventory)
+            OnOpenCrafting?.Invoke();
+        else
+            OnCloseCrafting?.Invoke();
+    }
+    #endregion
+
+    #region Handle Battle
     public static void BattleStart(BattleSettings battleSettings, GameObject enemy)
     {
-        if (!_isInFight)
-        {
-            _isInFight = true;
-            OnBattleStart?.Invoke(battleSettings, enemy);
-        }
+        if (IsInFight) return;
+
+        IsInFight = true;
+        OnBattleStart?.Invoke(battleSettings, enemy);
     }
 
     public static void BattleEnd(BattleResult winner)
     {
-        if (_isInFight)
-        {
-            _isInFight = false;
-            OnBattleEnd?.Invoke();
-        }
+        if (!IsInFight) return;
+
+        IsInFight = false;
+        OnBattleEnd?.Invoke(winner);
     }
-
-
-    public static event Action<GameObject, GameObject> OnBattleEnter;
-    public static void RaiseBattleEnter(GameObject battle, GameObject player) => OnBattleEnter?.Invoke(battle, player);
+    #endregion
 }

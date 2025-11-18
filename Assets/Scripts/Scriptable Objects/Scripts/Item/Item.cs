@@ -6,8 +6,9 @@ public class Item : ScriptableObject
 {
     public new string name;
     public string description;
-    // public Sprite icon;
-    public ItemType type;
+    public Sprite icon;
+    public UsableType usableType;
+    public ItemType itemType;
 
     public virtual void Use(UnitBase target)
     {

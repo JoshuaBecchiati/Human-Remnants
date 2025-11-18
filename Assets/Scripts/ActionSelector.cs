@@ -47,32 +47,4 @@ public class ActionSelector : MonoBehaviour
             onCancel?.Invoke();
         }
     }
-
-    //private void ConfirmAttack()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.E))
-    //    {
-    //        _playerActionState = PlayerActionState.Acting;
-    //        StartCoroutine(ExecuteAttack());
-    //    }
-    //    else if (Input.GetKeyDown(KeyCode.Q))
-    //    {
-    //        _playerActionState = PlayerActionState.Idle;
-    //        CancelAttack();
-    //    }
-    //}
-
-    //private void ConfirmAction()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.E))
-    //    {
-    //        _playerActionState = PlayerActionState.Acting;
-    //        StartCoroutine(ExecuteItemUse());
-    //    }
-    //    else if (Input.GetKeyDown(KeyCode.Q))
-    //    {
-    //        _playerActionState = PlayerActionState.Idle;
-    //        CancelItemAction();
-    //    }
-    //}
 }

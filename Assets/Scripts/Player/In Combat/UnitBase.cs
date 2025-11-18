@@ -2,27 +2,24 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
 
 public abstract class UnitBase : MonoBehaviour
 {
     // --- Inspector ---
     [Header("Stats")]
-    [SerializeField] protected string _name;
-    [SerializeField] private float _health;
-    [SerializeField] private float _maxHealth;
-    [SerializeField] private float _speed;
-    [SerializeField] private float _accumulatedSpeed;
-    [SerializeField] private float _speedNextTurn;
-    [SerializeField] private float _damage;
-    [SerializeField] private EUnitTeam _team;
+    [SerializeField] protected string m_name;
+    [SerializeField] private float m_health;
+    [SerializeField] private float m_maxHealth;
+    [SerializeField] private float m_speed;
+    [SerializeField] private float m_accumulatedSpeed;
+    [SerializeField] private float m_speedNextTurn;
+    [SerializeField] private float m_damage;
+    [SerializeField] private UnitTeam m_team;
 
     [Header("Animations")]
-    [SerializeField] private Animator _animator;
-    [SerializeField] private PlayableDirector _attackCinematic;
-    [SerializeField] private TimelineAsset _baseAttack;
-    [SerializeField] private SignalReceiver _sr;
+    [SerializeField] private Animator m_animator;
+    [SerializeField] private TimelineDatabase m_timeLineDB;
+    [SerializeField] private List<AttackData> m_attackDatas;
 
     // --- Private ---
     [SerializeField] private UnitBase _target;
@@ -30,20 +27,20 @@ public abstract class UnitBase : MonoBehaviour
     [SerializeField] private bool _isDead;
 
     // --- Prorprierties ---
-    public string Name => _name;
-    public float Health => _health;
-    public float MaxHealth => _maxHealth;
-    public float Speed => _speed;
-    public float AccumulatedSpeed => _accumulatedSpeed;
-    public float SpeedNextTurn => _speedNextTurn;
-    public float Damage => _damage;
+    public string Name => m_name;
+    public float Health => m_health;
+    public float MaxHealth => m_maxHealth;
+    public float Speed => m_speed;
+    public float AccumulatedSpeed => m_accumulatedSpeed;
+    public float SpeedNextTurn => m_speedNextTurn;
+    public float Damage => m_damage;
     public bool IsItsTurn => _isItsTurn;
     public bool IsDead => _isDead;
-    public EUnitTeam Team => _team;
-    public PlayableDirector AttackCinematic => _attackCinematic;
-    public SignalReceiver SignalReceiver => _sr;
-    public TimelineAsset BaseAttack => _baseAttack;
+    public UnitTeam Team => m_team;
+    public Animator Animator => m_animator;
+    public TimelineDatabase TimeLineDB => m_timeLineDB;
     public UnitBase Target => _target;
+    public List<AttackData> AttackDatas => m_attackDatas;
 
 
     // --- Events ---
@@ -58,10 +55,15 @@ public abstract class UnitBase : MonoBehaviour
         _isDead = false;
     }
 
+    private void OnValidate()
+    {
+        if (!m_animator) m_animator = GetComponent<Animator>();
+    }
+
     public void StartAttackAnimation(UnitBase target)
     {
         _target = target;
-        _animator.SetTrigger("IsAttacking");
+        m_animator.SetTrigger("IsAttacking");
     }
 
     public void StartAttackCinematic(UnitBase target)
@@ -77,41 +79,27 @@ public abstract class UnitBase : MonoBehaviour
     #region Handle health
     public virtual void TakeDamage(float damage)
     {
-        _health -= damage;
-        _animator.SetTrigger("IsHitted");
+        m_health -= damage;
+        m_animator.SetTrigger("IsHitted");
 
-        if (_health <= 0)
+        if (m_health <= 0)
         {
-            StartCoroutine(DieSequence());
+            m_animator.SetTrigger("IsDying");
+            OnDeath?.Invoke(this);
         }
 
-        OnUnitTookDamage?.Invoke(_health, _maxHealth);
-    }
-
-    private IEnumerator DieSequence()
-    {
-        _animator.SetTrigger("IsDying");
-
-        // Attendi che l'animazione finisca o il segnale arrivi
-        yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
-
-        HandleDeath();
-    }
-
-    public virtual void HandleDeath()
-    {
-        OnDeath?.Invoke(this);
+        OnUnitTookDamage?.Invoke(m_health, m_maxHealth);
     }
 
     public virtual void Heal(float heal)
     {
-        if (_health + heal > _maxHealth)
-            _health = _maxHealth;
-        else if (_health == _maxHealth)
+        if (m_health + heal > m_maxHealth)
+            m_health = m_maxHealth;
+        else if (m_health == m_maxHealth)
             Debug.Log("You're full health");
         else
-            _health += heal;
-        OnHeal?.Invoke(_health, _maxHealth);
+            m_health += heal;
+        OnHeal?.Invoke(m_health, m_maxHealth);
     }
     #endregion
 
@@ -119,7 +107,7 @@ public abstract class UnitBase : MonoBehaviour
     public virtual void StartTurn()
 {
         _isItsTurn = true;
-        _accumulatedSpeed += Speed;
+        m_accumulatedSpeed += Speed;
     }
 
     public virtual void EndTurn()
@@ -131,18 +119,18 @@ public abstract class UnitBase : MonoBehaviour
     #region Handle speed
     public virtual void SetSpeed(int speed)
     {
-        _speed = speed;
+        m_speed = speed;
     }
 
     public virtual void ResetAccumulatedSpeed()
     {
-        _accumulatedSpeed = 0;
+        m_accumulatedSpeed = 0;
     }
     #endregion
 
     public void Attack()
     {
-        float finalDamage = _damage;
+        float finalDamage = m_damage;
 
         _target.TakeDamage(finalDamage);
     }

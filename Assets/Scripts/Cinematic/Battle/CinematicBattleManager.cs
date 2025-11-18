@@ -1,69 +1,115 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 public class CinematicBattleManager : MonoBehaviour
 {
-    [SerializeField] private TimelineAsset m_battleEnterTimeline;
+    [SerializeField] private TimelineDatabase m_TimelineDB;
+    [SerializeField] private CinemachineBrain m_cameraBrain;
+    [SerializeField] private PlayableDirector m_director;
 
     [Header("Dependencies")]
-    [SerializeField] private NewBattleManager m_newBattleManager;
+    [SerializeField] private BattleManager m_battleManager;
     [SerializeField] private CinematicManager m_cinematicManager;
 
     private void OnEnable()
     {
-        m_newBattleManager.OnStartBattleCinematic += SetupBattleIntro;
-        m_newBattleManager.OnStartAttack += PlayAttackCinematicCoroutine;
+        m_battleManager.OnStartAttack += PlayAttackCinematicCoroutine;
+
+        BattleFlowManager.Instance.OnSetupBattle += SetupCinematicBattle;
     }
 
     private void OnDisable()
     {
-        m_newBattleManager.OnStartBattleCinematic -= SetupBattleIntro;
-        m_newBattleManager.OnStartAttack -= PlayAttackCinematicCoroutine;
+        m_battleManager.OnStartAttack -= PlayAttackCinematicCoroutine;
+
+        BattleFlowManager.Instance.OnSetupBattle -= SetupCinematicBattle;
     }
 
-    public void SetupBattleIntro(List<UnitBase> units, SignalReceiver receiver)
+    public void SetupCinematicBattle(IReadOnlyList<GameObject> players, IReadOnlyList<GameObject> enemies)
     {
-        foreach (UnitBase unit in units)
+        TimelineAsset battleEnter = m_TimelineDB.GetTimeline("Battle enter");
+        m_director.playableAsset = battleEnter;
+
+        foreach (GameObject player in players)
         {
-            if (!unit.TryGetComponent(out AnimationTimeLine anim))
-                continue;
+            player.GetComponentInChildren<AnimationPlayer>().CinematicController();
+            SignalReceiver receiver = player.GetComponentInChildren<SignalReceiver>();
 
-            anim.CinematicController();
-
-            BindSignalArgs args = anim.BattleEnterArgs(receiver);
-            BindSignalUtility.BindMultiCallsToMultiAssets(args);
+            BindSignal(receiver, m_director);
         }
 
-        m_cinematicManager.PlayCinematic(m_battleEnterTimeline);
+        CinematicManager.PlayCinematic(battleEnter, m_director, m_cameraBrain);
+    }
+
+    private void BindSignal(SignalReceiver receiver, PlayableDirector director)
+    {
+        foreach (var output in director.playableAsset.outputs)
+        {
+            var track = output.sourceObject as TrackAsset;
+            Object Binding = director.GetGenericBinding(track);
+
+            if (track == null || Binding != null) continue;
+
+            // Controllo più sicuro: è un SignalTrack?
+            if (track.GetType().Name == "SignalTrack" || track is SignalTrack)
+            {
+                director.SetGenericBinding(track, receiver);
+                break;
+            }
+        }
+    }
+
+    private void BindAnimation(Animator animator, PlayableDirector director)
+    {
+        foreach (var output in director.playableAsset.outputs)
+        {
+            var track = output.sourceObject as TrackAsset;
+            Object Binding = director.GetGenericBinding(track);
+
+            if (track == null) continue;
+
+            // Controllo più sicuro: è un SignalTrack?
+            if (track.GetType().Name == "AnimationTrack" || track is AnimationTrack)
+            {
+                director.SetGenericBinding(track, animator);
+                break;
+            }
+        }
     }
 
     private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit)
     {
-        // 1. Collega l’evento "StartAttack" della timeline all’attacco effettivo
-        UnityAction call = unit.Attack;
-        BindSignalUtility.BindSingleCallSingleAsset(call, "StartAttack", unit.SignalReceiver);
+        GameObject attackPrefab = unit.AttackDatas.Find(n => n.attackName == "Base attack").attackPrefab;
+        GameObject attack = Instantiate(attackPrefab, unit.transform.parent);
+
+        PlayableDirector director = attack.GetComponent<PlayableDirector>();
+        TimelineAsset attckTimeLine = director.playableAsset as TimelineAsset;
+
+        BindAnimation(unit.Animator, director);
+        BindSignal(unit.gameObject.GetComponent<SignalReceiver>(), director);
 
         // 2. Salva la rotazione originale della unit (non del manager!)
-        Quaternion originalRotation = unit.transform.rotation;
+        Quaternion originalRotation = unit.gameObject.transform.parent.rotation;
 
         // 3. Ruota la unit verso il target (solo sull’asse Y)
         if (unit.Target != null)
         {
-            Vector3 dir = unit.Target.transform.position - unit.transform.position;
+            Vector3 dir = unit.Target.gameObject.transform.parent.position - unit.gameObject.transform.position;
             dir.y = 0f;
             if (dir != Vector3.zero)
-                unit.transform.rotation = Quaternion.LookRotation(dir);
+                unit.gameObject.transform.parent.rotation = Quaternion.LookRotation(dir);
         }
 
         // 4. Avvia la cinematica e attendi la fine
-        yield return m_cinematicManager.PlayCinematicCoroutine(unit.BaseAttack, unit.AttackCinematic);
+        yield return m_cinematicManager.PlayCinematicCoroutine(attckTimeLine, director);
 
         // 5. Ripristina la rotazione originale
-        unit.transform.rotation = originalRotation;
-    }
+        unit.gameObject.transform.parent.rotation = originalRotation;
 
+        Destroy(attack);
+    }
 }

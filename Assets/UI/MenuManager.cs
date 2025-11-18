@@ -115,7 +115,7 @@ public class MenuManager : MonoBehaviour
 
     public void ChangeScene(int index)
     {
-        SceneManager.LoadScene(index);
+        LoadingScreenManager.Instance.LoadScene(index);
     }
 
     public void QuitGame()

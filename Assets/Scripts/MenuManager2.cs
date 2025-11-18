@@ -12,7 +12,6 @@ public class MenuManager2 : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 1f;
-        Debug.Log("Start");
         pauseMenu.SetActive(false);
         if (PlayerInputSingleton.Instance != null)
         {
@@ -58,8 +57,14 @@ public class MenuManager2 : MonoBehaviour
         cinemachineBrain.enabled = !isPaused;
     }
 
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     public void MenuButton()
     {
-        SceneManager.LoadScene(0);
+        Time.timeScale = 1;
+        LoadingScreenManager.Instance.LoadScene(0);
     }
 }

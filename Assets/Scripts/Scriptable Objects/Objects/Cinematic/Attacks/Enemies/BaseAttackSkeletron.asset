@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edd08d8af7d856f489a2e0000e8936f4, type: 3}
+  m_Name: BaseAttackSkeletron
+  m_EditorClassIdentifier: 
+  attackName: Base attack
+  attackPrefab: {fileID: 3659105621100440597, guid: 99007915f506a594d9cb23a1db61c1bc,
+    type: 3}
