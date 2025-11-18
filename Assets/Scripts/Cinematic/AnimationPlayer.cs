@@ -13,12 +13,12 @@ public class AnimationPlayer : MonoBehaviour
 
     public void StartEntrance()
     {
-        m_animator.CrossFade("StartEntrance", 0.3f);
+        m_animator.CrossFade("StartEntrance", 0.05f);
     }
 
     public void ReadyPose()
     {
-        m_animator.CrossFade("ReadyPose", 0.3f);
+        m_animator.CrossFade("ReadyPose", 0.05f);
     }
 
     public void CombatPose()

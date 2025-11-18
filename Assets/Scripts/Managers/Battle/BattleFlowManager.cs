@@ -1,8 +1,10 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 [DefaultExecutionOrder(-10)]
 public class BattleFlowManager : MonoBehaviour
@@ -17,6 +19,7 @@ public class BattleFlowManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private GameObject m_BattleUI;
     [SerializeField] private GameObject m_VictoryUI;
+    [SerializeField] private GameObject m_LoseUI;
 
     [Header("Players")]
     [SerializeField] private List<GameObject> m_players;
@@ -26,6 +29,10 @@ public class BattleFlowManager : MonoBehaviour
     [Header("Victory screen")]
     [SerializeField] private GameObject m_itemSlot;
     [SerializeField] private Transform m_transformItemSlot;
+
+    [Header("Camera effects")]
+    [SerializeField] private CanvasGroup m_blackScreen;
+    [SerializeField] private CinemachineVirtualCamera m_explorationCamera;
 
     // --- Private ---
     private GameObject _enemy;
@@ -68,10 +75,50 @@ public class BattleFlowManager : MonoBehaviour
 
     private void BattleStart(BattleSettings battleSettings, GameObject enemy)
     {
-        // salvataggio dati
         _enemy = enemy;
         _battleSettings = battleSettings;
 
+        StartCoroutine(FadeInBattle());
+    }
+
+    private IEnumerator FadeInBattle()
+    {
+        m_blackScreen.gameObject.SetActive(true);
+
+        float targetFOV = 140f;
+        float startFOV = m_explorationCamera.m_Lens.FieldOfView;
+        float t = 0f;
+        float duration = 0.45f;
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            m_explorationCamera.m_Lens.FieldOfView = Mathf.Lerp(startFOV, targetFOV, t / duration);
+            yield return null;
+        }
+
+        m_explorationCamera.m_Lens.FieldOfView = targetFOV;
+
+        t = 0f;
+        duration = 0.25f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            m_blackScreen.alpha = Mathf.Lerp(0f, 1f, t / duration);
+            yield return null;
+        }
+
+        m_explorationCamera.m_Lens.FieldOfView = targetFOV;
+
+        yield return new WaitForSeconds(0.5f);
+
+        m_explorationCamera.m_Lens.FieldOfView = startFOV;
+        InitializeStartBattle();
+    }
+
+
+    private void InitializeStartBattle()
+    {
         // Set degli input da combattimento
         PlayerInputSingleton.Instance.CombatInput();
 
@@ -111,20 +158,23 @@ public class BattleFlowManager : MonoBehaviour
 
     public void BattleClose(BattleResult winner)
     {
-        switch(winner)
+        m_BattleUI.SetActive(false);
+        switch (winner)
         {
             case BattleResult.Player:
                 PlayerWin();
                 break;
+            case BattleResult.Enemy:
+                PlayerLose();
+                break;
             case BattleResult.Escape:
                 BattleCloseBTN();
-            break;
+                break;
         }
     }
 
     private void PlayerWin()
     {
-        m_BattleUI.SetActive(false);
         m_VictoryUI.SetActive(true);
 
         foreach (Transform child in m_transformItemSlot)
@@ -137,21 +187,56 @@ public class BattleFlowManager : MonoBehaviour
         }
     }
 
+    private void PlayerLose()
+    {
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        m_LoseUI.SetActive(true);
+    }
+
     public void BattleCloseBTN()
     {
-        m_BattleUI.SetActive(true);
+        StartCoroutine(FadeOutBattle());
+
+
+    }
+
+    private IEnumerator FadeOutBattle()
+    {
         m_VictoryUI.SetActive(false);
+
+        float t = 0f;
+        float duration = 0.25f;
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            m_blackScreen.alpha = Mathf.Lerp(0f, 1f, t / duration);
+            yield return null;
+        }
+
         m_battleScene.SetActive(false);
+        m_BattleUI.SetActive(true);
         m_currentPlayer.SetActive(true);
         m_exploreCamera.SetActive(true);
 
-        _enemy.SetActive(true);
-        StartCoroutine(DisableCollider());
+        t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            m_blackScreen.alpha = Mathf.Lerp(1f, 0f, t / duration);
+            yield return null;
+        }
 
+        _enemy.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
         PlayerInputSingleton.Instance.ExploreInput();
+
+        yield return new WaitForSeconds(2f);
+
+        StartCoroutine(DisableCollider());
     }
 
     private IEnumerator DisableCollider()

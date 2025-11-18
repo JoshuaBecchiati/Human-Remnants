@@ -57,6 +57,11 @@ public class MenuManager2 : MonoBehaviour
         cinemachineBrain.enabled = !isPaused;
     }
 
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     public void MenuButton()
     {
         SceneManager.LoadScene(0);

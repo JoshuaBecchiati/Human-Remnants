@@ -49,7 +49,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 10
+  m_Priority: 15
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
@@ -58,7 +58,7 @@ MonoBehaviour:
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 5000
-    Dutch: 0
+    Dutch: -0
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
@@ -535,12 +535,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_jumpForce: 3
   m_gravity: 35
+  m_groundMask:
+    serializedVersion: 2
+    m_Bits: 0
   m_cameraSpeed: 320
   m_cameraPivot: {fileID: 4309256205709023147}
   m_animator: {fileID: 4694789401805515377}
   m_characterController: {fileID: 3143275856103230290}
   m_animationTransition: 0
-  m_health: 100
   _combatPF: {fileID: 4311111495703447436, guid: ec2325d712ba405419f3af7958978d0e,
     type: 3}
 --- !u!1 &7945880325837505886
@@ -816,12 +818,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_jumpForce: 3
   m_gravity: 15
+  m_groundMask:
+    serializedVersion: 2
+    m_Bits: 0
   m_cameraSpeed: 320
   m_cameraPivot: {fileID: 4309256205709023147}
   m_animator: {fileID: 5209792527290079025}
   m_characterController: {fileID: 5307257957910394621}
   m_animationTransition: 5
-  m_health: 100
   _combatPF: {fileID: 6021961570360790873, guid: 140dcdb0fe9cab94d80e5256feef1813,
     type: 3}
 --- !u!114 &871522311693090667
