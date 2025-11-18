@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class CraftingTable : MonoBehaviour
 {
-    [SerializeField] private CraftingRecipe m_recipe;
     [SerializeField] private GameObject m_craftMenu;
     [SerializeField] private GameObject m_infoText;
     [SerializeField] private GameObject m_backButton;
