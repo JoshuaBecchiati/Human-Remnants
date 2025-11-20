@@ -32,7 +32,6 @@ public class UIHealthBar : MonoBehaviour
 
     private void UpdateBar(float current, float max)
     {
-        if (_unit.Team == UnitTeam.Enemy)
         _image.fillAmount = current / max;
     }
 }
