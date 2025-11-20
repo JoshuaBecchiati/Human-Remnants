@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+Ôªøusing Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.Rendering.DebugUI;
@@ -9,12 +9,12 @@ public class CharController : MonoBehaviour
     private const float MIN_MOVE_SPEED = 0.1f;
     private const float WALK_VALUE = 0.5f;
     private const float RUN_VALUE = 1.0f;
-    private const float STOP_VALUE = 0.0f;
 
     // --- Inspector ---
     [Header("Jump")]
     [SerializeField] private float m_jumpForce = 3f;
     [SerializeField] private float m_gravity = 15f;
+    [SerializeField] private float m_jumpHorizontalSpeed = 5f;
     [SerializeField] private LayerMask m_groundMask;
 
     [Header("Camera")]
@@ -36,9 +36,9 @@ public class CharController : MonoBehaviour
     private float _speedMagnitude;
 
     private bool _isJumping;
+    private bool _isGrounded;
     private bool _isClimbing;
     private bool _isRunning;
-    private bool _isGrounded;
     private bool _isMoving;
 
     #region Unity methods
@@ -71,6 +71,8 @@ public class CharController : MonoBehaviour
 
     private void OnAnimatorMove()
     {
+        if (!IsGrounded()) return;
+
         Vector3 motion = m_animator.deltaPosition;
         motion.y = 0;
         m_characterController.Move(motion);
@@ -90,28 +92,47 @@ public class CharController : MonoBehaviour
         if (Mathf.Abs(_horizontal) > MIN_MOVE_SPEED || Mathf.Abs(_vertical) > MIN_MOVE_SPEED)
             OrientCharToCamera();
 
-        // Gestione della gravit‡
+        // Gestione della gravit√†
         if (!_isClimbing)
         {
-            if (m_characterController.isGrounded && !_isJumping)
+            if (IsGrounded() && !_isJumping)
             {
-                _verticalVelocity = -1f;
+                if (_verticalVelocity < 0f) _verticalVelocity = -1f;
+
+                m_animator.SetBool("IsGrounded", true);
+                m_animator.SetBool("IsJumping", false);
+                m_animator.SetBool("IsFalling", false);
             }
             else
             {
-                // Calcolo della velocit‡ verticale per far tornare il giocatore a terra
+                // Calcolo della velocit√† verticale per far tornare il giocatore a terra
                 _verticalVelocity += -m_gravity * Time.deltaTime;
+                m_animator.SetBool("IsJumping", false);
+                m_animator.SetBool("IsGrounded", false);
+                m_animator.SetBool("IsFalling", true);
                 _isJumping = false;
             }
             _currentSpeed.y = _verticalVelocity;
         }
         HandleClimbing();
 
-        _currentSpeed = Vector3.MoveTowards(_currentSpeed, _wantedSpeed, m_animationTransition * Time.deltaTime);
-        UpdateAnimator();
+        if (!IsGrounded())
+        {
+            Vector3 velocity = _wantedSpeed * m_jumpHorizontalSpeed;
 
-        // Movimento effettivo
-        m_characterController.Move(m_cameraPivot.TransformDirection(_currentSpeed) * Time.deltaTime);
+            velocity.y = _currentSpeed.y;
+
+            m_characterController.Move(m_cameraPivot.TransformDirection(velocity) * Time.deltaTime);
+        }
+        else
+        {
+            _currentSpeed = Vector3.MoveTowards(_currentSpeed, _wantedSpeed, m_animationTransition * Time.deltaTime);
+            UpdateAnimator();
+            // Movimento effettivo
+            m_characterController.Move(m_cameraPivot.TransformDirection(_currentSpeed) * Time.deltaTime);
+        }
+
+
         MovementSounds.UpdateMovementState(_isRunning, _currentSpeed);
     }
     #endregion
@@ -194,17 +215,20 @@ public class CharController : MonoBehaviour
     #region Jump logic
     private void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (IsGrounded())
+        if (!_isClimbing && IsGrounded())
         {
-            m_animator.SetTrigger("Jump");
             _isJumping = true;
+            m_animator.SetBool("IsJumping", true);
+            m_animator.SetBool("IsGrounded", false);
+            m_animator.SetBool("IsFalling", false);
+
             _verticalVelocity = Mathf.Sqrt(2 * m_jumpForce * m_gravity);
         }
     }
 
     private bool IsGrounded()
     {
-        if (Physics.CheckSphere(transform.position, 0.3f, m_groundMask)) return true;
+        if (Physics.CheckSphere(transform.position, 0.35f, m_groundMask)) return true;
 
         return false;
     }
