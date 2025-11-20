@@ -1,7 +1,5 @@
-﻿using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.Rendering.DebugUI;
 
 public class CharController : MonoBehaviour
 {
@@ -238,6 +236,8 @@ public class CharController : MonoBehaviour
     protected virtual void OnSprintStarted(InputAction.CallbackContext context)
     {
         if (!IsGrounded()) return;
+
+        m_animator.SetBool("IsRunning", true);
         _speedMagnitude = RUN_VALUE;
         _isRunning = true;
     }
@@ -245,6 +245,8 @@ public class CharController : MonoBehaviour
     protected virtual void OnSprintCanceled(InputAction.CallbackContext context)
     {
         if (!IsGrounded()) return;
+
+        m_animator.SetBool("IsRunning", false);
         _speedMagnitude = WALK_VALUE;
         _isRunning = false;
     }
