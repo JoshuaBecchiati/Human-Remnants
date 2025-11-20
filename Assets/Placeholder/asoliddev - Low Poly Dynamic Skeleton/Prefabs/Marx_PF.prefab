@@ -993,6 +993,10 @@ MonoBehaviour:
   _AbilitiesData:
   - Ability: {fileID: 11400000, guid: 81d7a69e8433fed4d9c4cba6520c09fa, type: 2}
     ChargeCounter: 0
+  - Ability: {fileID: 11400000, guid: a5202bb93d425504197e608f464f373d, type: 2}
+    ChargeCounter: 0
+  - Ability: {fileID: 11400000, guid: 5dfa927d78c4ec745add3b43c8c4b137, type: 2}
+    ChargeCounter: 0
 --- !u!114 &2565723077398452281
 MonoBehaviour:
   m_ObjectHideFlags: 0

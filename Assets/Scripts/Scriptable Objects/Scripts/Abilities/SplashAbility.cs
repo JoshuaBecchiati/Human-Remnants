@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Splash ability", menuName = "Abilities/Splash ability")]
+[CreateAssetMenu(fileName = "Splash ability", menuName = "Battle/Abilities/Splash ability")]
 
 public class SplashAbility : Ability
 {

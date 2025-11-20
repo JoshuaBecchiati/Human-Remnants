@@ -116,7 +116,6 @@ public class BattleFlowManager : MonoBehaviour
         InitializeStartBattle();
     }
 
-
     private void InitializeStartBattle()
     {
         // Set degli input da combattimento

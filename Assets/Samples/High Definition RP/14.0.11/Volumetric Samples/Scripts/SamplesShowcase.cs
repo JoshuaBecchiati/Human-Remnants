@@ -150,8 +150,9 @@ public class SamplesShowcaseEditor : Editor
 
     private void GoToSample(SamplesShowcase self, VisualElement root, int index, List<string> samplesText)
     {
-        serializedObject.Update();
-        currentIndex.intValue = index; //Send the new index value to the monobehaviour
+        var component = (SamplesShowcase)target;
+        component.currentIndex = index;
+
         var sampleInfosElement = root.Q<VisualElement>("sampleInfosContainer");
         string currentSampleText = samplesText.Count > index + 1 ? samplesText[index + 1] : ""; //Update description text, we put +1 because first paragraph is used for introduction 
         CreateMarkdown(sampleInfosElement, currentSampleText, self.linkColor);

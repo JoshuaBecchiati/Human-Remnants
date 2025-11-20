@@ -8,6 +8,7 @@ public static class GameEvents
     public static bool IsInCrafting { get; private set; }
     public static bool IsInInventory { get; private set; }
     public static bool IsInFight { get; private set; }
+    public static bool CanOpenInventory => IsInFight || IsInCrafting;
 
     // --- Crafting events ---
     public static event Action OnOpenCrafting;

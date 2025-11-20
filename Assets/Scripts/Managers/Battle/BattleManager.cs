@@ -293,8 +293,9 @@ public class BattleManager : MonoBehaviour
     /// <param name="ability"></param>
     public void BTNUseAbility(AbilityData ability)
     {
-        if (ability.ChargeCounter != ability.Ability.maxCharge && _battleStatus != BattleStatus.PlayerTurn)
-            return;
+        if (_battleStatus != BattleStatus.PlayerTurn) return;
+
+        if (ability.ChargeCounter < ability.Ability.maxCharge) return;
 
         m_cameraController.EnemyCamera();
 
@@ -343,7 +344,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
 
         _selectedAbility = null;
-        _battleStatus = BattleStatus.ChangingTurn;
+        _battleStatus = BattleStatus.CheckingEnd;
     }
     private void CancelItem()
     {
@@ -369,7 +370,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
 
         _selectedAbility = null;
-        _battleStatus = BattleStatus.ChangingTurn;
+        _battleStatus = BattleStatus.CheckingEnd;
     }
     private void CancelAbility()
     {

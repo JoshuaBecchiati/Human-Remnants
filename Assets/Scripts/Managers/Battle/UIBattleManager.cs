@@ -92,8 +92,7 @@ public class UIBattleManager : MonoBehaviour
 
     public void CreatePlayerUI(UnitBase player)
     {
-        if (player.Team != UnitTeam.Player)
-            return;
+        if (player.Team != UnitTeam.Player) return;
 
         GameObject ui = Instantiate(m_healthBarPrefab, m_playerUIParent);
 
@@ -103,8 +102,7 @@ public class UIBattleManager : MonoBehaviour
 
     public void CreateEnemyUI(UnitBase enemy)
     {
-        if (enemy.Team != UnitTeam.Enemy)
-            return;
+        if (enemy.Team != UnitTeam.Enemy) return;
 
         if (enemy.TryGetComponent(out UIHealthBar healthBar))
             healthBar.Setup(enemy);

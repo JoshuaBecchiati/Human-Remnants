@@ -65,7 +65,7 @@ public class UIInventoryManager : MonoBehaviour
 
     private void OnToggleInventory(InputAction.CallbackContext context)
     {
-        if (GameEvents.IsInCrafting) return;
+        if (GameEvents.CanOpenInventory) return;
 
         if (_isInventoryOpen)
             CloseInventory();

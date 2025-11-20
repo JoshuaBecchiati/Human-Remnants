@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "Single ability", menuName = "Abilities/Single ability")]
+[CreateAssetMenu(fileName = "Single ability", menuName = "Battle/Abilities/Single ability")]
 
 public class SingleAbility : Ability
 {
