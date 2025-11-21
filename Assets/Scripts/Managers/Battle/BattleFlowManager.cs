@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 [DefaultExecutionOrder(-10)]
 public class BattleFlowManager : MonoBehaviour
@@ -46,11 +45,11 @@ public class BattleFlowManager : MonoBehaviour
     // --- Public ---
     public List<GameObject> PlayersCombatPF =>
         m_players
-            .Where(p => p.TryGetComponent<Player>(out _)) // filtra quelli che hanno lo script
-            .Select(p => p.GetComponent<Player>().CombatPF) // prendi il prefab
+            .Where(p => p.TryGetComponent<Player>(out _)) // Filter only with Player script
+            .Select(p => p.GetComponent<Player>().CombatPF) // Take prefab
             .ToList();
 
-
+    #region Unity Methods
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -74,7 +73,9 @@ public class BattleFlowManager : MonoBehaviour
         GameEvents.OnBattleStart -= BattleStart;
         GameEvents.OnBattleEnd -= BattleClose;
     }
+    #endregion
 
+    #region Handle start battle
     private void BattleStart(BattleSettings battleSettings, GameObject enemy)
     {
         _enemy = enemy;
@@ -83,15 +84,21 @@ public class BattleFlowManager : MonoBehaviour
         StartCoroutine(FadeInBattle());
     }
 
+    /// <summary>
+    /// Transition to enter the battle
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator FadeInBattle()
     {
         m_blackScreen.gameObject.SetActive(true);
 
+        // Initialize camera values
         float targetFOV = 140f;
         float startFOV = m_explorationCamera.m_Lens.FieldOfView;
         float t = 0f;
         float duration = 0.45f;
 
+        // Changing camera FOV
         while (t < duration)
         {
             t += Time.deltaTime;
@@ -99,8 +106,7 @@ public class BattleFlowManager : MonoBehaviour
             yield return null;
         }
 
-        m_explorationCamera.m_Lens.FieldOfView = targetFOV;
-
+        // Fade in black screen transition
         t = 0f;
         duration = 0.25f;
         while (t < duration)
@@ -110,40 +116,44 @@ public class BattleFlowManager : MonoBehaviour
             yield return null;
         }
 
-        m_explorationCamera.m_Lens.FieldOfView = targetFOV;
-
         yield return new WaitForSeconds(0.5f);
 
+        // Resete exploration camera
         m_explorationCamera.m_Lens.FieldOfView = startFOV;
+
         InitializeStartBattle();
     }
 
     private void InitializeStartBattle()
     {
-        // Set degli input da combattimento
+        // Set combat inputs
         PlayerInputSingleton.Instance.CombatInput();
 
-        // Disattiva il nemico nella scena esplorativa
+        // Disable enemy in scene
         _enemy.GetComponent<Collider>().isTrigger = false;
         _enemy.SetActive(false);
 
-        // Rende il cursore visibile
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Attiva la scena di combattimento e disattiva il player
+        // Activate combat scene, disable exploration player
         m_BattleUI.SetActive(true);
         m_battleScene.SetActive(true);
         m_currentPlayer.SetActive(false);
         m_exploreCamera.SetActive(false);
 
-        // Istanziamento e evento per inizio della battaglia
+        // Prefab instantiate and event to start the battle
         IReadOnlyList<GameObject> enemies = InstantiatePrefabs(_battleSettings.enemies.ToList());
         IReadOnlyList<GameObject> players = InstantiatePrefabs(PlayersCombatPF);
 
         OnSetupBattle?.Invoke(players, enemies);
     }
 
+    /// <summary>
+    /// Instatiate prefab and healthbar of every unit in the list
+    /// </summary>
+    /// <param name="prefabs"></param>
+    /// <returns></returns>
     private IReadOnlyList<GameObject> InstantiatePrefabs(List<GameObject> prefabs)
     {
         List<GameObject> prefabList = new();
@@ -154,6 +164,7 @@ public class BattleFlowManager : MonoBehaviour
             UnitBase u = go.GetComponentInChildren<UnitBase>();
             Player p = m_players[i].GetComponent<Player>();
 
+            // Sync player exploration health with combat health
             if (u.Team == UnitTeam.Player && u.Health >= p.Health)
             {
                 u.SetHealth(p.Health);
@@ -165,12 +176,15 @@ public class BattleFlowManager : MonoBehaviour
 
         return prefabList;
     }
+    #endregion
 
+    #region Handle close battle
     public void BattleClose(BattleResult winner, List<UnitBase> units)
     {
         _units = units;
 
         m_BattleUI.SetActive(false);
+
         switch (winner)
         {
             case BattleResult.Player:
@@ -184,10 +198,14 @@ public class BattleFlowManager : MonoBehaviour
                 break;
         }
 
-        SetNewHealth(_units);
+        SetEndBattleHealth(_units);
     }
 
-    private void SetNewHealth(List<UnitBase> units)
+    /// <summary>
+    /// Sync player combat health and exploration health after battle
+    /// </summary>
+    /// <param name="units"></param>
+    private void SetEndBattleHealth(List<UnitBase> units)
     {
         foreach (UnitBase u in _units)
         {
@@ -204,6 +222,9 @@ public class BattleFlowManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Active victory player screen
+    /// </summary>
     private void PlayerWin()
     {
         m_VictoryUI.SetActive(true);
@@ -218,6 +239,9 @@ public class BattleFlowManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Active game over screen
+    /// </summary>
     private void PlayerLose()
     {
         Time.timeScale = 0f;
@@ -231,10 +255,12 @@ public class BattleFlowManager : MonoBehaviour
         StartCoroutine(FadeOutBattle());
     }
 
+
     private IEnumerator FadeOutBattle()
     {
         m_VictoryUI.SetActive(false);
 
+        // Fade in black screen to transition out of combat
         float t = 0f;
         float duration = 0.25f;
 
@@ -250,9 +276,11 @@ public class BattleFlowManager : MonoBehaviour
         m_currentPlayer.SetActive(true);
         m_exploreCamera.SetActive(true);
 
+        // Destroy every unit prefab
         foreach (UnitBase u in _units)
             Destroy(u.transform.parent.gameObject);
 
+        // Fade out black screen to transition in exploration
         t = 0f;
         while (t < duration)
         {
@@ -273,9 +301,15 @@ public class BattleFlowManager : MonoBehaviour
         GameEvents.SetBattleState(false);
     }
 
+    /// <summary>
+    /// Disable enemy collider for a set time
+    /// to avoid immedate play battle in case of escape from it
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator DisableCollider()
     {
         yield return new WaitForSeconds(2f);
         _enemy.GetComponent<Collider>().isTrigger = true;
     }
+    #endregion
 }
