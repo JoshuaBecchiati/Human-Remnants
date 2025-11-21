@@ -67,6 +67,17 @@ public class CharController : MonoBehaviour
         }
     }
 
+    private void OnValidate()
+    {
+        if (!m_animator) m_animator = GetComponent<Animator>();
+        if (!m_characterController) m_characterController = GetComponent<CharacterController>();
+    }
+
+    private void Update()
+    {
+        HandleMovement();
+    }
+
     private void OnAnimatorMove()
     {
         if (!IsGrounded()) return;

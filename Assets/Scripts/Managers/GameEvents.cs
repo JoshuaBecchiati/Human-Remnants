@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // Global Event Bus
@@ -17,7 +18,7 @@ public static class GameEvents
 
     // --- Battle events ---
     public static event Action<BattleSettings, GameObject> OnBattleStart;
-    public static event Action<BattleResult> OnBattleEnd;
+    public static event Action<BattleResult, List<UnitBase>> OnBattleEnd;
 
     #region Handle crafting
     public static void SetCraftingState(bool state)
@@ -51,12 +52,18 @@ public static class GameEvents
         OnBattleStart?.Invoke(battleSettings, enemy);
     }
 
-    public static void BattleEnd(BattleResult winner)
+    public static void BattleEnd(BattleResult winner, List<UnitBase> units)
     {
         if (!IsInFight) return;
 
-        IsInFight = false;
-        OnBattleEnd?.Invoke(winner);
+        OnBattleEnd?.Invoke(winner, units);
+    }
+
+    public static void SetBattleState(bool state)
+    {
+        if (IsInFight == state) return;
+
+        IsInFight = state;
     }
     #endregion
 }

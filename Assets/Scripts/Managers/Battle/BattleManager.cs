@@ -47,7 +47,7 @@ public class BattleManager : MonoBehaviour
 
     // --- Events ---
     public event Action<ItemData> OnUseItem;
-    public event Action<UnitBase> OnCreateUnit;
+    //public event Action<UnitBase> OnCreateUnit;
     public event Func<UnitBase, IEnumerator> OnStartAttack;
 
     #region Unity methods
@@ -132,7 +132,6 @@ public class BattleManager : MonoBehaviour
             prefabs[i].transform.position = spawnPos;
             UnitBase u = prefabs[i].GetComponentInChildren<UnitBase>();
             u.OnDeath += HandleUnitDeath;
-            OnCreateUnit.Invoke(u);
             m_unitsInBattle.Add(u);
 
             if (u.Team == UnitTeam.Player)
@@ -512,16 +511,10 @@ public class BattleManager : MonoBehaviour
         if (_battleStatus != BattleStatus.Ending)
             return;
 
-        foreach (Transform child in m_playerSide.Cast<Transform>().ToArray())
-            Destroy(child.gameObject);
-
-        foreach (Transform child in m_enemySide.Cast<Transform>().ToArray())
-            Destroy(child.gameObject);
+        GameEvents.BattleEnd(_pendingResult, m_unitsInBattle);
 
         m_unitsInBattle.Clear();
         m_turnOrder.Clear();
-
-        GameEvents.BattleEnd(_pendingResult);
     }
     private void HandleUnitDeath(UnitBase unit)
     {

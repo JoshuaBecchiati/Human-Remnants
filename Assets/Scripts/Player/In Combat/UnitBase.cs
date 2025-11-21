@@ -49,7 +49,6 @@ public abstract class UnitBase : MonoBehaviour
     public event Action OnEndAttack;
     public event Action<UnitBase> OnDeath;
 
-
     protected virtual void Awake()
     {
         _isDead = false;
@@ -100,6 +99,11 @@ public abstract class UnitBase : MonoBehaviour
         else
             m_health += heal;
         OnHeal?.Invoke(m_health, m_maxHealth);
+    }
+
+    public virtual void SetHealth(float health)
+    {
+        m_health = health;
     }
     #endregion
 

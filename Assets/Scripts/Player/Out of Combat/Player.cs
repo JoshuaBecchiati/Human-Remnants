@@ -1,20 +1,22 @@
 ﻿using UnityEngine;
 
-public class Player : CharController
+public class Player : MonoBehaviour
 {
     // --- Inspector References ---
-    //[Header("Stats")]
-    //[SerializeField] private float m_health = 100f;
+    [Header("Stats")]
+    [SerializeField] private string m_name = string.Empty;
+    [SerializeField] private float m_health = 100f;
 
     [Header("Combat settings")]
     [SerializeField] private GameObject _combatPF;
 
     // --- Proprierties ---
+    public string Name => m_name;
+    public float Health => m_health;
     public GameObject CombatPF => _combatPF;
 
-    // Update is called once per frame
-    void Update()
+    public void SetHealth(float health)
     {
-        HandleMovement();
+        m_health = health;
     }
 }

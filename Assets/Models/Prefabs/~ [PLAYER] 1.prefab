@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 309338522211157172}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: -4}
+  m_LocalPosition: {x: 0, y: 0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -201,7 +201,7 @@ Transform:
   m_GameObject: {fileID: 1766406634284162721}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -252,6 +252,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4309256205709023147}
   - component: {fileID: 2557870698321613716}
+  - component: {fileID: 1976512377716971249}
   m_Layer: 3
   m_Name: Follow at
   m_TagString: Untagged
@@ -268,7 +269,7 @@ Transform:
   m_GameObject: {fileID: 4486376121547851725}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5000001, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -287,19 +288,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61decd6d98964824897f966253e327c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _target: {fileID: 7540850159876662358}
+  _target: {fileID: 2106618923487597940}
   _elevation: {fileID: 7937866555126780529}
   _cameraPoint: {fileID: 1333197704344808068}
-  _offset: {x: 0, y: 0.5, z: 0}
+  _offset: {x: 0, y: 1.5, z: 0}
   _collisionMask:
     serializedVersion: 2
-    m_Bits: 65
+    m_Bits: 7233
   _horizontalSpeed: 10
   _verticalSpeed: 10
   _maxElevation: 80
   _minElevation: -80
   _desiredArmLenght: 1.5
   _invertMouse: 0
+--- !u!114 &1976512377716971249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4486376121547851725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 969036dbc5fbff346ba5e96cdc741651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  character: {fileID: 0}
+  cameraPoint: {fileID: 7937866555126780529}
+  walkAmplitude: 0.035
+  walkFrequency: 9
+  runAmplitude: 0.07
+  runFrequency: 11.5
+  smooth: 8
 --- !u!1 &4941804544674086340
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,16 +553,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a836e32a177144d8fc9db023144ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_jumpForce: 3
-  m_gravity: 35
-  m_groundMask:
-    serializedVersion: 2
-    m_Bits: 0
-  m_cameraSpeed: 320
-  m_cameraPivot: {fileID: 4309256205709023147}
-  m_animator: {fileID: 4694789401805515377}
-  m_characterController: {fileID: 3143275856103230290}
-  m_animationTransition: 0
+  m_name: 
+  m_health: 100
   _combatPF: {fileID: 4311111495703447436, guid: ec2325d712ba405419f3af7958978d0e,
     type: 3}
 --- !u!1 &7945880325837505886
@@ -655,12 +667,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7232415685461704671}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &4694789401805515377 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 2700345208742778286, guid: 64b182395c0b6744a920c74bce3ece13,
-    type: 3}
-  m_PrefabInstance: {fileID: 7232415685461704671}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7869313685000716959
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -693,11 +699,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8073086772555192299, guid: 64b182395c0b6744a920c74bce3ece13,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8073086772555192299, guid: 64b182395c0b6744a920c74bce3ece13,
         type: 3}
@@ -766,12 +767,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7869313685000716959}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &5209792527290079025 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 2700345208742778286, guid: 64b182395c0b6744a920c74bce3ece13,
-    type: 3}
-  m_PrefabInstance: {fileID: 7869313685000716959}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6083667693641033530 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4132312772176831909, guid: 64b182395c0b6744a920c74bce3ece13,
@@ -816,16 +811,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a836e32a177144d8fc9db023144ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_jumpForce: 3
-  m_gravity: 15
-  m_groundMask:
-    serializedVersion: 2
-    m_Bits: 0
-  m_cameraSpeed: 320
-  m_cameraPivot: {fileID: 4309256205709023147}
-  m_animator: {fileID: 5209792527290079025}
-  m_characterController: {fileID: 5307257957910394621}
-  m_animationTransition: 5
+  m_name: Marx
+  m_health: 100
   _combatPF: {fileID: 6021961570360790873, guid: 140dcdb0fe9cab94d80e5256feef1813,
     type: 3}
 --- !u!114 &871522311693090667

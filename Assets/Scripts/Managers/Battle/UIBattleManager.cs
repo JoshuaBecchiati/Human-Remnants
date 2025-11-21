@@ -41,9 +41,9 @@ public class UIBattleManager : MonoBehaviour
     {
         if (m_battleManager != null)
         {
-            m_battleManager.OnCreateUnit += CreatePlayerUI;
-            m_battleManager.OnCreateUnit += CreateEnemyUI;
-            m_battleManager.OnCreateUnit += InitUnitUI;
+            BattleFlowManager.Instance.OnCreateUnit += CreatePlayerUI;
+            BattleFlowManager.Instance.OnCreateUnit += CreateEnemyUI;
+            BattleFlowManager.Instance.OnCreateUnit += InitUnitUI;
         }
 
         if (m_inventoryManager != null)
@@ -59,8 +59,8 @@ public class UIBattleManager : MonoBehaviour
     {
         if (m_battleManager != null)
         {
-            m_battleManager.OnCreateUnit -= CreatePlayerUI;
-            m_battleManager.OnCreateUnit -= CreateEnemyUI;
+            BattleFlowManager.Instance.OnCreateUnit -= CreatePlayerUI;
+            BattleFlowManager.Instance.OnCreateUnit -= CreateEnemyUI;
         }
 
 

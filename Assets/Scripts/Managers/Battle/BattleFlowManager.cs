@@ -37,9 +37,11 @@ public class BattleFlowManager : MonoBehaviour
     // --- Private ---
     private GameObject _enemy;
     private BattleSettings _battleSettings;
+    private List<UnitBase> _units;
 
     // --- Events ---
     public event Action<IReadOnlyList<GameObject>, IReadOnlyList<GameObject>> OnSetupBattle;
+    public event Action<UnitBase> OnCreateUnit;
 
     // --- Public ---
     public List<GameObject> PlayersCombatPF =>
@@ -149,14 +151,25 @@ public class BattleFlowManager : MonoBehaviour
         for (int i = 0; i < prefabs.Count; i++)
         {
             GameObject go = Instantiate(prefabs[i]);
+            UnitBase u = go.GetComponentInChildren<UnitBase>();
+            Player p = m_players[i].GetComponent<Player>();
+
+            if (u.Team == UnitTeam.Player && u.Health >= p.Health)
+            {
+                u.SetHealth(p.Health);
+            }
+
+            OnCreateUnit.Invoke(u);
             prefabList.Add(go);
         }
 
         return prefabList;
     }
 
-    public void BattleClose(BattleResult winner)
+    public void BattleClose(BattleResult winner, List<UnitBase> units)
     {
+        _units = units;
+
         m_BattleUI.SetActive(false);
         switch (winner)
         {
@@ -169,6 +182,25 @@ public class BattleFlowManager : MonoBehaviour
             case BattleResult.Escape:
                 BattleCloseBTN();
                 break;
+        }
+
+        SetNewHealth(_units);
+    }
+
+    private void SetNewHealth(List<UnitBase> units)
+    {
+        foreach (UnitBase u in _units)
+        {
+            if (u.Team == UnitTeam.Enemy) continue;
+
+            Player player = m_players
+                .Select(go => go.GetComponent<Player>())
+                .FirstOrDefault(p => p != null && p.Name == u.Name);
+
+            if (player != null)
+            {
+                player.SetHealth(u.Health);
+            }
         }
     }
 
@@ -197,8 +229,6 @@ public class BattleFlowManager : MonoBehaviour
     public void BattleCloseBTN()
     {
         StartCoroutine(FadeOutBattle());
-
-
     }
 
     private IEnumerator FadeOutBattle()
@@ -220,6 +250,9 @@ public class BattleFlowManager : MonoBehaviour
         m_currentPlayer.SetActive(true);
         m_exploreCamera.SetActive(true);
 
+        foreach (UnitBase u in _units)
+            Destroy(u.transform.parent.gameObject);
+
         t = 0f;
         while (t < duration)
         {
@@ -236,6 +269,8 @@ public class BattleFlowManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         StartCoroutine(DisableCollider());
+
+        GameEvents.SetBattleState(false);
     }
 
     private IEnumerator DisableCollider()
