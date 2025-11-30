@@ -9,7 +9,8 @@ public static class GameEvents
     public static bool IsInCrafting { get; private set; }
     public static bool IsInInventory { get; private set; }
     public static bool IsInFight { get; private set; }
-    public static bool CanOpenInventory => IsInFight || IsInCrafting;
+    public static bool IsInPause { get; private set; }
+    public static bool CanOpenInventory => IsInFight || IsInCrafting || IsInPause;
 
     // --- Crafting events ---
     public static event Action OnOpenCrafting;
@@ -56,6 +57,7 @@ public static class GameEvents
     {
         if (!IsInFight) return;
 
+        IsInFight = false;
         OnBattleEnd?.Invoke(winner, units);
     }
 
@@ -64,6 +66,13 @@ public static class GameEvents
         if (IsInFight == state) return;
 
         IsInFight = state;
+    }
+    #endregion
+
+    #region Pause game
+    public static void SetGameState(bool state)
+    {
+        IsInPause = state;
     }
     #endregion
 }

@@ -91,6 +91,8 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
+        if (!GameEvents.IsInFight) return;
+
         switch(_battleStatus)
         {
             case BattleStatus.ChangingTurn:
@@ -112,8 +114,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     public void SetupBattleUnits(IReadOnlyList<GameObject> playersPf, IReadOnlyList<GameObject> EnemyPf)
     {
-        if (_battleStatus != BattleStatus.Starting)
-            return;
+        if (_battleStatus != BattleStatus.Starting) return;
 
         InitializeUnitsOnSide(playersPf, m_playerSide);
         InitializeUnitsOnSide(EnemyPf, m_enemySide);

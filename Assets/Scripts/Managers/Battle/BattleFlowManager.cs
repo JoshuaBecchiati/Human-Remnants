@@ -30,6 +30,10 @@ public class BattleFlowManager : MonoBehaviour
     [SerializeField] private Transform m_transformItemSlot;
 
     [Header("Camera effects")]
+    [SerializeField] private float m_targetFOV = 140f;
+    [SerializeField, Range(0f, 1f)] private float m_durationCameraEffect = 0.45f;
+    [SerializeField, Range(0f, 1f)] private float m_durationFadeIn = 0.25f;
+    [SerializeField, Range(0f, 1f)] private float m_durationFadeOut = 0.25f;
     [SerializeField] private CanvasGroup m_blackScreen;
     [SerializeField] private CinemachineVirtualCamera m_explorationCamera;
 
@@ -37,17 +41,15 @@ public class BattleFlowManager : MonoBehaviour
     private GameObject _enemy;
     private BattleSettings _battleSettings;
     private List<UnitBase> _units;
+    private List<GameObject> _playersCombatPF => m_players
+        .Where(p => p.TryGetComponent<Player>(out _)) // Filter only with Player script
+        .Select(p => p.GetComponent<Player>().CombatPF) // Take prefab
+        .ToList();
 
     // --- Events ---
     public event Action<IReadOnlyList<GameObject>, IReadOnlyList<GameObject>> OnSetupBattle;
     public event Action<UnitBase> OnCreateUnit;
 
-    // --- Public ---
-    public List<GameObject> PlayersCombatPF =>
-        m_players
-            .Where(p => p.TryGetComponent<Player>(out _)) // Filter only with Player script
-            .Select(p => p.GetComponent<Player>().CombatPF) // Take prefab
-            .ToList();
 
     #region Unity Methods
     private void Awake()
@@ -85,7 +87,7 @@ public class BattleFlowManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Transition to enter the battle
+    /// Transition of entering the battle
     /// </summary>
     /// <returns></returns>
     private IEnumerator FadeInBattle()
@@ -93,26 +95,23 @@ public class BattleFlowManager : MonoBehaviour
         m_blackScreen.gameObject.SetActive(true);
 
         // Initialize camera values
-        float targetFOV = 140f;
         float startFOV = m_explorationCamera.m_Lens.FieldOfView;
         float t = 0f;
-        float duration = 0.45f;
 
         // Changing camera FOV
-        while (t < duration)
+        while (t < m_durationCameraEffect)
         {
             t += Time.deltaTime;
-            m_explorationCamera.m_Lens.FieldOfView = Mathf.Lerp(startFOV, targetFOV, t / duration);
+            m_explorationCamera.m_Lens.FieldOfView = Mathf.Lerp(startFOV, m_targetFOV, t / m_durationCameraEffect);
             yield return null;
         }
 
         // Fade in black screen transition
         t = 0f;
-        duration = 0.25f;
-        while (t < duration)
+        while (t < m_durationFadeIn)
         {
             t += Time.deltaTime;
-            m_blackScreen.alpha = Mathf.Lerp(0f, 1f, t / duration);
+            m_blackScreen.alpha = Mathf.Lerp(0f, 1f, t / m_durationFadeIn);
             yield return null;
         }
 
@@ -144,7 +143,7 @@ public class BattleFlowManager : MonoBehaviour
 
         // Prefab instantiate and event to start the battle
         IReadOnlyList<GameObject> enemies = InstantiatePrefabs(_battleSettings.enemies.ToList());
-        IReadOnlyList<GameObject> players = InstantiatePrefabs(PlayersCombatPF);
+        IReadOnlyList<GameObject> players = InstantiatePrefabs(_playersCombatPF);
 
         OnSetupBattle?.Invoke(players, enemies);
     }
@@ -234,6 +233,7 @@ public class BattleFlowManager : MonoBehaviour
 
         foreach (ItemData itemData in _battleSettings.drops)
         {
+            Debug.Log("Item added, QTY: " + itemData.Qty);
             InventoryManager.Instance.AddItemInInventory(itemData.Item, itemData.Qty);
             UIInventoryManager.Instance.CreateItemSlot(itemData, m_transformItemSlot);
         }
@@ -255,19 +255,21 @@ public class BattleFlowManager : MonoBehaviour
         StartCoroutine(FadeOutBattle());
     }
 
-
+    /// <summary>
+    /// Transition of ending the battle
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator FadeOutBattle()
     {
         m_VictoryUI.SetActive(false);
 
         // Fade in black screen to transition out of combat
         float t = 0f;
-        float duration = 0.25f;
 
-        while (t < duration)
+        while (t < m_durationFadeOut)
         {
             t += Time.deltaTime;
-            m_blackScreen.alpha = Mathf.Lerp(0f, 1f, t / duration);
+            m_blackScreen.alpha = Mathf.Lerp(0f, 1f, t / m_durationFadeOut);
             yield return null;
         }
 
@@ -282,10 +284,10 @@ public class BattleFlowManager : MonoBehaviour
 
         // Fade out black screen to transition in exploration
         t = 0f;
-        while (t < duration)
+        while (t < m_durationFadeOut)
         {
             t += Time.deltaTime;
-            m_blackScreen.alpha = Mathf.Lerp(1f, 0f, t / duration);
+            m_blackScreen.alpha = Mathf.Lerp(1f, 0f, t / m_durationFadeOut);
             yield return null;
         }
 

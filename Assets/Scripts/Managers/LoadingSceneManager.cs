@@ -10,7 +10,6 @@ public class LoadingScreenManager : MonoBehaviour
     [SerializeField] private int _sceneToLoad;
     [SerializeField] private Animator _animator;
 
-
     private void Awake()
     {
         if (Instance == null)
