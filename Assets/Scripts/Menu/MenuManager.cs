@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
-    [SerializeField] private UIPanel mainMenuPanel;
+    [SerializeField] private UIPanel m_mainMenuPanel;
 
     [Header("Pause menu settings")]
     [SerializeField] private bool m_isPauseMenu;
@@ -32,22 +33,48 @@ public class MenuManager : MonoBehaviour
     private void Start()
     {
         // inizializza lo stack con il MainMenu
-        panelStack.Push(mainMenuPanel);
-        mainMenuPanel.gameObject.SetActive(true);
-        mainMenuPanel.OnEnter();
+        panelStack.Push(m_mainMenuPanel);
+        m_mainMenuPanel.gameObject.SetActive(true);
+        m_mainMenuPanel.OnEnter();
 
         if (PlayerInputSingleton.Instance != null)
-            PlayerInputSingleton.Instance.Actions["Back"].performed += Back;
+            PlayerInputSingleton.Instance.Actions["Back"].performed += BackInput;
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDestroy()
     {
         if (PlayerInputSingleton.Instance != null)
-            PlayerInputSingleton.Instance.Actions["Back"].performed -= Back;
+            PlayerInputSingleton.Instance.Actions["Back"].performed -= BackInput;
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        panelStack.Clear();
+        // qui ti ri-agganci tutto
+        FindReferences();
+        panelStack.Push(m_mainMenuPanel);
+    }
+
+    private void FindReferences()
+    {
+        m_mainMenuPanel = GameObject.Find("MainMenu-Panel").GetComponent<UIPanel>();
+        m_pauseCanvas = GameObject.Find("Pause Canvas");
+
+        if (m_pauseCanvas != null)
+        {
+            m_pauseCanvas.SetActive(false);
+            m_isPauseMenu = true;
+        }
+
     }
 
     public void OpenPanel(UIPanel panel)
     {
+        Debug.Log("Open Panel");
         if (panelStack.Count > 0)
         {
             panelStack.Peek().OnExit();
@@ -60,7 +87,7 @@ public class MenuManager : MonoBehaviour
         panel.OnEnter();
     }
 
-    public void Back(InputAction.CallbackContext ctx)
+    public void Back()
     {
         if (panelStack.Count <= 1)
         {
@@ -95,6 +122,11 @@ public class MenuManager : MonoBehaviour
             current.gameObject.SetActive(true);
             current.OnEnter();
         }
+    }
+
+    public void BackInput(InputAction.CallbackContext ctx)
+    {
+        Back();
     }
 
     private void TogglePauseMenu()

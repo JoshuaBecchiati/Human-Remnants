@@ -338,19 +338,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 65466306}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: OnChangePanel
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1274979693}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &65466306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1542,6 +1530,7 @@ GameObject:
   - component: {fileID: 462394283}
   - component: {fileID: 462394282}
   - component: {fileID: 462394285}
+  - component: {fileID: 462394286}
   m_Layer: 5
   m_Name: Quit game-BTN
   m_TagString: Untagged
@@ -1642,19 +1631,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 462394282}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1376737683}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: QuitApplication
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!222 &462394284
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1675,6 +1652,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9d164c9eb23324e934c042a7043db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &462394286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 462394280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8885da1cb1e2b9f44a944a01540a7750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_buttonType: 6
 --- !u!1 &495508315
 GameObject:
   m_ObjectHideFlags: 0
@@ -3980,6 +3970,7 @@ GameObject:
   - component: {fileID: 1032514000}
   - component: {fileID: 1032514001}
   - component: {fileID: 1032514004}
+  - component: {fileID: 1032514005}
   m_Layer: 5
   m_Name: Options-BTN
   m_TagString: Untagged
@@ -4031,19 +4022,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1032514001}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1376737683}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: OpenPanel
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1150868533}
-          m_ObjectArgumentAssemblyTypeName: UIPanel, Assembly-CSharp
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1032514001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4113,6 +4092,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9d164c9eb23324e934c042a7043db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1032514005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032513999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc412d24e0a82b4d9f891a23a2636f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_buttonType: 2
+  m_panel: {fileID: 1150868533}
 --- !u!1 &1037642799
 GameObject:
   m_ObjectHideFlags: 0
@@ -5706,7 +5699,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cabb04fcb578a0d4285e81fe6e4db3ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenuPanel: {fileID: 1653927815}
+  m_mainMenuPanel: {fileID: 1653927815}
+  m_isPauseMenu: 0
+  m_pauseCanvas: {fileID: 8318194638185052581, guid: e61958daa79103948b5b8f14eb77dcaf,
+    type: 3}
 --- !u!4 &1376737684
 Transform:
   m_ObjectHideFlags: 0
@@ -6234,6 +6230,7 @@ GameObject:
   - component: {fileID: 1473121573}
   - component: {fileID: 1473121574}
   - component: {fileID: 1473121577}
+  - component: {fileID: 1473121578}
   m_Layer: 5
   m_Name: Start_game-BTN
   m_TagString: Untagged
@@ -6285,19 +6282,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1473121574}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1376737683}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: ChangeScene
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1473121574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6367,6 +6352,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9d164c9eb23324e934c042a7043db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1473121578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1473121572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1078e55e3e3975c4da63ec9a212210b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_buttonType: 1
+  m_indexScene: 1
 --- !u!1 &1477158417
 GameObject:
   m_ObjectHideFlags: 0

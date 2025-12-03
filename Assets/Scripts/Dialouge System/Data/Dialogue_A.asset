@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6440e8a211ffbb942acca73f24ccf8d6, type: 3}
+  m_Name: Dialogue_A
+  m_EditorClassIdentifier: 
+  _dialogueLines:
+  - _speakerName: Marsh
+    _dialogueText: Can I join you?
+  _dialogueChoices:
+  - _choiceText: Yes
+    _nextDialogue: {fileID: 11400000, guid: ab599acd8d7c56541bef94f4daa83d05, type: 2}
+    OnCoichePicked:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - _choiceText: Not for now
+    _nextDialogue: {fileID: 11400000, guid: 1f617580bba56ea41b1d66157f2eff56, type: 2}
+    OnCoichePicked:
+      m_PersistentCalls:
+        m_Calls: []
+  OnCoichePicked:
+    m_PersistentCalls:
+      m_Calls: []

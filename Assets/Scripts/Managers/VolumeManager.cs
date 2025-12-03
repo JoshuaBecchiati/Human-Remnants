@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 public class VolumeManager : MonoBehaviour
 {
@@ -29,7 +30,19 @@ public class VolumeManager : MonoBehaviour
 
     private void Start()
     {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
         InitializeChannels();
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        m_uiSource = GameObject.Find("UI Source").GetComponent<AudioSource>();
     }
 
     private void InitializeChannels()
@@ -44,7 +57,6 @@ public class VolumeManager : MonoBehaviour
         foreach (var c in _channels.Values)
             c.Load();
     }
-
 
     public float GetVolume(VolumeType type)
     {

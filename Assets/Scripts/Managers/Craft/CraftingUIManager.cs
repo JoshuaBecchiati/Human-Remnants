@@ -17,6 +17,7 @@ public class CraftingUIManager : MonoBehaviour
             return;
         }
         Instance = this;
+        
     }
 
     public void SelectSlot(CraftingSlot slot)

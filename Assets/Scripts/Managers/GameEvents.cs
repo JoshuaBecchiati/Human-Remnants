@@ -10,7 +10,8 @@ public static class GameEvents
     public static bool IsInInventory { get; private set; }
     public static bool IsInFight { get; private set; }
     public static bool IsInPause { get; private set; }
-    public static bool CanOpenInventory => IsInFight || IsInCrafting || IsInPause;
+    public static bool IsInDialogue { get; private set; }
+    public static bool CanOpenInventory => IsInFight || IsInCrafting || IsInPause || IsInDialogue;
 
     // --- Crafting events ---
     public static event Action OnOpenCrafting;
@@ -73,6 +74,13 @@ public static class GameEvents
     public static void SetGameState(bool state)
     {
         IsInPause = state;
+    }
+    #endregion
+
+    #region Handle Dialogue
+    public static void SetDialogueState(bool state)
+    {
+        IsInDialogue = state;
     }
     #endregion
 }
