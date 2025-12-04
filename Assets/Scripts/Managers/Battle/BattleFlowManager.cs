@@ -181,7 +181,6 @@ public class BattleFlowManager : MonoBehaviour
     public void BattleClose(BattleResult winner, List<UnitBase> units)
     {
         _units = units;
-
         m_BattleUI.SetActive(false);
 
         switch (winner)
@@ -198,6 +197,19 @@ public class BattleFlowManager : MonoBehaviour
         }
 
         SetEndBattleHealth(_units);
+    }
+
+    private void CheckEnemyAlive(List<UnitBase> units)
+    {
+        List<UnitBase> enemies = units.FindAll(x => x.Team == UnitTeam.Enemy);
+        int counter = 0;
+
+        foreach (UnitBase e in enemies)
+            if (e.Health <= 0f)
+                counter++;
+
+        if (counter == enemies.Count)
+            Destroy(_enemy);
     }
 
     /// <summary>
@@ -233,7 +245,6 @@ public class BattleFlowManager : MonoBehaviour
 
         foreach (ItemData itemData in _battleSettings.drops)
         {
-            Debug.Log("Item added, QTY: " + itemData.Qty);
             InventoryManager.Instance.AddItemInInventory(itemData.Item, itemData.Qty);
             UIInventoryManager.Instance.CreateItemSlot(itemData, m_transformItemSlot);
         }
@@ -278,9 +289,13 @@ public class BattleFlowManager : MonoBehaviour
         m_currentPlayer.SetActive(true);
         m_exploreCamera.SetActive(true);
 
+        CheckEnemyAlive(_units);
+
         // Destroy every unit prefab
         foreach (UnitBase u in _units)
             Destroy(u.transform.parent.gameObject);
+
+        _units.Clear();
 
         // Fade out black screen to transition in exploration
         t = 0f;
@@ -291,14 +306,17 @@ public class BattleFlowManager : MonoBehaviour
             yield return null;
         }
 
-        _enemy.SetActive(true);
+        if (_enemy)
+            _enemy.SetActive(true);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         PlayerInputSingleton.Instance.ExploreInput();
 
         yield return new WaitForSeconds(2f);
 
-        StartCoroutine(DisableCollider());
+        if (_enemy)
+            StartCoroutine(DisableCollider());
 
         GameEvents.SetBattleState(false);
     }

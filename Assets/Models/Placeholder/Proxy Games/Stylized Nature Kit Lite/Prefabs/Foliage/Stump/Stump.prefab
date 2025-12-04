@@ -259,7 +259,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2481384745673457707}
   - component: {fileID: 8156590878013693598}
-  - component: {fileID: 4960096696798466291}
+  - component: {fileID: 3757691029244133895}
   m_Layer: 0
   m_Name: Stump
   m_TagString: Untagged
@@ -317,8 +317,8 @@ LODGroup:
     renderers:
     - renderer: {fileID: 2417767375907638927}
   m_Enabled: 1
---- !u!136 &4960096696798466291
-CapsuleCollider:
+--- !u!65 &3757691029244133895
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -335,10 +335,8 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.33
-  m_Height: 0.95
-  m_Direction: 1
+  serializedVersion: 3
+  m_Size: {x: 0.4, y: 1, z: 0.4}
   m_Center: {x: 0, y: 0.37, z: 0}
 --- !u!1 &8534235163752558671
 GameObject:

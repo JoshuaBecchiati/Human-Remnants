@@ -514,8 +514,6 @@ public class BattleManager : MonoBehaviour
             return;
 
         GameEvents.BattleEnd(_pendingResult, m_unitsInBattle);
-
-        m_unitsInBattle.Clear();
         m_turnOrder.Clear();
     }
     private void HandleUnitDeath(UnitBase unit)

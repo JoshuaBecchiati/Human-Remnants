@@ -15,6 +15,7 @@ public class CharController : MonoBehaviour
     [SerializeField] private float m_jumpHorizontalSpeed = 5f;
     [SerializeField] private float m_groundedSphere = 0.25f;
     [SerializeField] private LayerMask m_groundMask;
+    [SerializeField] private Transform m_groundCheck;
 
     [Header("Camera")]
     [SerializeField] private float m_cameraSpeed = 320f;
@@ -73,6 +74,12 @@ public class CharController : MonoBehaviour
     #region Movement
     private void HandleMovement()
     {
+        if (IsGrounded())
+        {
+            _speedMagnitude = _isRunning ? RUN_VALUE : WALK_VALUE;
+            m_animator.SetBool("IsRunning", _isRunning);
+        }
+
         _wantedSpeed.z = _vertical * _speedMagnitude;
         _wantedSpeed.x = _horizontal * _speedMagnitude;
 
@@ -105,9 +112,6 @@ public class CharController : MonoBehaviour
         {
             m_animator.SetBool("IsGrounded", true);
             m_animator.SetBool("IsFalling", false);
-
-            if (_verticalVelocity < 0f)
-                _verticalVelocity = -1f;
 
             if (_isJumping)
                 _isJumping = false;
@@ -151,7 +155,7 @@ public class CharController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        return Physics.CheckSphere(transform.position, m_groundedSphere, m_groundMask);
+        return Physics.CheckSphere(m_groundCheck.position, m_groundedSphere, m_groundMask) && _verticalVelocity <= 0.01f;
     }
     #endregion
 
@@ -183,20 +187,16 @@ public class CharController : MonoBehaviour
 
     private void OnSprintStarted(InputAction.CallbackContext context)
     {
-        if (!IsGrounded()) return;
-
-        m_animator.SetBool("IsRunning", true);
-        _speedMagnitude = RUN_VALUE;
         _isRunning = true;
+
+        if (!IsGrounded()) return;
     }
 
     private void OnSprintCanceled(InputAction.CallbackContext context)
     {
-        if (!IsGrounded()) return;
-
-        m_animator.SetBool("IsRunning", false);
-        _speedMagnitude = WALK_VALUE;
         _isRunning = false;
+
+        if (!IsGrounded()) return;
     }
     #endregion
 
@@ -208,6 +208,16 @@ public class CharController : MonoBehaviour
             !_isMoving)
         {
             _currentSpeed = Vector3.zero;
+        }
+
+        if (Mathf.Abs(m_animator.GetFloat("X")) > 1f && _isMoving)
+        {
+            _currentSpeed.x = 1f;
+        }
+
+        if (Mathf.Abs(m_animator.GetFloat("Y")) > 1f && _isMoving)
+        {
+            _currentSpeed.z = 1f;
         }
 
         m_animator.SetFloat("X", _currentSpeed.x);

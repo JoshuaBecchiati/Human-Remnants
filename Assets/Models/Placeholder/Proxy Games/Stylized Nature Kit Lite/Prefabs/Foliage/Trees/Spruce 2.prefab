@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8310358355782034666}
   - component: {fileID: 6168247090485617691}
   - component: {fileID: 1885280820132006513}
+  - component: {fileID: 2494027769384524379}
   m_Layer: 0
   m_Name: Spruce 2_LOD1
   m_TagString: Untagged
@@ -84,6 +85,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &2494027769384524379
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3013064464910278001}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.25, y: 2.75, z: 0.25}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 2.3, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &3731095390187986728
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,6 +203,7 @@ GameObject:
   - component: {fileID: 348266619621410502}
   - component: {fileID: 1936476102953869702}
   - component: {fileID: 6212658864275681124}
+  - component: {fileID: 3052881018391091470}
   m_Layer: 0
   m_Name: Spruce 2_LOD3
   m_TagString: Untagged
@@ -259,6 +277,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &3052881018391091470
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828991336546146468}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.25, y: 2.75, z: 0.25}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 2.3, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &5289512668786254364
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,6 +304,7 @@ GameObject:
   - component: {fileID: 6610538961354909891}
   - component: {fileID: 5506796467281262502}
   - component: {fileID: 4859832360398608661}
+  - component: {fileID: 7745958129548237200}
   m_Layer: 0
   m_Name: Spruce 2_LOD0
   m_TagString: Untagged
@@ -343,6 +378,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &7745958129548237200
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5289512668786254364}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.25, y: 2.75, z: 0.25}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 2.3, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &6119422277959754521
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,6 +405,7 @@ GameObject:
   - component: {fileID: 1188239962818361679}
   - component: {fileID: 7717825662414331933}
   - component: {fileID: 7913072882568581480}
+  - component: {fileID: 4912797563805813590}
   m_Layer: 0
   m_Name: Spruce 2_LOD2
   m_TagString: Untagged
@@ -427,3 +479,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &4912797563805813590
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6119422277959754521}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.25, y: 2.75, z: 0.25}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 2.3, z: 0}
+  m_TimeToStationary: 0.5
