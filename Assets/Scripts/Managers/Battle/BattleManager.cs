@@ -47,7 +47,6 @@ public class BattleManager : MonoBehaviour
 
     // --- Events ---
     public event Action<ItemData> OnUseItem;
-    //public event Action<UnitBase> OnCreateUnit;
     public event Func<UnitBase, IEnumerator> OnStartAttack;
 
     #region Unity methods
@@ -217,6 +216,14 @@ public class BattleManager : MonoBehaviour
 
         // Attiva il canvas del nuovo target
         m_UIManager.SetOnInfoBar(CurrentTarget);
+    }
+    public UnitBase SelectEnemyTarget()
+    {
+        List<UnitBase> players = m_unitsInBattle.FindAll(p => p.Team == UnitTeam.Player);
+
+        int index = UnityEngine.Random.Range(0, players.Count);
+
+        return players[index];
     }
     #endregion
 
@@ -417,11 +424,13 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            // Nemico: esegui l’attacco in coroutine
+            EnemyCombatStateManager enemyFSM = CurrentUnit.GetComponent<EnemyCombatStateManager>();
+            enemyFSM.SwitchState(enemyFSM.ActState);
+
             _battleStatus = BattleStatus.Executing;
-            StartCoroutine(StartEnemyTurn());
         }
     }
+
     private void StartPlayerTurn()
     {
         _battleStatus = BattleStatus.TurnTransition;
@@ -435,11 +444,11 @@ public class BattleManager : MonoBehaviour
             _indexTarget = m_unitsInBattle.FindIndex(e => e.Team == UnitTeam.Enemy && !e.IsDead);
         }
 
-
         m_UIManager.SetOnInfoBar(CurrentTarget);
 
         _battleStatus = BattleStatus.PlayerTurn;
     }
+
     private void EndPlayerTurn()
     {
         _selectingTeam = UnitTeam.Enemy;
@@ -454,17 +463,20 @@ public class BattleManager : MonoBehaviour
         else
             _oldTarget = m_unitsInBattle.FindIndex(e => !e.IsDead);
     }
-    private IEnumerator StartEnemyTurn()
+
+    public IEnumerator NotifyEnemyAttack()
     {
-        UnitBase playerTarget = m_unitsInBattle.Find(u => u.Team == UnitTeam.Player && !u.IsDead);
-        if (playerTarget != null)
-            CurrentUnit.SetTarget(playerTarget);
+        if (OnStartAttack == null)
+            yield break;
 
-        if (OnStartAttack != null)
-            yield return StartCoroutine(OnStartAttack.Invoke(CurrentUnit));
+        foreach (Func<UnitBase, IEnumerator> handler in OnStartAttack.GetInvocationList())
+        {
+            yield return StartCoroutine(handler(CurrentUnit));
+        }
+    }
 
-        CurrentUnit.EndTurn();
-
+    public void NotifyEnemyFinished()
+    {
         _battleStatus = BattleStatus.CheckingEnd;
     }
     #endregion

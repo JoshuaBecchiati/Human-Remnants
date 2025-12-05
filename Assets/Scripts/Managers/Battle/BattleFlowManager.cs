@@ -307,16 +307,17 @@ public class BattleFlowManager : MonoBehaviour
         }
 
         if (_enemy)
+        {
             _enemy.SetActive(true);
+            _enemy.GetComponent<EnemyStateManager>().StartPostFightCooldown();
+            StartCoroutine(DisableEnemy());
+        }
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         PlayerInputSingleton.Instance.ExploreInput();
 
         yield return new WaitForSeconds(2f);
-
-        if (_enemy)
-            StartCoroutine(DisableCollider());
 
         GameEvents.SetBattleState(false);
     }
@@ -326,9 +327,9 @@ public class BattleFlowManager : MonoBehaviour
     /// to avoid immedate play battle in case of escape from it
     /// </summary>
     /// <returns></returns>
-    private IEnumerator DisableCollider()
+    private IEnumerator DisableEnemy()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(4f);
         _enemy.GetComponent<Collider>().isTrigger = true;
     }
     #endregion

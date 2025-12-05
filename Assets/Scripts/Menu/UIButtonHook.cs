@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIButtonHook : MonoBehaviour, IPointerEnterHandler
@@ -14,7 +13,6 @@ public class UIButtonHook : MonoBehaviour, IPointerEnterHandler
         _buttonHandler = GetComponent<IUIButton>();
 
         _button.onClick.AddListener(OnClickButton);
-
     }
 
     public void OnPointerEnter(PointerEventData eventData)
