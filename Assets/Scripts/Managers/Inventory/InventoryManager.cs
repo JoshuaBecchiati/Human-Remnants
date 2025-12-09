@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
@@ -37,10 +38,11 @@ public class InventoryManager : MonoBehaviour
             m_battleManager.OnUseItem -= RemoveItemInInventory;
     }
 
-    public void AddItemInInventory(Item item, int qty)
+    public void AddItemInInventory( Item item, int qty)
     {
         if (_itemsData.Exists(i => i.Item == item))
         {
+            SaveSystem.Instance.CurrentSave.inventory.Find(i => i.Item);
             int index = _itemsData.FindIndex(i => i.Item == item);
             _itemsData[index].AddItem(qty);
         }
@@ -97,5 +99,13 @@ public class InventoryManager : MonoBehaviour
     public IReadOnlyList<ItemData> GetItems()
     {
         return _itemsData;
+    }
+
+    public void SetItems(List<ItemData> inventory)
+    {
+        if (inventory == null) return;
+
+        _itemsData = inventory;
+        OnAddItem?.Invoke();
     }
 }
