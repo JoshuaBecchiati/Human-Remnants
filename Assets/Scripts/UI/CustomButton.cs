@@ -13,9 +13,12 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [SerializeField] private TextMeshProUGUI m_highlightedText;
     [SerializeField] private Image m_highlightedImage;
 
-    private void OnValidate()
+    private void OnDisable()
     {
+        m_normalText.gameObject.SetActive(true);
 
+        m_highlightedText.gameObject.SetActive(false);
+        m_highlightedImage.gameObject.SetActive(false);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
