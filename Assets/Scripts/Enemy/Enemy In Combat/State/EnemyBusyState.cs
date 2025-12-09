@@ -1,9 +1,12 @@
 using System.Collections;
+using UnityEngine;
 
 public class EnemyBusyState : EnemyCombatBaseState
 {
     public override void EnterState(EnemyCombatStateManager enemy)
     {
+        AttackData ead = enemy.unit.GetAttack();
+        enemy.unit.SetAttack(ead);
         enemy.StartCoroutine(ExecuteAttack(enemy));
     }
 

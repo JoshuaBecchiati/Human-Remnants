@@ -47,7 +47,7 @@ public class BattleManager : MonoBehaviour
 
     // --- Events ---
     public event Action<ItemData> OnUseItem;
-    public event Func<UnitBase, IEnumerator> OnStartAttack;
+    public event Func<UnitBase, AttackData, IEnumerator> OnStartAttack;
 
     #region Unity methods
     private void Awake()
@@ -330,7 +330,7 @@ public class BattleManager : MonoBehaviour
         // Avvia la coroutine dell'attacco
         if (OnStartAttack != null)
         {
-            yield return StartCoroutine(OnStartAttack.Invoke(CurrentUnit));
+            yield return StartCoroutine(OnStartAttack.Invoke(CurrentUnit, CurrentUnit.AttackDatas[0]));
         }
 
         _battleStatus = BattleStatus.CheckingEnd;
@@ -360,7 +360,6 @@ public class BattleManager : MonoBehaviour
         _selectedItem = null;
         SelectTarget(m_unitsInBattle[_oldTarget]);
         m_cameraController.BattleCamera();
-        Debug.Log("Azione annullata");
     }
     private IEnumerator ExecuteAbility()
     {
@@ -385,7 +384,6 @@ public class BattleManager : MonoBehaviour
         _selectingTeam = UnitTeam.Enemy;
         _selectedAbility = null;
         m_cameraController.BattleCamera();
-        Debug.Log("Azione annullata");
     }
     #endregion
 
@@ -415,11 +413,9 @@ public class BattleManager : MonoBehaviour
             _isFirstTurn = false;
         }
 
-        // Inizio turno unità corrente
-        CurrentUnit.StartTurn();
-
         if (CurrentUnit.Team == UnitTeam.Player)
         {
+            CurrentUnit.StartTurn();
             StartPlayerTurn(); // Manteniamo la funzione esistente
         }
         else
@@ -469,9 +465,9 @@ public class BattleManager : MonoBehaviour
         if (OnStartAttack == null)
             yield break;
 
-        foreach (Func<UnitBase, IEnumerator> handler in OnStartAttack.GetInvocationList())
+        foreach (Func<UnitBase, AttackData, IEnumerator> handler in OnStartAttack.GetInvocationList())
         {
-            yield return StartCoroutine(handler(CurrentUnit));
+            yield return StartCoroutine(handler(CurrentUnit, CurrentUnit.CurrentAttack));
         }
     }
 

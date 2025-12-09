@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,5 +30,8 @@ public class PlayerInCombat : UnitBase
             m_uiBattleManager.CreateAbilityUI(_AbilitiesData);
     }
 
-    public IReadOnlyList<AbilityData> GetAbilities() => _AbilitiesData;
+    public IReadOnlyList<AbilityData> GetAbilities()
+    {
+        return _AbilitiesData;
+    }
 }

@@ -9,6 +9,5 @@ public class ChangePanelBTN : MonoBehaviour, IUIButton
     public void OnButtonPressed()
     {
         MenuManager.Instance.OpenPanel(m_panel);
-        Debug.Log("OnButtonPressed");
     }
 }

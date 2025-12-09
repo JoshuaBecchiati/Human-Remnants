@@ -2,6 +2,8 @@ public class EnemyActState : EnemyCombatBaseState
 {
     public override void EnterState(EnemyCombatStateManager enemy)
     {
+        enemy.unit.StartTurn();
+
         if (enemy.unit.IsDead)
         {
             enemy.SwitchState(enemy.DyingState);

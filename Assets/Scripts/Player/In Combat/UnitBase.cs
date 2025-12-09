@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,13 +17,14 @@ public abstract class UnitBase : MonoBehaviour
 
     [Header("Animations")]
     [SerializeField] private Animator m_animator;
-    [SerializeField] private TimelineDatabase m_timeLineDB;
-    [SerializeField] private List<AttackData> m_attackDatas;
+
+    [Header("Attacks")]
+    [SerializeField] protected List<AttackData> _attacks;
 
     // --- Private ---
-    [SerializeField] private UnitBase _target;
-    private bool _isItsTurn;
-    [SerializeField] private bool _isDead;
+    private UnitBase _target;
+    private bool _isDead;
+    private AttackData _attack;
 
     // --- Prorprierties ---
     public string Name => m_name;
@@ -33,15 +33,12 @@ public abstract class UnitBase : MonoBehaviour
     public float Speed => m_speed;
     public float AccumulatedSpeed => m_accumulatedSpeed;
     public float SpeedNextTurn => m_speedNextTurn;
-    public float Damage => m_damage;
-    public bool IsItsTurn => _isItsTurn;
     public bool IsDead => _isDead;
     public UnitTeam Team => m_team;
     public Animator Animator => m_animator;
-    public TimelineDatabase TimeLineDB => m_timeLineDB;
     public UnitBase Target => _target;
-    public List<AttackData> AttackDatas => m_attackDatas;
-
+    public List<AttackData> AttackDatas => _attacks;
+    public AttackData CurrentAttack => _attack;
 
     // --- Events ---
     public event Action<float, float> OnUnitTookDamage;
@@ -110,13 +107,12 @@ public abstract class UnitBase : MonoBehaviour
     #region Handle start and end turn
     public virtual void StartTurn()
 {
-        _isItsTurn = true;
         m_accumulatedSpeed += Speed;
     }
 
     public virtual void EndTurn()
     {
-        _isItsTurn = false;
+
     }
     #endregion
 
@@ -131,6 +127,17 @@ public abstract class UnitBase : MonoBehaviour
         m_accumulatedSpeed = 0;
     }
     #endregion
+    public void SetAttack(AttackData attack)
+    {
+        if (attack == null) return;
+
+        _attack = attack;
+
+        if (_attack.Damage > 0)
+            m_damage = _attack.Damage;
+        else
+            m_damage = 1;
+    }
 
     public void Attack()
     {
@@ -138,7 +145,16 @@ public abstract class UnitBase : MonoBehaviour
 
         _target.TakeDamage(finalDamage);
     }
-    public void SetTarget(UnitBase target) => _target = target;
-    public void SetDead() => _isDead = true;
-    public void SetAlive() => _isDead = false;
+    public void SetTarget(UnitBase target)
+    {
+        _target = target;
+    }
+    public void SetDead()
+    {
+        _isDead = true;
+    }
+    public void SetAlive()
+    {
+        _isDead = false;
+    }
 }

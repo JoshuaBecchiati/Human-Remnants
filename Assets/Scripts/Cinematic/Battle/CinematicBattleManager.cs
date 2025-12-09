@@ -81,10 +81,47 @@ public class CinematicBattleManager : MonoBehaviour
         }
     }
 
-    private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit)
+    //private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit)
+    //{
+    //    if (unit == null)
+    //        yield break;
+
+    //    GameObject attackPrefab = unit.AttackDatas.Find(n => n.attackName == "Base attack").attackPrefab;
+    //    GameObject attack = Instantiate(attackPrefab, unit.transform.parent);
+
+    //    PlayableDirector director = attack.GetComponent<PlayableDirector>();
+    //    TimelineAsset attckTimeLine = director.playableAsset as TimelineAsset;
+
+    //    BindAnimation(unit.Animator, director);
+    //    BindSignal(unit.gameObject.GetComponent<SignalReceiver>(), director);
+
+    //    // 2. Salva la rotazione originale della unit (non del manager!)
+    //    Quaternion originalRotation = unit.gameObject.transform.parent.rotation;
+
+    //    // 3. Ruota la unit verso il target (solo sull’asse Y)
+    //    if (unit.Target != null)
+    //    {
+    //        Vector3 dir = unit.Target.gameObject.transform.parent.position - unit.gameObject.transform.position;
+    //        dir.y = 0f;
+    //        if (dir != Vector3.zero)
+    //            unit.gameObject.transform.parent.rotation = Quaternion.LookRotation(dir);
+    //    }
+
+    //    // 4. Avvia la cinematica e attendi la fine
+    //    yield return m_cinematicManager.PlayCinematicCoroutine(attckTimeLine, director);
+
+    //    // 5. Ripristina la rotazione originale
+    //    unit.gameObject.transform.parent.rotation = originalRotation;
+
+    //    Destroy(attack);
+    //}
+
+    private IEnumerator PlayAttackCinematicCoroutine(UnitBase unit, AttackData attackData)
     {
-        GameObject attackPrefab = unit.AttackDatas.Find(n => n.attackName == "Base attack").attackPrefab;
-        GameObject attack = Instantiate(attackPrefab, unit.transform.parent);
+        if (unit == null || attackData == null)
+            yield break;
+
+        GameObject attack = Instantiate(attackData.Animation, unit.transform.parent);
 
         PlayableDirector director = attack.GetComponent<PlayableDirector>();
         TimelineAsset attckTimeLine = director.playableAsset as TimelineAsset;

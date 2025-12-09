@@ -13,7 +13,7 @@ public class MenuManager : MonoBehaviour
 
     private Stack<UIPanel> panelStack = new Stack<UIPanel>();
 
-    public static MenuManager Instance;
+    public static MenuManager Instance {  get; private set; }
 
     private void Awake()
     {
@@ -27,7 +27,6 @@ public class MenuManager : MonoBehaviour
 
         if (m_isPauseMenu)
             m_pauseCanvas.SetActive(false);
-
     }
 
     private void Start()
@@ -69,12 +68,10 @@ public class MenuManager : MonoBehaviour
             m_pauseCanvas.SetActive(false);
             m_isPauseMenu = true;
         }
-
     }
 
     public void OpenPanel(UIPanel panel)
     {
-        Debug.Log("Open Panel");
         if (panelStack.Count > 0)
         {
             panelStack.Peek().OnExit();

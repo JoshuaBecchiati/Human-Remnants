@@ -985,18 +985,17 @@ MonoBehaviour:
   m_damage: 100
   m_team: 1
   m_animator: {fileID: 5977710994050529584}
-  m_timeLineDB: {fileID: 11400000, guid: 89bba72b3a88c15459e2ef205e6511ec, type: 2}
-  m_attackDatas:
-  - {fileID: 11400000, guid: ee2fdec017943cc46b37981af8141a4b, type: 2}
+  _attacks:
+  - m_attack: {fileID: 11400000, guid: 3fe7094d78c834f42beb897f22176a9c, type: 2}
   _target: {fileID: 0}
   _isDead: 0
   _AbilitiesData:
-  - Ability: {fileID: 11400000, guid: 81d7a69e8433fed4d9c4cba6520c09fa, type: 2}
-    ChargeCounter: 0
-  - Ability: {fileID: 11400000, guid: a5202bb93d425504197e608f464f373d, type: 2}
-    ChargeCounter: 0
-  - Ability: {fileID: 11400000, guid: 5dfa927d78c4ec745add3b43c8c4b137, type: 2}
-    ChargeCounter: 0
+  - m_ability: {fileID: 11400000, guid: a5202bb93d425504197e608f464f373d, type: 2}
+    m_chargeCounter: 0
+  - m_ability: {fileID: 11400000, guid: 81d7a69e8433fed4d9c4cba6520c09fa, type: 2}
+    m_chargeCounter: 0
+  - m_ability: {fileID: 11400000, guid: 5dfa927d78c4ec745add3b43c8c4b137, type: 2}
+    m_chargeCounter: 0
 --- !u!114 &2565723077398452281
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,17 +10,17 @@ public class EnemyCombatStateManager : MonoBehaviour
     [HideInInspector] public EnemyDyingState DyingState = new ();
 
     // --- Public ---
-    public UnitBase unit;
+    public EnemyInCombat unit;
 
     private void OnValidate()
     {
-        unit = GetComponent<UnitBase>();
+        unit = GetComponent<EnemyInCombat>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        unit = GetComponent<UnitBase>();
+        unit = GetComponent<EnemyInCombat>();
         CurrentState = WaitingState;
     }
 

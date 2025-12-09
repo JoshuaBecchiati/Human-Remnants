@@ -1,27 +1,31 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class AbilityData
 {
-    public Ability Ability;
-    public int ChargeCounter;
+    [SerializeField] private Ability m_ability;
+    [SerializeField] private int m_chargeCounter;
+
+    public Ability Ability => m_ability;
+    public int ChargeCounter => m_chargeCounter;
 
     public AbilityData(Ability ability)
     {
-        Ability = ability;
-        ChargeCounter = 0;
+        m_ability = ability;
+        m_chargeCounter = 0;
     }
 
     public void UseAbility(UnitBase[] targets)
     {
-        Ability.Use(targets);
-        ChargeCounter = 0;
+        m_ability.Use(targets);
+        m_chargeCounter = 0;
     }
 
     public void CharchingAbility()
     {
         if (ChargeCounter != Ability.maxCharge)
-            ChargeCounter++;
+            m_chargeCounter++;
     }
 
 }

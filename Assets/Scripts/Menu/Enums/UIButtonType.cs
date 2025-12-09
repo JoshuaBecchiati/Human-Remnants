@@ -7,5 +7,8 @@ public enum UIButtonType
     Achievements,
     Menu,
     Quit,
-    Resume
+    Resume,
+    Back,
+    SaveFile,
+    LoadGame
 }

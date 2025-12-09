@@ -14,6 +14,7 @@ public class VolumeManager : MonoBehaviour
     [SerializeField] private AudioSource m_uiSource;
     [SerializeField] private AudioClip m_clickClip;
     [SerializeField] private AudioClip m_hoverClip;
+    [SerializeField] private AudioClip m_hoverSaveClip;
 
     private Dictionary<VolumeType, IVolumeChannel> _channels;
 
@@ -88,6 +89,14 @@ public class VolumeManager : MonoBehaviour
         if (m_uiSource && m_hoverClip)
         {
             m_uiSource.PlayOneShot(m_hoverClip, GetVolume(VolumeType.UI));
+        }
+    }
+
+    public void PlayUISaveHover()
+    {
+        if (m_uiSource && m_hoverSaveClip)
+        {
+            m_uiSource.PlayOneShot(m_hoverSaveClip, GetVolume(VolumeType.UI));
         }
     }
 }
