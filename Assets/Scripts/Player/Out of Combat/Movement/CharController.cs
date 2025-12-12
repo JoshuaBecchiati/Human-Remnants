@@ -11,8 +11,8 @@ public class CharController : MonoBehaviour
     // --- Inspector ---
     [Header("Jump")]
     [SerializeField] private float m_jumpForce = 3f;
-    [SerializeField] private float m_gravity = 15f;
-    [SerializeField] private float m_jumpHorizontalSpeed = 5f;
+    [SerializeField] private float m_gravity = 16f;
+    [SerializeField] private float m_jumpHorizontalSpeed = 8f;
     [SerializeField] private float m_groundedSphere = 0.25f;
     [SerializeField] private LayerMask m_groundMask;
     [SerializeField] private Transform m_groundCheck;
@@ -24,7 +24,7 @@ public class CharController : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator m_animator;
     [SerializeField] private CharacterController m_characterController;
-    [SerializeField] private float m_animationTransition;
+    [SerializeField] private float m_animationTransition = 20f;
 
     // --- Private ---
     private Vector3 _currentSpeed;
@@ -52,12 +52,27 @@ public class CharController : MonoBehaviour
             PlayerInputSingleton.Instance.Actions["Sprint"].started += OnSprintStarted;
             PlayerInputSingleton.Instance.Actions["Sprint"].canceled += OnSprintCanceled;
         }
+
+        if (!m_cameraPivot) m_cameraPivot = GameObject.FindGameObjectWithTag("Player camera").transform;
+    }
+
+    private void OnDestroy()
+    {
+        if (PlayerInputSingleton.Instance != null)
+        {
+            PlayerInputSingleton.Instance.Actions["Move"].performed -= OnMoveInput;
+            PlayerInputSingleton.Instance.Actions["Move"].canceled -= OnMoveCanceled;
+            PlayerInputSingleton.Instance.Actions["Jump"].performed -= OnJumpInput;
+            PlayerInputSingleton.Instance.Actions["Sprint"].started -= OnSprintStarted;
+            PlayerInputSingleton.Instance.Actions["Sprint"].canceled -= OnSprintCanceled;
+        }
     }
 
     private void OnValidate()
     {
         if (!m_animator) m_animator = GetComponent<Animator>();
         if (!m_characterController) m_characterController = GetComponent<CharacterController>();
+        if (!m_groundCheck) m_groundCheck = GameObject.Find("GroundCheck").transform;
     }
 
     private void Update()

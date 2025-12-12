@@ -1,17 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CustomAnimatedBTN : MonoBehaviour, IPointerExitHandler, IPointerClickHandler
+public class CustomAnimatedBTN : MonoBehaviour, IPointerClickHandler
 {
     // --- Inspector ---
     [SerializeField] protected string m_highlightedTrigger = "Highlighted";
     [SerializeField] protected string m_dehighlightedTrigger = "Dehighlighted";
+    [SerializeField] protected List<CustomAnimatedBTN> m_buttonsGroup;
 
     // --- Private ---
     protected Animator _animator;
+    protected bool _isOpen;
+
+    public bool IsOpen => _isOpen;
 
     private void OnValidate()
     {
@@ -24,16 +26,6 @@ public class CustomAnimatedBTN : MonoBehaviour, IPointerExitHandler, IPointerCli
         _animator.Update(0f);
     }
 
-    public virtual void OnPointerExit(PointerEventData eventData)
-    {
-        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-
-        if (!stateInfo.IsName(m_highlightedTrigger)) return;
-
-        _animator.SetTrigger(m_dehighlightedTrigger);
-        VolumeManager.Instance.PlayUISaveHover();
-    }
-
     public virtual void OnPointerClick(PointerEventData eventData)
     {
         AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
@@ -42,11 +34,32 @@ public class CustomAnimatedBTN : MonoBehaviour, IPointerExitHandler, IPointerCli
         {
             _animator.SetTrigger(m_highlightedTrigger);
             VolumeManager.Instance.PlayUISaveHover();
+
+            CustomAnimatedBTN cbt = m_buttonsGroup.Find(o => o.IsOpen && o.gameObject != this);
+            if (cbt != null)
+            {
+                cbt.SetOpenState(false);
+                cbt.AnimationClose();
+            }
+
+            _isOpen = true;
         }
         else
         {
-            _animator.SetTrigger(m_dehighlightedTrigger);
-            VolumeManager.Instance.PlayUISaveHover();
+            AnimationClose();
         }
+    }
+
+    public void AnimationClose()
+    {
+        _animator.SetTrigger(m_dehighlightedTrigger);
+        VolumeManager.Instance.PlayUISaveHover();
+
+        _isOpen = false;
+    }
+
+    public void SetOpenState(bool state)
+    {
+        _isOpen = state;
     }
 }

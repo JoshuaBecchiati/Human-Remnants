@@ -1,14 +1,21 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SaveSystem : MonoBehaviour
 {
+    // --- Instance ---
     public static SaveSystem Instance { get; private set; }
 
+    // --- Proprierties ---
     public SaveData CurrentSave { get; private set; }
+    public string CurrentSavePath {  get; private set; }
 
-    private string savePath;
+    // --- Private ---
+    private string _savesFolder;
 
     private void Awake()
     {
@@ -21,79 +28,146 @@ public class SaveSystem : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        savePath = Path.Combine(Application.persistentDataPath, "save.json");
+        _savesFolder = Path.Combine(Application.persistentDataPath, "Saves");
+
+        if (!Directory.Exists(_savesFolder))
+            Directory.CreateDirectory(_savesFolder);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(KeyCode.P))
             SaveGame();
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            LoadGame();
-            ReloadSceneState();
-        }
     }
 
-    public void NewGame()
+    public void CreateNewSave(string selectedCharacterID)
     {
         CurrentSave = new SaveData();
-        CurrentSave.creationDate = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         CurrentSave.totalPlayTime = 0;
+        CurrentSave.player = new PlayerData();
+        CurrentSave.player.characterID = selectedCharacterID;
+        CurrentSave.currentScene = "Misty Forest";
+        CurrentSave.totalPlayTime = 0f;
+
+        // Ottengo lo slot selezionato
+        int slotIndex = LoadFileSlotManager.Instance.GetSelectedSlotIndex();
+        if (slotIndex < 0)
+        {
+            Debug.LogError("Nessun file selezionato!");
+            return;
+        }
+
+        // Nome file basato sull'indice
+        string fileName = $"{slotIndex}.json";
+
+        CurrentSavePath = Path.Combine(_savesFolder, fileName);
+
+        // Segna lo slot come usato
+        LoadFileSlotManager.Instance.MarkSlotUsed(slotIndex);
+
+        SaveGame();
     }
 
     public void SaveGame()
     {
-        if (CurrentSave == null)
+        if (CurrentSave == null || string.IsNullOrEmpty(CurrentSavePath))
         {
-            Debug.LogWarning("Nessun save attivo! Creo un nuovo save...");
-            NewGame();
+            Debug.LogWarning("Nessun salvataggio attivo!");
+            return;
         }
 
-        // Qui aggiorno tutti gli oggetti Saveable
         ISaveable[] saveables = FindObjectsOfType<MonoBehaviour>(true)
-                                  .OfType<ISaveable>()
-                                  .ToArray();
+                  .OfType<ISaveable>()
+                  .ToArray();
 
-        foreach (var s in saveables)
+        foreach (ISaveable s in saveables)
         {
             s.SaveState(CurrentSave);
         }
 
-        // Ora il JSON sarà pieno
-        string json = JsonUtility.ToJson(CurrentSave, true);
-        File.WriteAllText(savePath, json);
+        CurrentSave.lastSaveDate = DateTime.Now.ToString("yyyy/MM/dd");
 
-        Debug.Log($"Salvataggio completato: {savePath}");
+        string sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName != "Menu")
+            CurrentSave.currentScene = sceneName;
+
+        if (SceneTime.Instance != null)
+            CurrentSave.totalPlayTime = SceneTime.Instance.TimePlay;
+        else
+            CurrentSave.totalPlayTime = 0f;
+
+        string json = JsonUtility.ToJson(CurrentSave, true);
+        File.WriteAllText(CurrentSavePath, json);
+
+        Debug.Log($"Salvataggio completato: {CurrentSavePath}");
+    }
+
+    public void LoadGame(string path)
+    {
+        if (!File.Exists(path))
+        {
+            Debug.LogError("Il file di salvataggio non esiste!");
+            return;
+        }
+
+        string json = File.ReadAllText(path);
+        CurrentSave = JsonUtility.FromJson<SaveData>(json);
+        CurrentSavePath = path;
+
+        Debug.Log("CURRENT SAVE " + CurrentSave);
+
+        ISaveable[] saveables = FindObjectsOfType<MonoBehaviour>(true)
+                  .OfType<ISaveable>()
+                  .ToArray();
+
+        foreach (ISaveable s in saveables)
+        {
+            s.LoadState(CurrentSave);
+        }
+
+        Debug.Log($"Caricato salvataggio da: {path}");
     }
 
     public void LoadGame()
     {
-        if (!File.Exists(savePath))
+        if (CurrentSavePath == null) return;
+
+        LoadGame(CurrentSavePath);
+    }
+
+    public void DeleteGame(string path)
+    {
+        if (!File.Exists(path))
         {
-            Debug.LogWarning("Nessun file di salvataggio trovato. Creo un nuovo save...");
-            NewGame();
+            Debug.LogError("Il file di salvataggio non esiste!");
             return;
         }
 
-        string json = File.ReadAllText(savePath);
-        CurrentSave = JsonUtility.FromJson<SaveData>(json);
-
-        Debug.Log("Save caricato correttamente.");
+        File.Delete(path);
+        Debug.Log("File eliminato!");
     }
 
-    private void ReloadSceneState()
+    public List<string> GetAllSaveFiles()
     {
-        var save = CurrentSave;
-        var saveables = FindObjectsOfType<MonoBehaviour>(true);
-
-        foreach (var s in saveables)
-        {
-            if (s is ISaveable saveable)
-            {
-                saveable.LoadState(save);
-            }
-        }
+        return new List<string>(Directory.GetFiles(_savesFolder, "*.json"));
     }
 
+    public void SetCurrentPath(GameObject parent)
+    {
+        string saveFolder = Path.Combine(Application.persistentDataPath, "Saves");
+
+        LoadFileSlotManager.Instance.SetSelectedFile(parent);
+        int slotIndex = LoadFileSlotManager.Instance.GetSelectedSlotIndex();
+
+        string fileName = $"{slotIndex}.json";
+
+        CurrentSavePath = Path.Combine(saveFolder, fileName);
+    }
+
+    public SaveData GetSaveByPath()
+    {
+        string json = File.ReadAllText(CurrentSavePath);
+        return CurrentSave = JsonUtility.FromJson<SaveData>(json);
+    }
 }

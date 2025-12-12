@@ -6,6 +6,9 @@ using UnityEngine.EventSystems;
 public class ChooseCharBTN : CustomAnimatedBTN
 {
     [SerializeField] private GameObject _charInfo;
+    [SerializeField] private List<ChooseCharBTN> _charList;
+
+    public GameObject CharInfo => _charInfo;
 
     private void Awake()
     {
@@ -20,12 +23,22 @@ public class ChooseCharBTN : CustomAnimatedBTN
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
-        _charInfo.SetActive(true);
+
+        if (_isOpen)
+        {
+            ChooseCharBTN cl = _charList.Find(o => o.CharInfo.activeSelf && o.gameObject != this);
+            if (cl != null)
+            {
+                cl.SetCharInfoState(false);
+            }
+            _charInfo.SetActive(true);
+        }
+        else
+            _charInfo.SetActive(false);
     }
 
-    public override void OnPointerExit(PointerEventData eventData)
+    public void SetCharInfoState(bool state)
     {
-        base.OnPointerExit(eventData);
-        _charInfo.SetActive(false);
+        _charInfo.SetActive(state);
     }
 }

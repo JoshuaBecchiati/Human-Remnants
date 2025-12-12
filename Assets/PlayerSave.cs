@@ -7,8 +7,8 @@ public class PlayerSave : SaveableObject
 
     private void OnValidate()
     {
-        m_player = GetComponent<Player>();
-        m_playerTransform = GetComponent<Transform>();
+        if (!m_player) m_player = GetComponent<Player>();
+        if (!m_playerTransform) m_playerTransform = GetComponent<Transform>();
     }
 
     public override void SaveState(SaveData save)

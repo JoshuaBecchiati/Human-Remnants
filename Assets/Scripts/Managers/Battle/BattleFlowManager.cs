@@ -23,7 +23,6 @@ public class BattleFlowManager : MonoBehaviour
 
     [Header("Players")]
     [SerializeField] private List<GameObject> m_players;
-    [SerializeField] private GameObject m_currentPlayer;
     [SerializeField] private GameObject m_exploreCamera;
 
     [Header("Victory screen")]
@@ -42,10 +41,7 @@ public class BattleFlowManager : MonoBehaviour
     private GameObject _enemy;
     private BattleSettings _battleSettings;
     private List<UnitBase> _units;
-    private List<GameObject> _playersCombatPF => m_players
-        .Where(p => p.TryGetComponent<Player>(out _)) // Filter only with Player script
-        .Select(p => p.GetComponent<Player>().CombatPF) // Take prefab
-        .ToList();
+    [SerializeField] private List<GameObject> _playersCombatPF;
 
     // --- Events ---
     public event Action<IReadOnlyList<GameObject>, IReadOnlyList<GameObject>> OnSetupBattle;
@@ -62,7 +58,7 @@ public class BattleFlowManager : MonoBehaviour
         }
         Instance = this;
     }
-    private void OnEnable()
+    private void Start()
     {
         GameEvents.OnBattleStart += BattleStart;
         GameEvents.OnBattleEnd += BattleClose;
@@ -71,7 +67,7 @@ public class BattleFlowManager : MonoBehaviour
         m_VictoryUI.SetActive(false);
         m_BattleUI.SetActive(false);
     }
-    private void OnDisable()
+    private void OnDestroy()
     {
         GameEvents.OnBattleStart -= BattleStart;
         GameEvents.OnBattleEnd -= BattleClose;
@@ -83,6 +79,16 @@ public class BattleFlowManager : MonoBehaviour
     {
         _enemy = enemy;
         _battleSettings = battleSettings;
+
+        m_players = GameObject.FindGameObjectsWithTag("Player").ToList();
+
+        _playersCombatPF = m_players
+            .Select(p => p.transform.Find("Model"))         // cerca il figlio
+            .Where(model => model != null)                  // filtriamo solo quelli validi
+            .Select(model => model.GetComponent<Player>())  // prende il Player
+            .Where(player => player != null)                // sicurezza
+            .Select(player => player.CombatPF)              // prende il prefab
+            .ToList();
 
         StartCoroutine(FadeInBattle());
     }
@@ -139,7 +145,8 @@ public class BattleFlowManager : MonoBehaviour
         // Activate combat scene, disable exploration player
         m_BattleUI.SetActive(true);
         m_battleScene.SetActive(true);
-        m_currentPlayer.SetActive(false);
+        foreach (GameObject p in m_players)
+            p.SetActive(false);
         m_exploreCamera.SetActive(false);
 
         // Prefab instantiate and event to start the battle
@@ -162,7 +169,8 @@ public class BattleFlowManager : MonoBehaviour
         {
             GameObject go = Instantiate(prefabs[i]);
             UnitBase u = go.GetComponentInChildren<UnitBase>();
-            Player p = m_players[i].GetComponent<Player>();
+
+            Player p = m_players[i].transform.Find("Model").GetComponent<Player>();
 
             // Sync player exploration health with combat health
             if (u.Team == UnitTeam.Player && u.Health >= p.Health)
@@ -210,7 +218,7 @@ public class BattleFlowManager : MonoBehaviour
                 counter++;
 
         if (counter == enemies.Count)
-            Destroy(_enemy);
+            _enemy.GetComponent<BattleEnter>().SetDeathState(true);
     }
 
     /// <summary>
@@ -224,8 +232,10 @@ public class BattleFlowManager : MonoBehaviour
             if (u.Team == UnitTeam.Enemy) continue;
 
             Player player = m_players
+                .Select(p => p.transform.Find("Model"))
+                .Where(model => model != null)
                 .Select(go => go.GetComponent<Player>())
-                .FirstOrDefault(p => p != null && p.Name == u.Name);
+                .FirstOrDefault(p => p != null && p.Name.ToString() == u.Name);
 
             if (player != null)
             {
@@ -287,7 +297,8 @@ public class BattleFlowManager : MonoBehaviour
 
         m_battleScene.SetActive(false);
         m_BattleUI.SetActive(true);
-        m_currentPlayer.SetActive(true);
+        foreach (GameObject p in m_players)
+            p.SetActive(true);
         m_exploreCamera.SetActive(true);
 
         CheckEnemyAlive(_units);
@@ -307,7 +318,12 @@ public class BattleFlowManager : MonoBehaviour
             yield return null;
         }
 
-        if (_enemy)
+        if (_enemy.GetComponent<BattleEnter>().IsDead)
+        {
+            _enemy.SetActive(false);
+            _enemy.GetComponent<BattleEnter>().OnDeath();
+        }
+        else
         {
             _enemy.SetActive(true);
             _enemy.GetComponent<EnemyStateManager>().StartPostFightCooldown();

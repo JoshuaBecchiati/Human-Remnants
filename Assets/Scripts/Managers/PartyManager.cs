@@ -1,11 +1,11 @@
 ﻿using Unity.VisualScripting;
 using UnityEngine;
 
-public class PartyManager : MonoBehaviour
+public class PartyManager : SaveableObject
 {
     private const int MAX_PARTY_MEMBERS = 3;
 
-    [SerializeField] private Player[] m_party = new Player[3];
+    [SerializeField] private GameObject[] m_party = new GameObject[3];
 
     public static PartyManager Instance { get; private set; }
 
@@ -20,14 +20,18 @@ public class PartyManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void AddPartyMember(Player newMember)
+    public void AddPartyMember(GameObject newMember)
     {
+        if (newMember.GetComponent<Player>() == null) return;
+
         if (PartySizeCheck())
             m_party.AddRange(m_party);
     }
 
-    public void RemovePartyMember(Player removedMember)
+    public void RemovePartyMember(GameObject removedMember)
     {
+        if (removedMember.GetComponent<Player>() == null) return;
+
         for (int i = 0; i < m_party.Length; i++)
         {
             if (m_party[i] == removedMember)
@@ -52,5 +56,19 @@ public class PartyManager : MonoBehaviour
             return false;
 
         return true;
+    }
+
+    public override void SaveState(SaveData save)
+    {
+        if (m_party.Length <= 0) return;
+
+        save.party = m_party;
+    }
+
+    public override void LoadState(SaveData save)
+    {
+        if (save.party.Length <= 0) return;
+
+        m_party = save.party;
     }
 }

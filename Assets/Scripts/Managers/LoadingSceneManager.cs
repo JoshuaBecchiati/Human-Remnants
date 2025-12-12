@@ -7,8 +7,8 @@ public class LoadingScreenManager : MonoBehaviour
 {
     public static LoadingScreenManager Instance;
 
-    [SerializeField] private int _sceneToLoad;
-    [SerializeField] private Animator _animator;
+    [SerializeField] private int m_sceneToLoad;
+    [SerializeField] private Animator m_animator;
 
     private void Awake()
     {
@@ -23,14 +23,19 @@ public class LoadingScreenManager : MonoBehaviour
         }
     }
 
+    private void OnValidate()
+    {
+        if (!m_animator) m_animator = GetComponent<Animator>();
+    }
+
     public void LoadScene(int sceneIndex)
     {
-        _sceneToLoad = sceneIndex;
-        _animator.SetTrigger("Load");
+        m_sceneToLoad = sceneIndex;
+        m_animator.SetTrigger("Load");
     }
 
     public void StartLoading()
     {
-        SceneManager.LoadScene(_sceneToLoad);
+        SceneManager.LoadScene(m_sceneToLoad);
     }
 }

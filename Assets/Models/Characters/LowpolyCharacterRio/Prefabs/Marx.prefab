@@ -427,9 +427,10 @@ GameObject:
   - component: {fileID: 5632289071625813623}
   - component: {fileID: 7538170669906093605}
   - component: {fileID: 1001320660290474392}
+  - component: {fileID: 5244666364284877584}
   m_Layer: 3
   m_Name: Model
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -536,7 +537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a836e32a177144d8fc9db023144ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_name: Marx
+  m_character: 0
   m_health: 100
   _combatPF: {fileID: 6021961570360790873, guid: 140dcdb0fe9cab94d80e5256feef1813,
     type: 3}
@@ -561,6 +562,21 @@ MonoBehaviour:
   - layerName: Tile
     surface: {fileID: 11400000, guid: 2b7539fe3236f4d428af533aa96e1af6, type: 2}
   m_minTimeBetweenSteps: 0.1
+--- !u!114 &5244666364284877584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144380542637123753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 083c73d55f738c844a9fc992904dd19d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uniqueID: Marx
+  m_player: {fileID: 7538170669906093605}
+  m_playerTransform: {fileID: 5876043077356581351}
 --- !u!1 &2151895667452051712
 GameObject:
   m_ObjectHideFlags: 0

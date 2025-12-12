@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class HeadBobController : MonoBehaviour
 {
@@ -88,5 +89,10 @@ public class HeadBobController : MonoBehaviour
         float x = character.GetComponent<Animator>().GetFloat("X");
         float y = character.GetComponent<Animator>().GetFloat("Y");
         return new Vector2(x, y).magnitude;
+    }
+
+    public void SetCharacter(CharController chara)
+    {
+        character = chara;
     }
 }

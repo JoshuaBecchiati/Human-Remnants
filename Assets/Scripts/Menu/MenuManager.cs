@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -154,5 +155,11 @@ public class MenuManager : MonoBehaviour
     public void ChangeScene(int index)
     {
         LoadingScreenManager.Instance.LoadScene(index);
+    }
+
+    public void NewGame(Characters character)
+    {
+        LoadingScreenManager.Instance.LoadScene(1);
+        SaveSystem.Instance.CreateNewSave(character.ToString());
     }
 }

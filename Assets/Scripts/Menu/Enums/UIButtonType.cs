@@ -10,5 +10,7 @@ public enum UIButtonType
     Resume,
     Back,
     SaveFile,
-    LoadGame
+    LoadGame,
+    NewGame,
+    SelectFile
 }
