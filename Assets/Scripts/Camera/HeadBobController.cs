@@ -20,6 +20,7 @@ public class HeadBobController : MonoBehaviour
 
     private Vector3 _defaultLocalPos;
     private float _timer;
+    private Animator _animator;
 
     private void Start()
     {
@@ -31,6 +32,7 @@ public class HeadBobController : MonoBehaviour
         }
 
         _defaultLocalPos = cameraPoint.localPosition;
+        _animator = character.transform.Find("Model").GetComponent<Animator>();
     }
 
     private void LateUpdate()
@@ -75,19 +77,19 @@ public class HeadBobController : MonoBehaviour
     private bool IsGrounded()
     {
         // il tuo metodo è privato, quindi uso l’animator:
-        return character.GetComponent<Animator>().GetBool("IsGrounded");
+        return _animator.GetBool("IsGrounded");
     }
 
     private bool IsRunning()
     {
-        return character.GetComponent<Animator>().GetBool("IsRunning");
+        return _animator.GetBool("IsRunning");
     }
 
     private float GetSpeed()
     {
         // Uso la magnitude del currentSpeed leggendo l’animator
-        float x = character.GetComponent<Animator>().GetFloat("X");
-        float y = character.GetComponent<Animator>().GetFloat("Y");
+        float x = _animator.GetFloat("X");
+        float y = _animator.GetFloat("Y");
         return new Vector2(x, y).magnitude;
     }
 

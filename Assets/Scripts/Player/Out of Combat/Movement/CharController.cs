@@ -7,6 +7,7 @@ public class CharController : MonoBehaviour
     private const float MIN_MOVE_SPEED = 0.1f;
     private const float WALK_VALUE = 0.5f;
     private const float RUN_VALUE = 1.0f;
+    private const float FALL_DELAY = 0.1f;
 
     // --- Inspector ---
     [Header("Jump")]
@@ -34,10 +35,12 @@ public class CharController : MonoBehaviour
     private float _vertical;
     private float _verticalVelocity = 0f;
     private float _speedMagnitude;
+    private float _airTime;
 
     private bool _isJumping;
     private bool _isRunning;
     private bool _isMoving;
+    private bool _isReallyFalling;
 
     #region Unity methods
     void Start()
@@ -70,8 +73,8 @@ public class CharController : MonoBehaviour
 
     private void OnValidate()
     {
-        if (!m_animator) m_animator = GetComponent<Animator>();
-        if (!m_characterController) m_characterController = GetComponent<CharacterController>();
+        if (!m_animator) m_animator = transform.Find("Model").GetComponent<Animator>();
+        if (!m_characterController) m_characterController = transform.Find("Model").GetComponent<CharacterController>();
         if (!m_groundCheck) m_groundCheck = GameObject.Find("GroundCheck").transform;
     }
 
@@ -125,23 +128,31 @@ public class CharController : MonoBehaviour
     {
         if (IsGrounded())
         {
+            _airTime = 0f;
+            _isReallyFalling = false;
+
             m_animator.SetBool("IsGrounded", true);
             m_animator.SetBool("IsFalling", false);
+            m_animator.SetBool("IsJumping", false);
 
-            if (_isJumping)
-                _isJumping = false;
+            if (_verticalVelocity < 0)
+                _verticalVelocity = -2f; // stick to ground
         }
         else
         {
-            _verticalVelocity += -m_gravity * Time.deltaTime;
+            _airTime += Time.deltaTime;
+            _verticalVelocity -= m_gravity * Time.deltaTime;
 
+            // salto: prima fase
             if (_verticalVelocity > 0)
             {
                 m_animator.SetBool("IsJumping", true);
                 m_animator.SetBool("IsFalling", false);
             }
-            else
+            // caduta vera solo dopo 1 secondo
+            else if (_airTime >= FALL_DELAY)
             {
+                _isReallyFalling = true;
                 m_animator.SetBool("IsJumping", false);
                 m_animator.SetBool("IsFalling", true);
             }
@@ -248,8 +259,8 @@ public class CharController : MonoBehaviour
             return;
 
         Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-        transform.rotation = Quaternion.RotateTowards(
-            transform.rotation,
+        transform.Find("Model").rotation = Quaternion.RotateTowards(
+            transform.Find("Model").rotation,
             targetRotation,
             m_cameraSpeed * Time.deltaTime
         );

@@ -72,7 +72,9 @@ public class CameraCtrl : MonoBehaviour
 
     private Vector3 GetWantedPosition()
     {
-        return _target.position + _offset;
+        // offset ruotato con la camera
+        Vector3 rotatedOffset = transform.rotation * _offset;
+        return _target.position + rotatedOffset;
     }
 
     private void IsCameraOccluded()

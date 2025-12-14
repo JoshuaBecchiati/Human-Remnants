@@ -83,8 +83,6 @@ public class BattleFlowManager : MonoBehaviour
         m_players = GameObject.FindGameObjectsWithTag("Player").ToList();
 
         _playersCombatPF = m_players
-            .Select(p => p.transform.Find("Model"))         // cerca il figlio
-            .Where(model => model != null)                  // filtriamo solo quelli validi
             .Select(model => model.GetComponent<Player>())  // prende il Player
             .Where(player => player != null)                // sicurezza
             .Select(player => player.CombatPF)              // prende il prefab
@@ -170,7 +168,7 @@ public class BattleFlowManager : MonoBehaviour
             GameObject go = Instantiate(prefabs[i]);
             UnitBase u = go.GetComponentInChildren<UnitBase>();
 
-            Player p = m_players[i].transform.Find("Model").GetComponent<Player>();
+            Player p = m_players[i].transform.GetComponent<Player>();
 
             // Sync player exploration health with combat health
             if (u.Team == UnitTeam.Player && u.Health >= p.Health)
@@ -232,8 +230,6 @@ public class BattleFlowManager : MonoBehaviour
             if (u.Team == UnitTeam.Enemy) continue;
 
             Player player = m_players
-                .Select(p => p.transform.Find("Model"))
-                .Where(model => model != null)
                 .Select(go => go.GetComponent<Player>())
                 .FirstOrDefault(p => p != null && p.Name.ToString() == u.Name);
 

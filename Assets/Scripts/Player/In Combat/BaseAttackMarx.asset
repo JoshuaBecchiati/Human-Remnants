@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0551d857bb9a4874e9906ac0ed3deb02, type: 3}
   m_Name: BaseAttackMarx
   m_EditorClassIdentifier: 
-  m_name: Attack name
+  m_name: Cross punch
   m_damage: 10
   m_possibility: 100
   m_animation: {fileID: 8294422319510225181, guid: 76c962164d8f9114895eadb79b406a0e,

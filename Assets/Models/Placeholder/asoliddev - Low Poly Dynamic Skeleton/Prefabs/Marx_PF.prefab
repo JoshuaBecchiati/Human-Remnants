@@ -546,7 +546,7 @@ Transform:
   m_GameObject: {fileID: 1718452859677873444}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -187.6261, y: 0.57672167, z: 28.705637}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -987,8 +987,6 @@ MonoBehaviour:
   m_animator: {fileID: 5977710994050529584}
   _attacks:
   - m_attack: {fileID: 11400000, guid: 3fe7094d78c834f42beb897f22176a9c, type: 2}
-  _target: {fileID: 0}
-  _isDead: 0
   _AbilitiesData:
   - m_ability: {fileID: 11400000, guid: a5202bb93d425504197e608f464f373d, type: 2}
     m_chargeCounter: 0

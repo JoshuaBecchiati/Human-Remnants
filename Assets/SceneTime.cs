@@ -19,13 +19,13 @@ public class SceneTime : MonoBehaviour
         Instance = this;
 
         GameObject go = Instantiate(FindCharacterPrefab());
-        Transform model = go.transform.Find("Model");
-        FindObjectOfType<CameraCtrl>().SetTarget(model);
-        FindObjectOfType<HeadBobController>().SetCharacter(model.GetComponent<CharController>());
 
         SaveSystem.Instance.LoadGame();
 
-        go.transform.SetParent(m_partyParent, true);
+        go.transform.SetParent(m_partyParent, false);
+
+        FindObjectOfType<CameraCtrl>().SetTarget(go.transform.Find("Model"));
+        FindObjectOfType<HeadBobController>().SetCharacter(go.GetComponent<CharController>());
     }
 
     private void Start()
@@ -46,10 +46,10 @@ public class SceneTime : MonoBehaviour
 
         foreach (GameObject prefab in m_CharactersPrefab)
         {
-            Transform model = prefab.transform.Find("Model");
-            if (model == null) continue;
+            Transform transformPF = prefab.transform;
+            if (transformPF == null) continue;
 
-            Player p = model.GetComponent<Player>();
+            Player p = transformPF.GetComponent<Player>();
             if (p == null) continue;
 
             if (p.Name.ToString() == targetID)

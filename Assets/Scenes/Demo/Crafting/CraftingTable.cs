@@ -38,7 +38,7 @@ public class CraftingTable : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.transform.parent.CompareTag("Player")) return;
 
         _playerNearby = true;
         m_infoText.SetActive(true);
@@ -50,7 +50,7 @@ public class CraftingTable : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.transform.parent.CompareTag("Player")) return;
 
         _playerNearby = false;
 

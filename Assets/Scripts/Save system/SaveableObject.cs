@@ -15,7 +15,11 @@ public class SaveableObject : MonoBehaviour, ISaveable
     }
 #endif
 
-    public string GetID() => uniqueID;
+    public string GetID()
+    {
+        return uniqueID;
+    }
+
 
     public virtual void LoadState(SaveData save)
     {

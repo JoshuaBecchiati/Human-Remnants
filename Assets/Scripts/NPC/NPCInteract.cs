@@ -13,7 +13,7 @@ public class NPCInteract : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        if (!other.transform.parent.CompareTag("Player"))
             return;
 
         m_interactText.SetActive(true);
@@ -22,7 +22,7 @@ public class NPCInteract : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        if (!other.transform.parent.CompareTag("Player"))
             return;
 
         m_interactText.SetActive(false);

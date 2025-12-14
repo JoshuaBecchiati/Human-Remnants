@@ -10,7 +10,7 @@ public class PickUpItem : SaveableObject
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Player"))
+        if (col.transform.parent.CompareTag("Player"))
         {
             m_textInfoPickUp.gameObject.SetActive(true);
             m_textInfoPickUp.text = $"Press [E] to pick up {m_item.name}";
@@ -21,7 +21,7 @@ public class PickUpItem : SaveableObject
 
     private void OnTriggerExit(Collider col)
     {
-        if (col.CompareTag("Player"))
+        if (col.transform.parent.CompareTag("Player"))
         {
             m_textInfoPickUp.gameObject.SetActive(false);
             PlayerInputSingleton.Instance.Actions["Interact"].performed -= PickUp;

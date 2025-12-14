@@ -7,7 +7,7 @@ public class PlayerSave : SaveableObject
 
     private void OnValidate()
     {
-        if (!m_player) m_player = GetComponent<Player>();
+        if (!m_player) m_player = transform.parent.GetComponent<Player>();
         if (!m_playerTransform) m_playerTransform = GetComponent<Transform>();
     }
 
@@ -17,9 +17,10 @@ public class PlayerSave : SaveableObject
             save.player = new PlayerData();
 
         save.player.characterID = uniqueID;
-        save.player.x = m_playerTransform.position.x;
-        save.player.y = m_playerTransform.position.y;
-        save.player.z = m_playerTransform.position.z;
+        save.player.x = m_playerTransform.localPosition.x;
+        save.player.y = m_playerTransform.localPosition.y;
+        save.player.z = m_playerTransform.localPosition.z;
+        save.player.rotation = m_playerTransform.localEulerAngles.y;
         save.player.hp = m_player.Health;
     }
 
@@ -29,9 +30,10 @@ public class PlayerSave : SaveableObject
 
         Debug.Log("Load player state");
 
-        CharacterController cc = m_player.GetComponent<CharacterController>();
+        CharacterController cc = m_player.transform.Find("Model").GetComponent<CharacterController>();
         cc.enabled = false; // disattivo temporaneamente
         m_playerTransform.position = new Vector3(save.player.x, save.player.y, save.player.z);
+        m_playerTransform.rotation = Quaternion.Euler(0f, save.player.rotation, 0f);
         cc.enabled = true;
 
         // Setto HP
