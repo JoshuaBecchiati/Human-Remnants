@@ -37,10 +37,8 @@ public class CharController : MonoBehaviour
     private float _speedMagnitude;
     private float _airTime;
 
-    private bool _isJumping;
     private bool _isRunning;
     private bool _isMoving;
-    private bool _isReallyFalling;
 
     #region Unity methods
     void Start()
@@ -80,12 +78,20 @@ public class CharController : MonoBehaviour
 
     private void Update()
     {
-        HandleMovement();
-        HandleGravity();
+        if (GameEvents.IsInDialogue)
+        {
+            m_animator.SetFloat("X", 0f);
+            m_animator.SetFloat("Y", 0f);
+        }
+        else
+        {
+            HandleMovement();
+            HandleGravity();
 
-        MovementSounds.UpdateMovementState(_isRunning, _currentSpeed);
+            MovementSounds.UpdateMovementState(_isRunning, _currentSpeed);
 
-        ApplyFinalMovement();
+            ApplyFinalMovement();
+        }
     }
     #endregion
 
@@ -129,7 +135,6 @@ public class CharController : MonoBehaviour
         if (IsGrounded())
         {
             _airTime = 0f;
-            _isReallyFalling = false;
 
             m_animator.SetBool("IsGrounded", true);
             m_animator.SetBool("IsFalling", false);
@@ -152,7 +157,6 @@ public class CharController : MonoBehaviour
             // caduta vera solo dopo 1 secondo
             else if (_airTime >= FALL_DELAY)
             {
-                _isReallyFalling = true;
                 m_animator.SetBool("IsJumping", false);
                 m_animator.SetBool("IsFalling", true);
             }
@@ -169,8 +173,6 @@ public class CharController : MonoBehaviour
     {
         if (IsGrounded())
         {
-            _isJumping = true;
-
             m_animator.SetBool("IsJumping", true);
             m_animator.SetBool("IsGrounded", false);
             m_animator.SetBool("IsFalling", false);
@@ -229,25 +231,22 @@ public class CharController : MonoBehaviour
     #region Animator + rotation
     private void UpdateAnimator()
     {
-        if (Mathf.Abs(m_animator.GetFloat("X")) < 0.005f &&
-            Mathf.Abs(m_animator.GetFloat("Y")) < 0.005f &&
-            !_isMoving)
+        float x = _currentSpeed.x;
+        float y = _currentSpeed.z;
+
+        // deadzone vera
+        if (!_isMoving || Mathf.Abs(x) < 0.05f && Mathf.Abs(y) < 0.05f)
         {
-            _currentSpeed = Vector3.zero;
+            x = 0f;
+            y = 0f;
         }
 
-        if (Mathf.Abs(m_animator.GetFloat("X")) > 1f && _isMoving)
-        {
-            _currentSpeed.x = 1f;
-        }
+        // clamp per il blend tree
+        x = Mathf.Clamp(x, -1f, 1f);
+        y = Mathf.Clamp(y, -1f, 1f);
 
-        if (Mathf.Abs(m_animator.GetFloat("Y")) > 1f && _isMoving)
-        {
-            _currentSpeed.z = 1f;
-        }
-
-        m_animator.SetFloat("X", _currentSpeed.x);
-        m_animator.SetFloat("Y", _currentSpeed.z);
+        m_animator.SetFloat("X", x, m_animationTransition * Time.deltaTime, Time.deltaTime);
+        m_animator.SetFloat("Y", y, m_animationTransition * Time.deltaTime, Time.deltaTime);
     }
 
     private void OrientCharToCamera()

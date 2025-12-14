@@ -33,7 +33,6 @@ public class AudioControlButton : Selectable
     private bool _isActive = false;
     private bool _isHover = false;
     private int _volume = 5;
-    private int _selected = 5;
 
     protected override void Start()
     {
@@ -54,23 +53,7 @@ public class AudioControlButton : Selectable
     {
         float saved = VolumeManager.Instance.GetVolume(volumeType);  // 0..1
         _volume = Mathf.RoundToInt(saved * m_volumeBars.Length);     // converto 0-1 in barre
-        _selected = _volume;
     }
-
-    //public override void OnSelect(BaseEventData eventData)
-    //{
-    //    base.OnSelect(eventData);
-    //    VolumeManager.Instance.PlayUIClick();
-    //    _isActive = true;
-    //    UpdateVisuals();
-    //}
-
-    //public override void OnDeselect(BaseEventData eventData)
-    //{
-    //    base.OnDeselect(eventData);
-    //    _isActive = false;
-    //    UpdateVisuals();
-    //}
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
@@ -90,7 +73,6 @@ public class AudioControlButton : Selectable
     private void ChangeVolume(int dir)
     {
         _volume = Mathf.Clamp(_volume + dir, 0, m_volumeBars.Length);
-        _selected = _volume;
         UpdateVisuals();
     }
 

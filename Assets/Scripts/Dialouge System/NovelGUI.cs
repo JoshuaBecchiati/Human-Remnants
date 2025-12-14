@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -16,6 +17,8 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
     private NovelDialogue _currentDialogue;
     private int _currentDialogueLineIndex = 0;
     private Coroutine _dialogueEffect;
+    private bool _isDialogueFinished;
+    private UnityEvent _onDialogueFinished;
 
     public UnityEvent OnDialogueAdvanced;
     public UnityEvent OnSceneEnded;
@@ -40,15 +43,23 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        // Handle pointer down events (e.g., advancing dialogue)
-        UpdateToNextDialogueLine();
-        OnDialogueAdvanced?.Invoke();
+        if (_isDialogueFinished)
+        {
+            UpdateToNextDialogueLine();
+            OnDialogueAdvanced?.Invoke();
+        }
+        else
+        {
+            _isDialogueFinished = true;
+        }
     }
 
-    public void StartDialogue(NovelDialogue dialogue)
+    public void StartDialogue(NovelDialogue dialogue, UnityEvent endDialogue)
     {
         m_dialogueBox.SetActive(true);
         SetCurrentDialogue(dialogue);
+
+        _onDialogueFinished = endDialogue;
     }
 
     public void EndDialogue()
@@ -110,6 +121,11 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
                 lastChar = Mathf.Clamp(charCount, 0, text.Length);
                 _dialogueText.text = text.Substring(0, lastChar);
             }
+            else if (_isDialogueFinished)
+            {
+                _dialogueText.text = dialogueLine.DialogueText;
+                break;
+            }
 
             yield return null;
         }
@@ -120,6 +136,7 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
         if(_currentDialogue.IsEndDialogue)
         {
             OnSceneEnded?.Invoke();
+            _onDialogueFinished?.Invoke();
             return;
         }
 

@@ -2,6 +2,6 @@ public enum VolumeType
 {
     Master,
     Music,
-    Effects,
+    Ambient,
     UI,
 }

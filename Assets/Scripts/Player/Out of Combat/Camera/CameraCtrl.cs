@@ -40,7 +40,7 @@ public class CameraCtrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_target == null) return;
+        if (_target == null || GameEvents.IsInDialogue) return;
 
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 

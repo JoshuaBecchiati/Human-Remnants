@@ -52,6 +52,7 @@ public class VolumeManager : MonoBehaviour
         {
             { VolumeType.Master,    new VolumeChannel(VolumeType.Master, globalMixer, "MasterVol") },
             { VolumeType.Music,     new VolumeChannel(VolumeType.Music, globalMixer, "MusicVol") },
+            { VolumeType.Ambient,   new VolumeChannel(VolumeType.Ambient, globalMixer, "AmbientVol") },
             { VolumeType.UI,        new VolumeChannel(VolumeType.UI, globalMixer, "UIVol") }
         };
 

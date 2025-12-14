@@ -14,7 +14,6 @@ public class MovementSounds : MonoBehaviour
     private static Vector3 _currentSpeed;
 
     #region Footstep sound
-
     public void PlayFootstepSound()
     {
         if (_currentSpeed.magnitude < 0.1f) return;
