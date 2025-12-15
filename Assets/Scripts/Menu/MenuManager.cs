@@ -137,7 +137,7 @@ public class MenuManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-        else if (m_isPauseMenu && !GameEvents.IsInPause)
+        else if (m_isPauseMenu && !GameEvents.IsInPause && !GameEvents.CanOpenMenu)
         {
             m_pauseCanvas.SetActive(true);
             GameEvents.SetGameState(true);

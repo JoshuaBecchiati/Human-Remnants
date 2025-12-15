@@ -200,8 +200,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7785217431537606544}
-  - component: {fileID: 3965312073850719858}
   - component: {fileID: 7251154940648261503}
+  - component: {fileID: 3965312073850719858}
   m_Layer: 0
   m_Name: Marsh_NPC
   m_TagString: Untagged
@@ -226,36 +226,6 @@ Transform:
   - {fileID: 2929029296411379928}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3965312073850719858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 439114693943813564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 748164da1a16b324080d1fa7aa89d598, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_interactText: {fileID: 0}
-  m_dialogueCamera: {fileID: 5743937529667190663}
-  m_scene: {fileID: 11400000, guid: 97266db0867db1c4aa48ae15f0a2c80e, type: 2}
-  m_endDialogue:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3965312073850719858}
-        m_TargetAssemblyTypeName: NPCInteract, Assembly-CSharp
-        m_MethodName: EndDialogue
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!135 &7251154940648261503
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -277,6 +247,22 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 2
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &3965312073850719858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439114693943813564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 748164da1a16b324080d1fa7aa89d598, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_character: 1
+  m_interactText: {fileID: 0}
+  m_scene: {fileID: 11400000, guid: 97266db0867db1c4aa48ae15f0a2c80e, type: 2}
+  m_dialogueCamera: {fileID: 5743937529667190663}
 --- !u!1 &496052299428739392
 GameObject:
   m_ObjectHideFlags: 0
@@ -1487,12 +1473,12 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 10
+  m_Priority: 20
   m_StandbyUpdate: 2
-  m_LookAt: {fileID: 0}
+  m_LookAt: {fileID: 7785217431537606544}
   m_Follow: {fileID: 0}
   m_Lens:
-    FieldOfView: 60.000004
+    FieldOfView: 45
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 5000

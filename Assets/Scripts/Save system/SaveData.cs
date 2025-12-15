@@ -5,11 +5,11 @@ using UnityEngine;
 [Serializable]
 public class SaveData
 {
-    public PlayerData player; // Fatto
-    public GameObject[] party = new GameObject[3];
-    public List<ItemData> inventory = new(); // Fatto
-    public List<string> collectedItems = new(); // Fatto
-    public List<string> defeatedEnemies = new(); // Fatto
+    public PlayerData player;
+    public List<MemberData> party = new();
+    public List<ItemData> inventory = new();
+    public List<string> collectedItems = new();
+    public List<string> defeatedEnemies = new();
     public List<string> completedEvents = new();
 
     public string currentScene;

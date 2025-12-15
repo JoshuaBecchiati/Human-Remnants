@@ -28,13 +28,13 @@ public class BattleEnter : SaveableObject
 
     public override void SaveState(SaveData save)
     {
-        if (!save.collectedItems.Contains(uniqueID) && !gameObject.activeSelf)
-            save.collectedItems.Add(uniqueID);
+        //if (!save.defeatedEnemies.Contains(uniqueID) && !gameObject.activeSelf)
+        //    save.defeatedEnemies.Add(uniqueID);
     }
 
     public override void LoadState(SaveData save)
     {
-        if (save.collectedItems.Contains(uniqueID))
+        if (save.defeatedEnemies.Contains(uniqueID))
             gameObject.SetActive(false);
         else if (!gameObject.activeSelf)
             gameObject.SetActive(true);

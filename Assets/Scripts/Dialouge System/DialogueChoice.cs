@@ -1,16 +1,13 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
-
 
 [Serializable]
 public class DialogueChoice
 {
     [SerializeField] private string _choiceText;
-    [SerializeField] private NovelDialogue _nextDialogue;
-    public UnityEvent OnCoichePicked;
+    [SerializeField] private Dialogue _nextDialogue;
 
     public string ChoiceText => _choiceText;
-    public NovelDialogue NextDialogue => _nextDialogue;
+    public Dialogue NextDialogue => _nextDialogue;
 }
 

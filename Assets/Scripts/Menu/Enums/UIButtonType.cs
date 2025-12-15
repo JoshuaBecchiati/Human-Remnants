@@ -12,5 +12,6 @@ public enum UIButtonType
     SaveFile,
     LoadGame,
     NewGame,
-    SelectFile
+    SelectFile,
+    Save
 }

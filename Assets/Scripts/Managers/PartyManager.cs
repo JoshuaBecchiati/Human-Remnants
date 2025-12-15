@@ -1,11 +1,16 @@
-﻿using Unity.VisualScripting;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.TextCore.Text;
 
 public class PartyManager : SaveableObject
 {
-    private const int MAX_PARTY_MEMBERS = 3;
-
-    [SerializeField] private GameObject[] m_party = new GameObject[3];
+    [Header("Party manager")]
+    [SerializeField] private Transform m_partyParent;
+    [SerializeField] private List<GameObject> m_party;
+    [SerializeField] private List<GameObject> m_characters;
 
     public static PartyManager Instance { get; private set; }
 
@@ -20,30 +25,46 @@ public class PartyManager : SaveableObject
         DontDestroyOnLoad(gameObject);
     }
 
-    public void AddPartyMember(GameObject newMember)
+    public Player AddPartyMember(Characters newMember)
     {
-        if (newMember.GetComponent<Player>() == null) return;
+        Player player = GetPlayerByName(newMember);
 
-        if (PartySizeCheck())
-            m_party.AddRange(m_party);
+        if (player != null)
+        {
+            if (PartySizeCheck())
+            {
+                Transform activePlayer = FindAnyObjectByType<CharacterController>().transform;
+
+                GameObject go = Instantiate(player.gameObject);
+                go.transform.position = new Vector3(activePlayer.localPosition.x + 0.75f, activePlayer.localPosition.y + 0.2f, activePlayer.localPosition.z);
+                go.transform.SetParent(m_partyParent, false);
+
+                go.GetComponent<AllyController>().SetActivePlayer(activePlayer);
+                go.GetComponent<NavMeshAgent>().enabled = true;
+                m_party.Add(go);
+                return go.GetComponent<Player>();
+            }
+        }
+
+        return null;
     }
 
     public void RemovePartyMember(GameObject removedMember)
     {
         if (removedMember.GetComponent<Player>() == null) return;
 
-        for (int i = 0; i < m_party.Length; i++)
+        for (int i = 0; i < m_party.Count; i++)
         {
             if (m_party[i] == removedMember)
             {
                 m_party[i] = null;
 
                 // opzionale ma consigliato → compattare l’array
-                for (int j = i; j < m_party.Length - 1; j++)
+                for (int j = i; j < m_party.Count - 1; j++)
                     m_party[j] = m_party[j + 1];
 
                 // libera l’ultimo slot dopo lo shift
-                m_party[m_party.Length - 1] = null;
+                m_party[m_party.Count - 1] = null;
 
                 return;
             }
@@ -52,7 +73,7 @@ public class PartyManager : SaveableObject
 
     private bool PartySizeCheck()
     {
-        if (m_party.Length >= 3)
+        if (m_party.Count >= 2)
             return false;
 
         return true;
@@ -60,15 +81,40 @@ public class PartyManager : SaveableObject
 
     public override void SaveState(SaveData save)
     {
-        if (m_party.Length <= 0) return;
+        if (m_party.Count <= 0) return;
 
-        save.party = m_party;
+        save.party.Clear();
+
+        for (int i = 0; i < m_party.Count; i++)
+        {
+            MemberData data = new();
+            Player member = m_party[i].GetComponent<Player>();
+
+            data.characterID = member.Name.ToString();
+            data.hp = member.Health;
+
+            save.party.Add(data);
+        }
     }
 
     public override void LoadState(SaveData save)
     {
-        if (save.party.Length <= 0) return;
+        if (save.party.Count <= 0) return;
 
-        m_party = save.party;
+        for (int i = 0; i < save.party.Count; i++)
+        {
+            if (Enum.TryParse<Characters>(save.party[i].characterID, out var characterID))
+            {
+                Player member = AddPartyMember(characterID);
+                member.SetHealth(save.party[i].hp);
+            }
+        }
+    }
+
+    public Player GetPlayerByName(Characters newMember)
+    {
+        return m_characters
+            .Select(go => go.GetComponent<Player>())   // prova a prendere il componente Player
+            .FirstOrDefault(player => player != null && player.Name == newMember);
     }
 }

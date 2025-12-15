@@ -34,12 +34,6 @@ public class SaveSystem : MonoBehaviour
             Directory.CreateDirectory(_savesFolder);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-            SaveGame();
-    }
-
     public void CreateNewSave(string selectedCharacterID)
     {
         CurrentSave = new SaveData();
@@ -92,15 +86,13 @@ public class SaveSystem : MonoBehaviour
         if (sceneName != "Menu")
             CurrentSave.currentScene = sceneName;
 
-        if (SceneTime.Instance != null)
-            CurrentSave.totalPlayTime = SceneTime.Instance.TimePlay;
+        if (LoadScene.Instance != null)
+            CurrentSave.totalPlayTime = LoadScene.Instance.TimePlay;
         else
             CurrentSave.totalPlayTime = 0f;
 
         string json = JsonUtility.ToJson(CurrentSave, true);
         File.WriteAllText(CurrentSavePath, json);
-
-        Debug.Log($"Salvataggio completato: {CurrentSavePath}");
     }
 
     public void LoadGame(string path)
@@ -115,8 +107,6 @@ public class SaveSystem : MonoBehaviour
         CurrentSave = JsonUtility.FromJson<SaveData>(json);
         CurrentSavePath = path;
 
-        Debug.Log("CURRENT SAVE " + CurrentSave);
-
         ISaveable[] saveables = FindObjectsOfType<MonoBehaviour>(true)
                   .OfType<ISaveable>()
                   .ToArray();
@@ -125,8 +115,6 @@ public class SaveSystem : MonoBehaviour
         {
             s.LoadState(CurrentSave);
         }
-
-        Debug.Log($"Caricato salvataggio da: {path}");
     }
 
     public void LoadGame()

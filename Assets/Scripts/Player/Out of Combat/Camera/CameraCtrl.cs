@@ -38,7 +38,7 @@ public class CameraCtrl : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         if (_target == null || GameEvents.IsInDialogue) return;
 
@@ -57,14 +57,11 @@ public class CameraCtrl : MonoBehaviour
         _elevation.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
 
         IsCameraOccluded();
+
+        transform.position = GetWantedPosition();
     }
 
     private void OnValidate()
-    {
-        if (_target == null) return;
-        transform.position = GetWantedPosition();
-    }
-    private void LateUpdate()
     {
         if (_target == null) return;
         transform.position = GetWantedPosition();

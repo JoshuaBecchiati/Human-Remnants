@@ -28,8 +28,6 @@ public class PlayerSave : SaveableObject
     {
         if (save.player == null) return;
 
-        Debug.Log("Load player state");
-
         CharacterController cc = m_player.transform.Find("Model").GetComponent<CharacterController>();
         cc.enabled = false; // disattivo temporaneamente
         m_playerTransform.position = new Vector3(save.player.x, save.player.y, save.player.z);

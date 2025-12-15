@@ -9,8 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1b0fa8db7d177d408d8f32ef9f3e809, type: 3}
-  m_Name: Scene_A
+  m_Script: {fileID: 11500000, guid: c65a49a7479b83d4cb49b792661a9cd4, type: 3}
+  m_Name: End Dialogue
   m_EditorClassIdentifier: 
-  _sceneName: Marsh intro
-  _startingDialogue: {fileID: 11400000, guid: 83be4c898d1a41d4b86f6b148f2fbacc, type: 2}

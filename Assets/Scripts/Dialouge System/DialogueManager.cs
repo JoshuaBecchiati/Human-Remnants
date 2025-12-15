@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
-public class NovelGUI : MonoBehaviour, IPointerDownHandler
+public class DialogueManager : MonoBehaviour
 {
     [SerializeField] private TMP_Text _speakerNameText;
     [SerializeField] private TMP_Text _dialogueText;
@@ -14,16 +14,15 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
     [SerializeField] private Transform _dialogueChoicesContainer;
     [SerializeField] private float m_charsPerSecond = 30f;
 
-    private NovelDialogue _currentDialogue;
+    private Dialogue _currentDialogue;
     private int _currentDialogueLineIndex = 0;
     private Coroutine _dialogueEffect;
     private bool _isDialogueFinished;
-    private UnityEvent _onDialogueFinished;
 
     public UnityEvent OnDialogueAdvanced;
     public UnityEvent OnSceneEnded;
 
-    public static NovelGUI Instance { get; private set; }
+    public static DialogueManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -39,9 +38,15 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
     private void Start()
     {
         m_dialogueBox.SetActive(false);
+        PlayerInputSingleton.Instance.Actions["Interact"].performed += OnContinueDialogue;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    private void OnDestroy()
+    {
+        PlayerInputSingleton.Instance.Actions["Interact"].performed -= OnContinueDialogue;
+    }
+
+    public void OnContinueDialogue(InputAction.CallbackContext ctx)
     {
         if (_isDialogueFinished)
         {
@@ -54,12 +59,10 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    public void StartDialogue(NovelDialogue dialogue, UnityEvent endDialogue)
+    public void StartDialogue(Dialogue dialogue)
     {
         m_dialogueBox.SetActive(true);
         SetCurrentDialogue(dialogue);
-
-        _onDialogueFinished = endDialogue;
     }
 
     public void EndDialogue()
@@ -68,7 +71,7 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
         m_dialogueBox.SetActive(false);
     }
 
-    public void SetCurrentDialogue(NovelDialogue dialogue)
+    public void SetCurrentDialogue(Dialogue dialogue)
     {
         GameEvents.SetDialogueState(true);
         _currentDialogue = dialogue;
@@ -99,6 +102,8 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
             StopCoroutine(_dialogueEffect);
 
         _dialogueEffect = StartCoroutine(TypeWriterEffect(dialogueLine));
+
+        dialogueLine.TriggerDialogueEvents();
     }
 
     private IEnumerator TypeWriterEffect(DialogueLine dialogueLine)
@@ -131,12 +136,11 @@ public class NovelGUI : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    private void DisplayChoices(NovelDialogue dialogue)
+    private void DisplayChoices(Dialogue dialogue)
     {
         if(_currentDialogue.IsEndDialogue)
         {
             OnSceneEnded?.Invoke();
-            _onDialogueFinished?.Invoke();
             return;
         }
 

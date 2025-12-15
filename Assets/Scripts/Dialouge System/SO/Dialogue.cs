@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Novel Dialogue", menuName = "Visual Novel Engine/Novel Dialogue")]
-public class NovelDialogue : ScriptableObject
+[CreateAssetMenu(fileName = "New Dialogue", menuName = "Dialogue system/Novel Dialogue")]
+public class Dialogue : ScriptableObject
 {
     [SerializeField] private DialogueLine[] _dialogueLines;
     [SerializeField] private DialogueChoice[] _dialogueChoices;

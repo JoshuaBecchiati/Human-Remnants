@@ -12,6 +12,7 @@ public static class GameEvents
     public static bool IsInPause { get; private set; }
     public static bool IsInDialogue { get; private set; }
     public static bool CanOpenInventory => IsInFight || IsInCrafting || IsInPause || IsInDialogue;
+    public static bool CanOpenMenu => IsInFight || IsInCrafting || IsInInventory || IsInDialogue;
 
     // --- Crafting events ---
     public static event Action OnOpenCrafting;

@@ -1,14 +1,17 @@
-using System.Collections.Generic;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public class NPCInteract : MonoBehaviour
+public class NPCInteract : SaveableObject
 {
+    [Header("Settings")]
+    [SerializeField] private Characters m_character;
     [SerializeField] private GameObject m_interactText;
+
+    [Header("Dialogue")]
+    [SerializeField] private DialogueScene m_scene;
     [SerializeField] private GameObject m_dialogueCamera;
-    [SerializeField] private NovelScene m_scene;
-    [SerializeField] private UnityEvent m_endDialogue;
 
     private bool _isTalking;
 
@@ -16,7 +19,6 @@ public class NPCInteract : MonoBehaviour
     {
         m_interactText.SetActive(false);
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
@@ -40,7 +42,7 @@ public class NPCInteract : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        NovelGUI.Instance.EndDialogue();
+        DialogueManager.Instance.EndDialogue();
         PlayerInputSingleton.Instance.Actions["Interact"].performed -= StartDialogue;
     }
 
@@ -51,7 +53,7 @@ public class NPCInteract : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         m_interactText.SetActive(false);
-        NovelGUI.Instance.StartDialogue(m_scene.StartingDialogue, m_endDialogue);
+        DialogueManager.Instance.StartDialogue(m_scene.StartingDialogue);
         GameEvents.SetDialogueState(true);
         m_dialogueCamera.SetActive(true);
 
@@ -60,11 +62,44 @@ public class NPCInteract : MonoBehaviour
 
     public void EndDialogue()
     {
+        Debug.Log("End Dialogue");
         m_dialogueCamera.SetActive(false);
-        GameEvents.SetDialogueState(false);
-        _isTalking = false;
+
+        if (gameObject.activeSelf)
+            StartCoroutine(Wait());
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+        gameObject.SetActive(false);
+    }
+
+    private IEnumerator Wait()
+    {
+        yield return null;
+
+        GameEvents.SetDialogueState(false);
+
+        _isTalking = false;
+    }
+
+    public void AddMember()
+    {
+        PartyManager.Instance.AddPartyMember(m_character);
+        SaveSystem.Instance.CurrentSave.completedEvents.Add(uniqueID);
+
+    }
+
+    public override void SaveState(SaveData save)
+    {
+        //if (!save.completedEvents.Contains(uniqueID) && !gameObject.activeSelf)
+        //    save.completedEvents.Add(uniqueID);
+    }
+
+    public override void LoadState(SaveData save)
+    {
+        if (save.completedEvents.Contains(uniqueID))
+            gameObject.SetActive(false);
+        else if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
     }
 }

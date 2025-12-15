@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
 
-public class SceneTime : MonoBehaviour
+public class LoadScene : MonoBehaviour
 {
     [SerializeField] private Transform m_partyParent;
     [SerializeField] private List<GameObject> m_CharactersPrefab;
@@ -12,20 +10,13 @@ public class SceneTime : MonoBehaviour
 
     public float TimePlay => _timePlay;
 
-    public static SceneTime Instance { get; private set; }
+    public static LoadScene Instance { get; private set; }
 
     private void Awake()
     {
         Instance = this;
 
-        GameObject go = Instantiate(FindCharacterPrefab());
-
-        SaveSystem.Instance.LoadGame();
-
-        go.transform.SetParent(m_partyParent, false);
-
-        FindObjectOfType<CameraCtrl>().SetTarget(go.transform.Find("Model"));
-        FindObjectOfType<HeadBobController>().SetCharacter(go.GetComponent<CharController>());
+        InitMainCharacter();
     }
 
     private void Start()
@@ -54,12 +45,21 @@ public class SceneTime : MonoBehaviour
 
             if (p.Name.ToString() == targetID)
             {
-                Debug.Log("Prefab trovato: " + prefab.name);
                 return prefab;
             }
         }
-
-        Debug.LogWarning("Nessun prefab corrisponde all'ID " + targetID);
         return null;
+    }
+
+    private void InitMainCharacter()
+    {
+        GameObject go = Instantiate(FindCharacterPrefab());
+
+        SaveSystem.Instance.LoadGame();
+
+        go.transform.SetParent(m_partyParent, false);
+
+        FindObjectOfType<CameraCtrl>().SetTarget(go.transform.Find("Model"));
+        FindObjectOfType<HeadBobController>().SetCharacter(go.GetComponent<CharController>());
     }
 }
