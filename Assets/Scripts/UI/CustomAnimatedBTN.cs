@@ -15,6 +15,11 @@ public class CustomAnimatedBTN : MonoBehaviour, IPointerClickHandler
 
     public bool IsOpen => _isOpen;
 
+    private void Awake()
+    {
+        _animator = GetComponent<Animator>();
+    }
+
     private void OnValidate()
     {
         _animator = GetComponent<Animator>();
@@ -22,20 +27,25 @@ public class CustomAnimatedBTN : MonoBehaviour, IPointerClickHandler
 
     private void OnEnable()
     {
-        _animator.Play("Base", 0, 0f);
-        _animator.Update(0f);
+        _animator = GetComponent<Animator>();
+        if (_animator != null)
+        {
+            _animator.Play("Base", 0, 0f);
+            _animator.Update(0f);
+        }
     }
 
     public virtual void OnPointerClick(PointerEventData eventData)
     {
-        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-
-        if (stateInfo.IsName(m_dehighlightedTrigger) || stateInfo.IsName("Base"))
+        if (!_isOpen)
         {
             _animator.SetTrigger(m_highlightedTrigger);
-            VolumeManager.Instance.PlayUISaveHover();
+            if (VolumeManager.Instance != null)
+                VolumeManager.Instance.PlayUISaveHover();
 
-            CustomAnimatedBTN cbt = m_buttonsGroup.Find(o => o.IsOpen && o.gameObject != this);
+            CustomAnimatedBTN cbt =
+                m_buttonsGroup.Find(o => o.IsOpen && o.gameObject != this);
+
             if (cbt != null)
             {
                 cbt.SetOpenState(false);

@@ -12,6 +12,9 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private Transform m_playerUIParent;
     [SerializeField] private GameObject m_healthBarPrefab;
 
+    [Header("Menus")]
+    [SerializeField] private GameObject m_menusGo;
+
     [Header("Inventory")]
     [SerializeField] private Transform m_itemUIParent;
     [SerializeField] private GameObject m_itemPrefab;
@@ -29,13 +32,7 @@ public class UIBattleManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void OnEnable()
@@ -142,9 +139,13 @@ public class UIBattleManager : MonoBehaviour
 
             itemGO.transform.Find("Item name").TryGetComponent(out TextMeshProUGUI itemNameTMP);
             itemNameTMP.text = itemData.Item.name;
+            itemGO.transform.Find("Item name highlighted").TryGetComponent(out TextMeshProUGUI itemNameHighTMP);
+            itemNameHighTMP.text = itemData.Item.name;
 
             itemGO.transform.Find("Item qty").TryGetComponent(out TextMeshProUGUI itemQtyTMP);
             itemQtyTMP.text = $"x{itemData.Qty}";
+            itemGO.transform.Find("Item qty highlighted").TryGetComponent(out TextMeshProUGUI itemQtyHighTMP);
+            itemQtyHighTMP.text = $"x{itemData.Qty}";
         }
     }
 
@@ -165,12 +166,18 @@ public class UIBattleManager : MonoBehaviour
 
             abilityGO.transform.Find("Ability name").TryGetComponent(out TextMeshProUGUI abilityNameTMP);
             abilityNameTMP.text = abilityData.Ability.name;
+            abilityGO.transform.Find("Ability name highlighted").TryGetComponent(out TextMeshProUGUI abilityNameHighTMP);
+            abilityNameHighTMP.text = abilityData.Ability.name;
 
             abilityGO.transform.Find("Ability type").TryGetComponent(out TextMeshProUGUI abilityQtyTMP);
             abilityQtyTMP.text = abilityData.Ability.damageType.ToString();
+            abilityGO.transform.Find("Ability type highlighted").TryGetComponent(out TextMeshProUGUI abilityQtyHighTMP);
+            abilityQtyHighTMP.text = abilityData.Ability.damageType.ToString();
 
             abilityGO.transform.Find("Ability charge").TryGetComponent(out TextMeshProUGUI abilityChargeTMP);
             abilityChargeTMP.text = $"Charge {abilityData.ChargeCounter}/{abilityData.Ability.maxCharge}";
+            abilityGO.transform.Find("Ability charge highlighted").TryGetComponent(out TextMeshProUGUI abilityChargeHighTMP);
+            abilityChargeHighTMP.text = $"Charge {abilityData.ChargeCounter}/{abilityData.Ability.maxCharge}";
         }
     }
 
@@ -201,4 +208,9 @@ public class UIBattleManager : MonoBehaviour
         m_menus[index].SetActive(true);
     }
     #endregion
+
+    public void ToggleUI(bool state)
+    {
+        m_menusGo.SetActive(state);
+    }
 }

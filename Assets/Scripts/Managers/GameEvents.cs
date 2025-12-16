@@ -84,4 +84,11 @@ public static class GameEvents
         IsInDialogue = state;
     }
     #endregion
+
+    #region Handle Inventory
+    public static void SetInventoryState(bool state)
+    {
+        IsInInventory = state;
+    }
+    #endregion
 }

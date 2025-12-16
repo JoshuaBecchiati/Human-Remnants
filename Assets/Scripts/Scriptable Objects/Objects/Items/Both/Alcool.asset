@@ -12,8 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fca21d21355bd34cbe4e7f00e9a5b7c, type: 3}
   m_Name: Alcool
   m_EditorClassIdentifier: 
-  name: Alcool
-  description: 
+  name: Alcohol
+  description: 'A versatile and volatile substance.
+
+    Useful in crafting various
+    items, or consumed in small amounts to regain mental stability
+
+
+    Restores
+    10 SP.'
   icon: {fileID: 21300000, guid: 64e959b5748aa744784ed42278b92847, type: 3}
   usableType: 1
   itemType: 3

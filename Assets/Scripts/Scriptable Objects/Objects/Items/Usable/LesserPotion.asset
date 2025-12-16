@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b70cdacd8a7042e4f84723a0943b9f6c, type: 3}
   m_Name: LesserPotion
   m_EditorClassIdentifier: 
-  name: Lesser heal potion
-  description: Heal 10 hp
+  name: Heal potion
+  description: 'A carefully prepared restorative concoction.
+
+    Widely used by
+    survivors to recover from injuries.
+
+
+    Restores 20 HP.'
   icon: {fileID: 21300000, guid: 91467c6c239d08248ae2073c1e73423e, type: 3}
   usableType: 1
   itemType: 2

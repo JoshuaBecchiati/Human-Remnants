@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ChooseCharBTN : CustomAnimatedBTN
+public class ChooseCharBTN : CustomAnimatedBTN, IPointerClickHandler
 {
     [SerializeField] private GameObject _charInfo;
     [SerializeField] private List<ChooseCharBTN> _charList;

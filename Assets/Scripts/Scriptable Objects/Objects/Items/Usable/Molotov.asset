@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Molotov
   m_EditorClassIdentifier: 
   name: Molotov
-  description: Explode
+  description: 'A molotov, an useful way to handle tricky situations from distance.
+
+
+    Inflicts
+    10 fire damage.'
   icon: {fileID: 21300000, guid: 3d0d57028c7f7444badb06b3d97ecb90, type: 3}
   usableType: 2
   itemType: 2

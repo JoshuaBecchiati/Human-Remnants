@@ -58,8 +58,16 @@ public class CraftingTable : MonoBehaviour
 
         SetCraftingOpen(false);
 
+        Color color = new();
+        color.a = 0;
+
         for (int i = 0; i < m_craftingSlots.Length; i++)
-            m_craftingSlots[i].GetComponent<Image>().sprite = null;
+        {
+            Image image = m_craftingSlots[i].GetComponent<Image>();
+            image.color = color;
+            image.sprite = null;
+        }
+
 
         PlayerInputSingleton.Instance.Actions["Interact"].performed -= OnToggleCrafting;
     }
@@ -102,10 +110,13 @@ public class CraftingTable : MonoBehaviour
     {
         if(CraftManager.Instance.Craft(_items))
         {
+            Color color = new();
+            color.a = 0;
             for (int i = 0; i < m_craftingSlots.Length; i++)
             {
-                m_craftingSlots[i].GetComponent<Image>().sprite = null;
-                _items[i] = null;
+                Image image = m_craftingSlots[i].GetComponent<Image>();
+                image.color = color;
+                image.sprite = null;
             }
         }
     }
@@ -209,7 +220,10 @@ public class CraftingTable : MonoBehaviour
     {
         if (_activeSlot == null) return;
 
-        _activeSlot.GetComponent<Image>().sprite = item.Item.icon;
+        Color color = new(216, 188, 139, 255f);
+        Image image = _activeSlot.GetComponent<Image>();
+        image.color = color;
+        image.sprite = item.Item.icon;
     }
     #endregion
 }

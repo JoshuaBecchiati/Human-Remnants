@@ -45,9 +45,22 @@ public class LoadFileSlotManager : MonoBehaviour
         return _selectedSlotIndex;
     }
 
-    public void MarkSlotUsed(int index)
+    public void DestroyFile()
     {
-        m_files[index].SetUsed(true);
+        if (_selectedSlotIndex < m_files.Count && _selectedSlotIndex > -1)
+        {
+            string saveFolder = Path.Combine(Application.persistentDataPath, "Saves");
+            string expectedFile = Path.Combine(saveFolder, $"{_selectedSlotIndex}.json");
+
+            File.Delete(expectedFile);
+
+            MarkSlotUsedState(_selectedSlotIndex, false);
+        }
+    }
+
+    public void MarkSlotUsedState(int index, bool state)
+    {
+        m_files[index].SetUsed(state);
     }
 
     public void LoadSaveFiles()

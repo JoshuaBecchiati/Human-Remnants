@@ -57,7 +57,7 @@ public class SaveSystem : MonoBehaviour
         CurrentSavePath = Path.Combine(_savesFolder, fileName);
 
         // Segna lo slot come usato
-        LoadFileSlotManager.Instance.MarkSlotUsed(slotIndex);
+        LoadFileSlotManager.Instance.MarkSlotUsedState(slotIndex, true);
 
         SaveGame();
     }

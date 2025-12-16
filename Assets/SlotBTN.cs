@@ -17,8 +17,6 @@ public class SlotBTN : MonoBehaviour
         SaveData sd = SaveSystem.Instance.GetSaveByPath();
         int index = SceneUtility.GetBuildIndexByScenePath($"Assets/Scenes/{sd.currentScene}.unity");
 
-        //Debug.Log($"Index scene {index} Current scene Assets/Scenes/{sd.currentScene}");
-
         MenuManager.Instance.ChangeScene(index);
     }
 }

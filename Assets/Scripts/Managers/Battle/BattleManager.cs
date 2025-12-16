@@ -11,7 +11,9 @@ public class BattleManager : MonoBehaviour
     [Header("Spawn Points")]
     [SerializeField] private Transform m_playerSide;
     [SerializeField] private Transform m_enemySide;
-    [SerializeField] private float m_space = 5f;
+    [SerializeField] private float m_angle = 15f;
+    [SerializeField] private float m_baseDepth = -3f;
+    [SerializeField] private float m_space = 2f;
 
     [Header("Battle List")]
     [SerializeField] private List<UnitBase> m_unitsInBattle;
@@ -52,13 +54,7 @@ public class BattleManager : MonoBehaviour
     #region Unity methods
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void OnEnable()
@@ -136,8 +132,34 @@ public class BattleManager : MonoBehaviour
             m_unitsInBattle.Add(u);
 
             if (u.Team == UnitTeam.Player)
-                prefabs[i].transform.Find("Model").position += new Vector3(0f, 0f, -3f);
+            {
+                Transform model = prefabs[i].transform.Find("Model");
+                PositionAndRotateUnit(
+                    model,
+                    i,
+                    prefabs.Count
+                );
+            }
         }
+    }
+
+
+    private void PositionAndRotateUnit(Transform model, int index, int count)
+    {
+        int center = count / 2;
+        int offset = index - center;
+
+        float angle = -offset * m_angle;   // es: 15f
+        float depth = m_baseDepth;          // es: -3f
+
+        if (offset != 0)
+        {
+            float lateral = Mathf.Abs(offset) * m_space;
+            depth += Mathf.Tan(Mathf.Abs(angle) * Mathf.Deg2Rad) * lateral;
+        }
+
+        model.localRotation = Quaternion.Euler(0f, angle, 0f);
+        model.localPosition += Vector3.forward * depth;
     }
 
     public void SetupBattle()
@@ -152,8 +174,6 @@ public class BattleManager : MonoBehaviour
             u.TryGetComponent(out AnimationPlayer atl);
             atl.CombatController();
         }
-
-        m_cameraController.BattleCamera();
 
         // Ording the list by the speed
         m_turnOrder = m_unitsInBattle.OrderByDescending(x => x.Speed).ToList();
@@ -321,6 +341,7 @@ public class BattleManager : MonoBehaviour
     private IEnumerator ExecuteAttack()
     {
         _battleStatus = BattleStatus.Executing;
+        m_UIManager.ToggleUI(false);
         m_cameraController.BattleCamera();
 
         yield return new WaitForSeconds(1.5f);
@@ -342,6 +363,7 @@ public class BattleManager : MonoBehaviour
     private IEnumerator ExecuteItem()
     {
         _battleStatus = BattleStatus.Executing;
+        m_UIManager.ToggleUI(false);
         _selectedItem.UseItem(CurrentTarget);
         OnUseItem?.Invoke(_selectedItem);
 
@@ -364,7 +386,7 @@ public class BattleManager : MonoBehaviour
     private IEnumerator ExecuteAbility()
     {
         _battleStatus = BattleStatus.Executing;
-
+        m_UIManager.ToggleUI(false);
         List<UnitBase> enemies = new() { CurrentTarget };
         enemies.AddRange(m_unitsInBattle.FindAll(e => e.Team == UnitTeam.Enemy && e != CurrentTarget));
 
@@ -416,7 +438,10 @@ public class BattleManager : MonoBehaviour
         if (CurrentUnit.Team == UnitTeam.Player)
         {
             CurrentUnit.StartTurn();
+            m_cameraController.BattleCamera();
+            m_UIManager.ToggleUI(true);
             StartPlayerTurn(); // Manteniamo la funzione esistente
+
         }
         else
         {
@@ -425,6 +450,7 @@ public class BattleManager : MonoBehaviour
 
             _battleStatus = BattleStatus.Executing;
         }
+
     }
 
     private void StartPlayerTurn()
@@ -448,7 +474,7 @@ public class BattleManager : MonoBehaviour
     private void EndPlayerTurn()
     {
         _selectingTeam = UnitTeam.Enemy;
-
+        m_UIManager.ToggleUI(false);
         m_UIManager.SetOffInfoBar(CurrentTarget);
 
         // Check if the current target is alive and is an enemy.
@@ -464,6 +490,8 @@ public class BattleManager : MonoBehaviour
     {
         if (OnStartAttack == null)
             yield break;
+
+        m_cameraController.ViewCamera();
 
         foreach (Func<UnitBase, AttackData, IEnumerator> handler in OnStartAttack.GetInvocationList())
         {

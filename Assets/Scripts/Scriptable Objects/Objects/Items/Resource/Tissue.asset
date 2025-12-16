@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Tissue
   m_EditorClassIdentifier: 
   name: Tissue
-  description: 
+  description: 'A simple but essential crafting material.
+
+    Often overlooked,
+    but surprisingly useful for creating basic medical items and improvised tools.'
   icon: {fileID: 21300000, guid: a51bc1540e41df841ac9082100acd8d7, type: 3}
   usableType: 0
   itemType: 1

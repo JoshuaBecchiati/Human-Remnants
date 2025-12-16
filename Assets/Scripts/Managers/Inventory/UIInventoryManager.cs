@@ -9,6 +9,7 @@ public class UIInventoryManager : MonoBehaviour
     [SerializeField] private GameObject m_inventory;
     [SerializeField] private Transform m_inventoryTransform;
     [SerializeField] private GameObject m_itemSlotPrefab;
+    [SerializeField] private Transform m_itemDesc;
 
     // --- Private ---
     private bool _isInventoryOpen; // True = open, False = closed
@@ -21,11 +22,6 @@ public class UIInventoryManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
     }
 
@@ -82,6 +78,7 @@ public class UIInventoryManager : MonoBehaviour
 
         Time.timeScale = 0f;
 
+        GameEvents.SetInventoryState(true);
         m_inventory.SetActive(true);
     }
 
@@ -94,6 +91,9 @@ public class UIInventoryManager : MonoBehaviour
 
         Time.timeScale = 1f;
 
+        HideDescription();
+
+        GameEvents.SetInventoryState(false);
         m_inventory.SetActive(false);
     }
 
@@ -104,6 +104,7 @@ public class UIInventoryManager : MonoBehaviour
 
         foreach (ItemData item in InventoryManager.Instance.GetItems())
         {
+            if (item == null) continue;
             CreateItemSlot(item, m_inventoryTransform);
         }
     }
@@ -114,11 +115,53 @@ public class UIInventoryManager : MonoBehaviour
 
         // Object name
         itemSlot.transform.Find("Item name").GetComponent<TextMeshProUGUI>().text = itemData.Item.name;
+        itemSlot.transform.Find("Item name highlighted").GetComponent<TextMeshProUGUI>().text = itemData.Item.name;
+
+        // Object quantity
+        itemSlot.transform.Find("Item qty").GetComponent<TextMeshProUGUI>().text = "x" + itemData.Qty;
+        itemSlot.transform.Find("Item qty highlighted").GetComponent<TextMeshProUGUI>().text = "x" + itemData.Qty;
+
+        // Object Sprite
+        itemSlot.transform.Find("Sprite").GetComponent<Image>().sprite = itemData.Item.icon;
+    }
+
+    public void CreateDropItemSlot(ItemData itemData, Transform parent, GameObject prefab)
+    {
+        GameObject itemSlot = Instantiate(prefab, parent);
+
+        // Object name
+        itemSlot.transform.Find("Item name").GetComponent<TextMeshProUGUI>().text = itemData.Item.name;
 
         // Object quantity
         itemSlot.transform.Find("Item qty").GetComponent<TextMeshProUGUI>().text = "x" + itemData.Qty;
 
         // Object Sprite
         itemSlot.transform.Find("Sprite").GetComponent<Image>().sprite = itemData.Item.icon;
+    }
+
+    public void ShowDescription(Item item)
+    {
+        m_itemDesc.Find("Desc").GetComponent<TextMeshProUGUI>().text = item.description;
+
+        m_itemDesc.Find("Desc_Name").GetComponent<TextMeshProUGUI>().text = item.name;
+
+        Image icon = m_itemDesc.Find("Desc_Icon").GetComponent<Image>();
+        Color alpha = icon.color;
+        icon.sprite = item.icon;
+        alpha.a = 1f;
+        icon.color = alpha;
+    }
+
+    public void HideDescription()
+    {
+        m_itemDesc.Find("Desc").GetComponent<TextMeshProUGUI>().text = string.Empty;
+
+        m_itemDesc.Find("Desc_Name").GetComponent<TextMeshProUGUI>().text = string.Empty;
+
+        Image icon = m_itemDesc.Find("Desc_Icon").GetComponent<Image>();
+        Color alpha = icon.color;
+        icon.sprite = null;
+        alpha.a = 0f;
+        icon.color = alpha;
     }
 }

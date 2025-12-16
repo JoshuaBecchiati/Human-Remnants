@@ -18,6 +18,8 @@ public class NPCInteract : SaveableObject
     private void Start()
     {
         m_interactText.SetActive(false);
+        if (m_character == FindAnyObjectByType<CharController>().GetComponent<Player>().Name)
+            gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)

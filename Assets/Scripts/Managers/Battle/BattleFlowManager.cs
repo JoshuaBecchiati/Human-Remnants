@@ -253,7 +253,7 @@ public class BattleFlowManager : MonoBehaviour
         foreach (ItemData itemData in _battleSettings.drops)
         {
             InventoryManager.Instance.AddItemInInventory(itemData.Item, itemData.Qty);
-            UIInventoryManager.Instance.CreateItemSlot(itemData, m_transformItemSlot);
+            UIInventoryManager.Instance.CreateDropItemSlot(itemData, m_transformItemSlot, m_itemSlot);
         }
     }
 

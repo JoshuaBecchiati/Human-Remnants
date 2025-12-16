@@ -5,7 +5,7 @@ using UnityEngine;
 public class Item : ScriptableObject
 {
     public new string name;
-    public string description;
+    [TextArea(3, 10)] public string description;
     public Sprite icon;
     public UsableType usableType;
     public ItemType itemType;
