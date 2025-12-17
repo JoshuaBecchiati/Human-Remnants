@@ -48,7 +48,7 @@ public class BattleManager : MonoBehaviour
     public UnitBase CurrentTarget => m_unitsInBattle[_indexTarget];
 
     // --- Events ---
-    public event Action<ItemData> OnUseItem;
+    public event Action<Item> OnUseItem;
     public event Func<UnitBase, AttackData, IEnumerator> OnStartAttack;
 
     #region Unity methods
@@ -365,7 +365,7 @@ public class BattleManager : MonoBehaviour
         _battleStatus = BattleStatus.Executing;
         m_UIManager.ToggleUI(false);
         _selectedItem.UseItem(CurrentTarget);
-        OnUseItem?.Invoke(_selectedItem);
+        OnUseItem?.Invoke(_selectedItem.Item);
 
         yield return new WaitForSeconds(0.5f);
 

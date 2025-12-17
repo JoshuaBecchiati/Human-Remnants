@@ -52,12 +52,16 @@ public class InventoryManager : MonoBehaviour
     /// Remove item in combat
     /// </summary>
     /// <param name="item"></param>
-    public void RemoveItemInInventory(ItemData item)
+    public void RemoveItemInInventory(Item item)
     {
-        int index = _itemsData.FindIndex(i => i == item);
+        int index = _itemsData.FindIndex(i => i.Item == item);
+        if (index < 0) return;
+
         _itemsData[index].RemoveItem();
+
         if (_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
+
         OnRemoveItem?.Invoke();
     }
 
@@ -66,13 +70,16 @@ public class InventoryManager : MonoBehaviour
     /// </summary>
     /// <param name="item"></param>
     /// <param name="qty"></param>
-    public void RemoveItemInInventory(ItemData item, int qty)
+    public void RemoveItemInInventory(Item item, int qty = 1)
     {
-        int index = _itemsData.FindIndex(i => i == item);
+        int index = _itemsData.FindIndex(i => i.Item == item);
+        if (index < 0) return;
+
         _itemsData[index].RemoveItem(qty);
 
-        if(_itemsData[index].Qty <= 0)
+        if (_itemsData[index].Qty <= 0)
             _itemsData.RemoveAt(index);
+
         OnRemoveItem?.Invoke();
     }
 

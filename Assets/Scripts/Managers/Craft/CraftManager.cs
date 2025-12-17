@@ -115,7 +115,7 @@ public class CraftManager : MonoBehaviour
             foreach (ItemData item in new List<ItemData>(InventoryManager.Instance.GetItems()))
             {
                 if (item.Item == ingridients.Item)
-                    InventoryManager.Instance.RemoveItemInInventory(item, ingridients.Qty);
+                    InventoryManager.Instance.RemoveItemInInventory(item.Item, ingridients.Qty);
             }
         }
     }

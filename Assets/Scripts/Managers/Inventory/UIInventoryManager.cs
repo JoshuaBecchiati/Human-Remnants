@@ -98,7 +98,11 @@ public class UIInventoryManager : MonoBehaviour
     private void CreateItemSlots()
     {
         foreach (Transform child in m_inventoryTransform)
+        {
+            Debug.Log("Remove Child");
             Destroy(child.gameObject);
+        }
+
 
         foreach (ItemData item in InventoryManager.Instance.GetItems())
         {
@@ -109,6 +113,7 @@ public class UIInventoryManager : MonoBehaviour
 
     public void CreateItemSlot(ItemData itemData, Transform parent)
     {
+        //Debug.Log("Remove Item");
         GameObject itemSlot = Instantiate(m_itemSlotPrefab, parent);
 
         // Object name
