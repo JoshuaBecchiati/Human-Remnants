@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Diary
   m_EditorClassIdentifier: 
   name: Wanderer diary
-  description: "I finally reached the island.\nThe fog never lifts, and the air feels
-    heavy, as if the land itself is watching me.\nShapes move beyond sight, and every
-    step forward feels like a mistake I\u2019ve already made before."
+  description: "\"I finally reached the island.\nThe fog never lifts, and the air
+    feels heavy, as if the land itself is watching me.\nShapes move beyond sight,
+    and every step forward feels like a mistake I\u2019ve already made before.\""
   icon: {fileID: 21300000, guid: cfbc88fdc4a6c6d40aebca8f499c3889, type: 3}
   usableType: 0
   itemType: 1
