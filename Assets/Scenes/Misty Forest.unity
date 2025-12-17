@@ -1043,7 +1043,7 @@ PrefabInstance:
     - target: {fileID: 6987928883966674464, guid: 3f8eda438d8aeab4d9223c5b53f5ef62,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.838085
+      value: -11.719
       objectReference: {fileID: 0}
     - target: {fileID: 6987928883966674464, guid: 3f8eda438d8aeab4d9223c5b53f5ef62,
         type: 3}
@@ -5229,6 +5229,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bottle.009
       objectReference: {fileID: 0}
+    - target: {fileID: 8265948030639602771, guid: 3d34adb10bdf7784aaad33b35cd059e6,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.25
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 660877738635415513, guid: 3d34adb10bdf7784aaad33b35cd059e6, type: 3}
     m_RemovedGameObjects: []
@@ -5238,10 +5243,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 521304651}
-    - targetCorrespondingSourceObject: {fileID: 4045492829957938060, guid: 3d34adb10bdf7784aaad33b35cd059e6,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 521304652}
   m_SourcePrefab: {fileID: 100100000, guid: 3d34adb10bdf7784aaad33b35cd059e6, type: 3}
 --- !u!1 &61486263 stripped
 GameObject:
@@ -44827,7 +44828,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 10000
     distanceFadeEnd: 10000
-    textureOffset: {x: -200.5445, y: -0, z: -0}
+    textureOffset: {x: -16.702293, y: -0, z: -0}
     falloffMode: 1
     maskMode: 0
     materialMask: {fileID: 0}
@@ -67944,7 +67945,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 10000
     distanceFadeEnd: 10000
-    textureOffset: {x: -200.5445, y: -0, z: -0}
+    textureOffset: {x: -16.702293, y: -0, z: -0}
     falloffMode: 1
     maskMode: 0
     materialMask: {fileID: 0}
@@ -69018,7 +69019,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 10000
     distanceFadeEnd: 10000
-    textureOffset: {x: -200.5445, y: -0, z: -0}
+    textureOffset: {x: -16.702293, y: -0, z: -0}
     falloffMode: 1
     maskMode: 0
     materialMask: {fileID: 0}
@@ -78082,7 +78083,7 @@ PrefabInstance:
     - target: {fileID: 3706368931317416246, guid: 3d34adb10bdf7784aaad33b35cd059e6,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -72.59599
+      value: -72.763
       objectReference: {fileID: 0}
     - target: {fileID: 3706368931317416246, guid: 3d34adb10bdf7784aaad33b35cd059e6,
         type: 3}
@@ -78092,7 +78093,7 @@ PrefabInstance:
     - target: {fileID: 3706368931317416246, guid: 3d34adb10bdf7784aaad33b35cd059e6,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 11.557
+      value: 11.342
       objectReference: {fileID: 0}
     - target: {fileID: 3706368931317416246, guid: 3d34adb10bdf7784aaad33b35cd059e6,
         type: 3}
@@ -78133,6 +78134,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bottle.009 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8265948030639602771, guid: 3d34adb10bdf7784aaad33b35cd059e6,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -80405,27 +80411,6 @@ MonoBehaviour:
   m_item: {fileID: 11400000, guid: 833b6102b0a5c5d4d923a245379d9cfb, type: 2}
   m_qty: 1
   m_textInfoPickUp: {fileID: 1571053236}
---- !u!135 &521304652
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 61486263}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.13
-  m_Center: {x: 0, y: 0.07317957, z: 0}
 --- !u!1 &523567674
 GameObject:
   m_ObjectHideFlags: 0
@@ -154584,7 +154569,7 @@ PrefabInstance:
     - target: {fileID: 3534633869010282941, guid: a501219ff3ba3ab42aae76e837efaea0,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.08500028
+      value: -0.96591496
       objectReference: {fileID: 0}
     - target: {fileID: 3534633869010282941, guid: a501219ff3ba3ab42aae76e837efaea0,
         type: 3}
@@ -173759,7 +173744,7 @@ PrefabInstance:
     - target: {fileID: 6987928883966674464, guid: 3f8eda438d8aeab4d9223c5b53f5ef62,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10.838085
+      value: -11.719
       objectReference: {fileID: 0}
     - target: {fileID: 6987928883966674464, guid: 3f8eda438d8aeab4d9223c5b53f5ef62,
         type: 3}
@@ -213983,7 +213968,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 10000
     distanceFadeEnd: 10000
-    textureOffset: {x: -200.5445, y: -0, z: -0}
+    textureOffset: {x: -16.702293, y: -0, z: -0}
     falloffMode: 1
     maskMode: 0
     materialMask: {fileID: 0}
@@ -248372,7 +248357,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 10000
     distanceFadeEnd: 10000
-    textureOffset: {x: -200.5445, y: -0, z: -0}
+    textureOffset: {x: -16.702293, y: -0, z: -0}
     falloffMode: 1
     maskMode: 0
     materialMask: {fileID: 0}
@@ -290556,7 +290541,7 @@ MonoBehaviour:
     invertFade: 0
     distanceFadeStart: 10000
     distanceFadeEnd: 10000
-    textureOffset: {x: -200.5445, y: -0, z: -0}
+    textureOffset: {x: -16.702293, y: -0, z: -0}
     falloffMode: 0
     maskMode: 0
     materialMask: {fileID: 0}
