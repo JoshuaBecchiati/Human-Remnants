@@ -57,7 +57,7 @@ public class LoadScene : MonoBehaviour
 
         SaveSystem.Instance.LoadGame();
 
-        go.transform.SetParent(m_partyParent, false);
+        go.transform.SetParent(m_partyParent, true);
 
         FindObjectOfType<CameraCtrl>().SetTarget(go.transform.Find("Model"));
         FindObjectOfType<HeadBobController>().SetCharacter(go.GetComponent<CharController>());
