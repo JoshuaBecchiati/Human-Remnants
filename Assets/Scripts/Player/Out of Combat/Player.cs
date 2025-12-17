@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Player : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class Player : MonoBehaviour
 
     [Header("Combat settings")]
     [SerializeField] private GameObject _combatPF;
+    [SerializeField] private List<AbilityData> m_abilites = new();
 
     // --- Proprierties ---
     public Characters Name => m_character;
@@ -18,5 +20,10 @@ public class Player : MonoBehaviour
     public void SetHealth(float health)
     {
         m_health = health;
+    }
+
+    public IReadOnlyList<AbilityData> GetAbilities()
+    {
+        return m_abilites;
     }
 }

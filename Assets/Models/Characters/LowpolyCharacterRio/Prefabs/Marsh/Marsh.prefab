@@ -2426,7 +2426,7 @@ MonoBehaviour:
   m_groundedSphere: 0.25
   m_groundMask:
     serializedVersion: 2
-    m_Bits: 7232
+    m_Bits: 7233
   m_groundCheck: {fileID: 2075411080403287508}
   m_cameraSpeed: 320
   m_cameraPivot: {fileID: 0}
@@ -2449,6 +2449,7 @@ MonoBehaviour:
   m_health: 100
   _combatPF: {fileID: 6021961570360790873, guid: 3e79628a43c05f8478606b8799d164cb,
     type: 3}
+  m_abilites: []
 --- !u!1 &9127284432318207285
 GameObject:
   m_ObjectHideFlags: 0

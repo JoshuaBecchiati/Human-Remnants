@@ -8,6 +8,7 @@ public class SaveData
     public PlayerData player;
     public List<MemberData> party = new();
     public List<ItemData> inventory = new();
+    public List<AbilityData> abilities = new();
     public List<string> collectedItems = new();
     public List<string> defeatedEnemies = new();
     public List<string> completedEvents = new();

@@ -1,11 +1,10 @@
 using Cinemachine;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerInCombat : UnitBase
 {
-    [Header("Abilities")]
-    [SerializeField] private List<AbilityData> _AbilitiesData = new();
     [SerializeField] private CinemachineVirtualCamera _VirtualCamera;
     [SerializeField] private Transform m_targetCamera;
     
@@ -26,19 +25,15 @@ public class PlayerInCombat : UnitBase
     {
         base.StartTurn();
 
+        List<AbilityData> abilities = AbilityManager.Instance.GetAbilites().ToList();
         BattleCameraManager.Instance.SetBattleCamera(_VirtualCamera);
         _VirtualCamera.LookAt = m_targetCamera;
 
-        if (_AbilitiesData != null)
-            foreach (AbilityData ability in _AbilitiesData)
+        if (abilities != null)
+            foreach (AbilityData ability in abilities)
                 ability.CharchingAbility();
 
         if (m_uiBattleManager != null)
-            m_uiBattleManager.CreateAbilityUI(_AbilitiesData);
-    }
-
-    public IReadOnlyList<AbilityData> GetAbilities()
-    {
-        return _AbilitiesData;
+            m_uiBattleManager.CreateAbilityUI(abilities);
     }
 }

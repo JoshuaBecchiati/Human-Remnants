@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-
     [SerializeField] private List<ItemData> _itemsData = new();
 
     [SerializeField] private BattleManager m_battleManager;
@@ -19,11 +18,6 @@ public class InventoryManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
         Instance = this;
     }
 
@@ -38,7 +32,7 @@ public class InventoryManager : MonoBehaviour
             m_battleManager.OnUseItem -= RemoveItemInInventory;
     }
 
-    public void AddItemInInventory( Item item, int qty)
+    public void AddItemInInventory(Item item, int qty)
     {
         if (_itemsData.Exists(i => i.Item == item))
         {
@@ -75,7 +69,6 @@ public class InventoryManager : MonoBehaviour
     public void RemoveItemInInventory(ItemData item, int qty)
     {
         int index = _itemsData.FindIndex(i => i == item);
-        Debug.Log("ITEM: " + _itemsData[index].Item);
         _itemsData[index].RemoveItem(qty);
 
         if(_itemsData[index].Qty <= 0)

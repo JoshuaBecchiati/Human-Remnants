@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [DefaultExecutionOrder(-10)]
@@ -40,8 +41,9 @@ public class BattleFlowManager : MonoBehaviour
     // --- Private ---
     private GameObject _enemy;
     private BattleSettings _battleSettings;
+    private List<BattleEnter> _enemies;
     private List<UnitBase> _units;
-    [SerializeField] private List<GameObject> _playersCombatPF;
+    private List<GameObject> _playersCombatPF;
 
     // --- Events ---
     public event Action<IReadOnlyList<GameObject>, IReadOnlyList<GameObject>> OnSetupBattle;
@@ -137,6 +139,13 @@ public class BattleFlowManager : MonoBehaviour
         _enemy.GetComponent<Collider>().isTrigger = false;
         _enemy.SetActive(false);
 
+        _enemies = FindObjectsOfType<BattleEnter>().ToList();
+        foreach (BattleEnter battle in _enemies)
+        {
+            if (!battle.IsDead)
+                battle.gameObject.SetActive(false);
+        }
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -168,12 +177,10 @@ public class BattleFlowManager : MonoBehaviour
             GameObject go = Instantiate(prefabs[i]);
             UnitBase u = go.GetComponentInChildren<UnitBase>();
 
-            Player p = m_players[i].transform.GetComponent<Player>();
-
             // Sync player exploration health with combat health
-            if (u.Team == UnitTeam.Player && u.Health >= p.Health)
+            if (u.Team == UnitTeam.Player && u.Health >= u.Health)
             {
-                u.SetHealth(p.Health);
+                u.SetHealth(u.Health);
             }
 
             OnCreateUnit.Invoke(u);
@@ -314,6 +321,7 @@ public class BattleFlowManager : MonoBehaviour
             yield return null;
         }
 
+
         if (_enemy.GetComponent<BattleEnter>().IsDead)
         {
             _enemy.SetActive(false);
@@ -324,6 +332,12 @@ public class BattleFlowManager : MonoBehaviour
             _enemy.SetActive(true);
             _enemy.GetComponent<EnemyStateManager>().StartPostFightCooldown();
             StartCoroutine(DisableEnemy());
+        }
+
+        foreach (BattleEnter battle in _enemies)
+        {
+            if (!battle.IsDead && _enemy != battle.gameObject)
+                battle.gameObject.SetActive(true);
         }
 
         Cursor.lockState = CursorLockMode.Locked;

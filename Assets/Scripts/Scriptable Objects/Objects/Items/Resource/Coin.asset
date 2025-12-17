@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fca21d21355bd34cbe4e7f00e9a5b7c, type: 3}
+  m_Name: Coin
+  m_EditorClassIdentifier: 
+  name: Coin
+  description: "Small coins, worn down by countless hands.\r\nThey don\u2019t look
+    worth much, but they still open doors, buy favors, and keep you alive a little
+    longer.\r\nIn a rotten world, even loose change has its use.\r\n"
+  icon: {fileID: 21300000, guid: 68744e208ebbe1747bfe6c31d4ead87d, type: 3}
+  usableType: 0
+  itemType: 1

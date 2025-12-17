@@ -16,11 +16,7 @@ MonoBehaviour:
   description: 'A versatile and volatile substance.
 
     Useful in crafting various
-    items, or consumed in small amounts to regain mental stability
-
-
-    Restores
-    10 SP.'
+    items, or consumed in small amounts to regain mental stability'
   icon: {fileID: 21300000, guid: 64e959b5748aa744784ed42278b92847, type: 3}
-  usableType: 1
-  itemType: 3
+  usableType: 0
+  itemType: 1

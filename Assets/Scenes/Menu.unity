@@ -401,7 +401,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &40247969
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2351,8 +2351,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "aaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\n 
-    aaaaaaaaaaaaaaaaaaaaaaaaaa\n   aaaaaaaaaaaaaaaaaaaaaaaaa"
+  m_text: 'Marx seeks forgotten stories.
+
+    His body masters martial arts.
+
+    Attacks
+    swift, graceful, and clean.
+
+    Moves like dancing through lines.
+
+    Dodges
+    and improvises danger.
+
+    Perfect for close-quarters fights.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e614dd0accedba2469cb64ac75250c02, type: 2}
   m_sharedMaterial: {fileID: -6244024684660766435, guid: e614dd0accedba2469cb64ac75250c02,
@@ -2380,19 +2391,19 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 48
-  m_fontSizeBase: 48
+  m_fontSize: 43
+  m_fontSizeBase: 43
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 8
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 30
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -14069,8 +14080,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "aaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaa\n 
-    aaaaaaaaaaaaaaaaaaaaaaaaaa\n   aaaaaaaaaaaaaaaaaaaaaaaaa"
+  m_text: 'Marsh investigates ancient texts.
+
+    His hands grip pistols with care.
+
+    He
+    strikes only what matters.
+
+    Eyes scan every shadow around.
+
+    Every move
+    is planned and precise.
+
+    Choose him for ranged combat style.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e614dd0accedba2469cb64ac75250c02, type: 2}
   m_sharedMaterial: {fileID: -6244024684660766435, guid: e614dd0accedba2469cb64ac75250c02,
@@ -14098,19 +14120,19 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 48
-  m_fontSizeBase: 48
+  m_fontSize: 42
+  m_fontSizeBase: 42
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 8
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 30
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
