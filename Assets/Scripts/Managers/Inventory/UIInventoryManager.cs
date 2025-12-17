@@ -40,8 +40,6 @@ public class UIInventoryManager : MonoBehaviour
 
         GameEvents.OnOpenCrafting += OpenInventory;
         GameEvents.OnCloseCrafting += CloseInventory;
-
-        CreateItemSlots();
     }
 
     private void OnDestroy()

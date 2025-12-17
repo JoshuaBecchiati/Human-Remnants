@@ -15,12 +15,11 @@ public class LoadScene : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-
-        InitMainCharacter();
     }
 
     private void Start()
     {
+        InitMainCharacter();
         if (SaveSystem.Instance.CurrentSave != null)
             _timePlay = SaveSystem.Instance.CurrentSave.totalPlayTime;
     }

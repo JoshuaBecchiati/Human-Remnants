@@ -178,9 +178,11 @@ public class BattleFlowManager : MonoBehaviour
             UnitBase u = go.GetComponentInChildren<UnitBase>();
 
             // Sync player exploration health with combat health
-            if (u.Team == UnitTeam.Player && u.Health >= u.Health)
+            if (u.Team == UnitTeam.Player)
             {
-                u.SetHealth(u.Health);
+                Player p = m_players[i].GetComponent<Player>();
+                if (u.Health >= p.Health)
+                    u.SetHealth(p.Health);
             }
 
             OnCreateUnit.Invoke(u);

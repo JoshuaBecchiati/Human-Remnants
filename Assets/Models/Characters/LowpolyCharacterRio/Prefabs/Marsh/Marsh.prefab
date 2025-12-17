@@ -2420,9 +2420,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 290baacc5ee7e2c40b623c1d4b792ba0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_jumpForce: 3
-  m_gravity: 16
-  m_jumpHorizontalSpeed: 8
+  m_jumpForce: 2.5
+  m_gravity: 18
+  m_jumpHorizontalSpeed: 6
   m_groundedSphere: 0.25
   m_groundMask:
     serializedVersion: 2

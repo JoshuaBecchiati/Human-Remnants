@@ -30,7 +30,7 @@ public class PartyManager : SaveableObject
 
                 GameObject go = Instantiate(player.gameObject);
                 go.transform.position = new Vector3(activePlayer.localPosition.x + 0.75f, activePlayer.localPosition.y + 0.2f, activePlayer.localPosition.z);
-                go.transform.SetParent(m_partyParent, false);
+                go.transform.SetParent(m_partyParent, true);
 
                 go.GetComponent<AllyController>().SetActivePlayer(activePlayer);
                 go.GetComponent<NavMeshAgent>().enabled = true;

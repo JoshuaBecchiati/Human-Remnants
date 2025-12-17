@@ -15,13 +15,6 @@ public class NPCInteract : SaveableObject
 
     private bool _isTalking;
 
-    private void Start()
-    {
-        m_interactText.SetActive(false);
-        if (m_character == FindAnyObjectByType<CharController>().GetComponent<Player>().Name)
-            gameObject.SetActive(false);
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if (!other.transform.parent.CompareTag("Player"))
@@ -64,7 +57,6 @@ public class NPCInteract : SaveableObject
 
     public void EndDialogue()
     {
-        Debug.Log("End Dialogue");
         m_dialogueCamera.SetActive(false);
 
         if (gameObject.activeSelf)
@@ -72,7 +64,6 @@ public class NPCInteract : SaveableObject
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        gameObject.SetActive(false);
     }
 
     private IEnumerator Wait()
@@ -88,7 +79,7 @@ public class NPCInteract : SaveableObject
     {
         PartyManager.Instance.AddPartyMember(m_character);
         SaveSystem.Instance.CurrentSave.completedEvents.Add(uniqueID);
-
+        gameObject.SetActive(false);
     }
 
     public override void SaveState(SaveData save)
@@ -99,9 +90,15 @@ public class NPCInteract : SaveableObject
 
     public override void LoadState(SaveData save)
     {
-        if (save.completedEvents.Contains(uniqueID))
+        m_interactText.SetActive(false);
+        if (m_character == FindAnyObjectByType<CharController>().GetComponent<Player>().Name)
             gameObject.SetActive(false);
-        else if (!gameObject.activeSelf)
-            gameObject.SetActive(true);
+        else
+        {
+            if (save.completedEvents.Contains(uniqueID))
+                gameObject.SetActive(false);
+            else if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+        }
     }
 }
