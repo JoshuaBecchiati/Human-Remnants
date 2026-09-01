@@ -332,7 +332,7 @@ public class BattleFlowManager : MonoBehaviour
         else
         {
             _enemy.SetActive(true);
-            _enemy.GetComponent<EnemyStateManager>().StartPostFightCooldown();
+            _enemy.GetComponent<EnemyMovementController>().StartPostFightCooldown();
             StartCoroutine(DisableEnemy());
         }
 

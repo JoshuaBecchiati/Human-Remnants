@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class LoadScene : MonoBehaviour
 {
+    public static LoadScene Instance { get; private set; }
+
     [SerializeField] private Transform m_partyParent;
     [SerializeField] private List<GameObject> m_CharactersPrefab;
     
     private float _timePlay;
 
     public float TimePlay => _timePlay;
-
-    public static LoadScene Instance { get; private set; }
 
     private void Awake()
     {

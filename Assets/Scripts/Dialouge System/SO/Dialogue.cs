@@ -19,6 +19,4 @@ public class Dialogue : ScriptableObject
         }
         return _dialogueLines[index];
     }
-
-
 }

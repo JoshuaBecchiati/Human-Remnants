@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Context dello state machine
-public class EnemyStateManager : MonoBehaviour
+public class EnemyMovementController : MonoBehaviour
 {
     // --- Inspector ---
     [SerializeField] private float m_postFightCooldown = 2f;

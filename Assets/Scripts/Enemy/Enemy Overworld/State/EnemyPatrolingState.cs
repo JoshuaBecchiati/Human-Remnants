@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class EnemyPatrolingState : EnemyBaseState
 {
-    public override void EnterState(EnemyStateManager manager)
+    public override void EnterState(EnemyMovementController manager)
     {
         manager.Movement.SetSpeed(EnemySpeed.Walk);
         manager.Movement.SearchWalkPoint();
     }
 
-    public override void ExitState(EnemyStateManager enemy) { }
+    public override void ExitState(EnemyMovementController enemy) { }
 
-    public override void UpdateState(EnemyStateManager manager)
+    public override void UpdateState(EnemyMovementController manager)
     {
         if (manager.Movement.IsPlayerVisible())
         {
